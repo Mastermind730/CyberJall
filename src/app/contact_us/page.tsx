@@ -2,13 +2,30 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const ContactPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [name,setName] = useState("");
+  const [email,setEmail]= useState("");
+  const [message,setMessage] = useState("");
 
-
-  const sendEmail=async()=>{
-        
+  const sendEmail=async(e:any)=>{
+    e.preventDefault();
+        const data ={
+          name,
+          email,message
+        }
+        console.log(data)
+        try{
+        const res=await axios.post("/api/sendEmail",data);
+          console.log(res.data);
+          setEmail("");
+          setName("");
+          setMessage("");
+        }catch(err){
+console.log("error submitting form",err);
+        }
   }
     
 
@@ -185,13 +202,14 @@ const ContactPage = () => {
                 delay: 0.8
               }}
             >
-              <form>
+              <form onSubmit={sendEmail}>
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
                     <div>
-                      <label className="block mb-2 text-sm font-medium text-gray-700">First Name</label>
+                      <label className="block mb-2 text-sm font-medium text-gray-700"> Name</label>
                       <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                         <input
+                        onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{setName(e?.target?.value)}}
                           type="text"
                           placeholder="John"
                           className="block w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white bg-opacity-90 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
@@ -199,44 +217,29 @@ const ContactPage = () => {
                       </motion.div>
                     </div>
 
-                    <div>
-                      <label className="block mb-2 text-sm font-medium text-gray-700">Last Name</label>
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                        <input
-                          type="text"
-                          placeholder="Doe"
-                          className="block w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white bg-opacity-90 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
-                        />
-                      </motion.div>
-                    </div>
+                   
                   </div>
 
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">Email address</label>
                     <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                       <input
+                       onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{setEmail(e?.target?.value)}}
+
                         type="email"
                         placeholder="johndoe@example.com"
                         className="block w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white bg-opacity-90 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
                       />
                     </motion.div>
                   </div>
-                  
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">Phone (Optional)</label>
-                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                      <input
-                        type="tel"
-                        placeholder="+1 (555) 000-0000"
-                        className="block w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white bg-opacity-90 border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
-                      />
-                    </motion.div>
-                  </div>
+                 
 
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">Message</label>
                     <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                       <textarea
+                        onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{setMessage(e?.target?.value)}}
+
                         className="block w-full h-32 px-5 py-3 text-gray-700 placeholder-gray-400 bg-white bg-opacity-90 border border-gray-200 rounded-lg md:h-48 focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 resize-none transition-all duration-300"
                         placeholder="How can we help you?"
                       ></textarea>
@@ -249,7 +252,7 @@ const ContactPage = () => {
                     className="relative group"
                   >
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:duration-200"></div>
-                    <button className="relative w-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                    <button  className="relative w-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
                       Send Message
                     </button>
                   </motion.div>

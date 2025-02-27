@@ -1,20 +1,23 @@
-import { NextResponse,NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { transport } from "@/lib/email";
 
-export async function POST(request:NextRequest){
-    const username=process.env.PUBLIC_EMAIL_USERNAME;
-    const password=process.env.PUBLIC_EMAIL_PASSWORD;
-    const myEmail=process.env.PUBLIC_PERSONAL_EMAIL;
+export async function POST(request: Request) {
+    const username = process.env.PUBLIC_EMAIL_USERNAME;
+    const password = process.env.PUBLIC_EMAIL_PASSWORD;
+    const myEmail = process.env.PUBLIC_PERSONAL_EMAIL;
 
-    const formData=await request.formData();
-    const name=formData.get('name');
-    const email=formData.get('email');
-    const message=formData.get('message');
-    const mobile_no=formData.get('number');
-    console.log(message);
+    try {
+        const formData = await request.json();
+        const name = formData.name;
+        const email = formData.email;
+        const message = formData.message;
+        console.log(message);
 
-    try{
-        const mailOptions: any = {
+        if (!name || !email || !message) {
+            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+        }
+
+        const mailOptions = {
             from: username,
             to: myEmail,
             subject: 'Thanks for connecting to CyberJall',
@@ -23,20 +26,15 @@ export async function POST(request:NextRequest){
                 <p>Email: ${email} </p>
                 <p>Message: ${message} </p>
             `,
+            replyTo: email
         };
-        
-        if (email !== null) {
-            mailOptions.replyTo = email;
-        }
         
         const mail = await transport.sendMail(mailOptions);
         
-       
+        return NextResponse.json({ message: "Success: email was sent" });
         
-    }catch(error) {  
-        console.log(`Error sending email :${error}`);  
-        NextResponse.json({message:"COULD NOT SEND MESSAGE"},{ status: 500 });
+    } catch (error) {  
+        console.log(`Error sending email: ${error}`);  
+        return NextResponse.json({ message: "COULD NOT SEND MESSAGE" }, { status: 500 });
     }
-
-    return NextResponse.json({message:"Success:email was sent"});
 }
