@@ -164,7 +164,7 @@ const Page = () => {
                   />
                   
                 </div> */}
-                <SignIn  />
+                <SignIn routing='hash' />
               </div>
               <motion.div 
                 className="h-32 relative overflow-hidden"
