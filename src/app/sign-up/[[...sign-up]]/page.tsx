@@ -1,8 +1,7 @@
 "use client";
-import { SignIn, SignUp } from '@clerk/nextjs';
+import {  SignUp } from '@clerk/nextjs';
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 
 

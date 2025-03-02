@@ -10,7 +10,7 @@ const ContactPage = () => {
   const [email,setEmail]= useState("");
   const [message,setMessage] = useState("");
 
-  const sendEmail=async(e:any)=>{
+  const sendEmail=async(e:Event)=>{
     e.preventDefault();
         const data ={
           name,
@@ -80,7 +80,7 @@ console.log("error submitting form",err);
             transition={{ duration: 0.5, delay: 0.3 }}
             className="text-3xl font-bold text-gray-800 md:text-4xl lg:text-5xl"
           >
-            Let's Start a Conversation
+            Let&apos;s Start a Conversation
           </motion.h1>
 
           <motion.p
@@ -89,7 +89,7 @@ console.log("error submitting form",err);
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mt-4 max-w-2xl mx-auto text-gray-600"
           >
-            We'd love to hear from you. Our team is ready to assist with any questions or inquiries you may have.
+            We&apos;d love to hear from you. Our team is ready to assist with any questions or inquiries you may have.
           </motion.p>
         </motion.div>
 

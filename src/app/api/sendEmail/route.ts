@@ -1,9 +1,9 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { transport } from "@/lib/email";
 
 export async function POST(request: Request) {
     const username = process.env.PUBLIC_EMAIL_USERNAME;
-    const password = process.env.PUBLIC_EMAIL_PASSWORD;
+    // const password = process.env.PUBLIC_EMAIL_PASSWORD;
     const myEmail = process.env.PUBLIC_PERSONAL_EMAIL;
 
     try {
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             replyTo: email
         };
         
-        const mail = await transport.sendMail(mailOptions);
+         await transport.sendMail(mailOptions);
         
         return NextResponse.json({ message: "Success: email was sent" });
         
