@@ -10,7 +10,7 @@ const ContactPage = () => {
   const [email,setEmail]= useState("");
   const [message,setMessage] = useState("");
 
-  const sendEmail=async(e:Event)=>{
+  const sendEmail=async(e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
         const data ={
           name,
