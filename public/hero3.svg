@@ -1,0 +1,30 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1920" height="1080" fill="#1A1A1A"/>
+  
+  <!-- Network Pattern -->
+  <g transform="translate(960,540)">
+    <circle cx="0" cy="0" r="200" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2" fill="none"/>
+    <circle cx="-100" cy="-100" r="20" fill="#FF3E3E" fillOpacity="0.2"/>
+    <circle cx="100" cy="-100" r="20" fill="#FF3E3E" fillOpacity="0.2"/>
+    <circle cx="0" cy="100" r="20" fill="#FF3E3E" fillOpacity="0.2"/>
+    <circle cx="-150" cy="50" r="20" fill="#FF3E3E" fillOpacity="0.2"/>
+    <circle cx="150" cy="50" r="20" fill="#FF3E3E" fillOpacity="0.2"/>
+    
+    <!-- Connection Lines -->
+    <line x1="-100" y1="-100" x2="100" y2="-100" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2"/>
+    <line x1="-100" y1="-100" x2="0" y2="100" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2"/>
+    <line x1="100" y1="-100" x2="0" y2="100" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2"/>
+    <line x1="-150" y1="50" x2="150" y2="50" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2"/>
+    <line x1="-150" y1="50" x2="0" y2="100" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2"/>
+    <line x1="150" y1="50" x2="0" y2="100" stroke="#FF3E3E" strokeOpacity="0.1" strokeWidth="2"/>
+  </g>
+  
+  <!-- Lock Pattern -->
+  <g transform="translate(960,540)">
+    <path d="M-25 -40V-20H25V-40C25 -51 16 -60 5 -60C-6 -60 -15 -51 -15 -40" stroke="#FF3E3E" strokeWidth="4" fill="none"/>
+    <rect x="-30" y="-20" width="60" height="40" rx="5" fill="#FF3E3E" fillOpacity="0.3"/>
+  </g>
+  
+  <!-- Grid Pattern -->
+  <path d="M0 0h1920v1080h-1920z" stroke="#FF3E3E" strokeOpacity="0.05" strokeWidth="1" pathLength="1" strokeDasharray="4 4"/>
+</svg> 
