@@ -6,61 +6,67 @@ export const About: FC = () => {
   return (
     <section className="py-20 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center">
+        {/* About Us Section */}
+        <div className="lg:text-center mb-20">
           <h2 className="text-base text-red-600 font-semibold tracking-wide uppercase">About Us</h2>
           <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-            Securing the Digital Future
+            Securing the Digital Future Together
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
-            CyberJall is your trusted partner in cybersecurity, connecting organizations with top security talent worldwide.
+          <p className="mt-4 max-w-3xl text-xl text-gray-300 lg:mx-auto">
+            We are a community-driven ecosystem dedicated to making the digital world safer through innovative collaboration between security companies and organizations.
           </p>
         </div>
 
+        {/* Business Features */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3 mb-20">
+          <div className="bg-gray-800 p-6 rounded-lg">
+            <h3 className="text-xl font-bold text-white mb-4">Business To Business</h3>
+            <p className="text-gray-300">India's pioneering B2B bug bounty platform connecting enterprises with security experts.</p>
+          </div>
+          <div className="bg-gray-800 p-6 rounded-lg">
+            <h3 className="text-xl font-bold text-white mb-4">Business Collaboration</h3>
+            <p className="text-gray-300">Facilitating partnerships between businesses and leading security companies for comprehensive vulnerability assessment.</p>
+          </div>
+          <div className="bg-gray-800 p-6 rounded-lg">
+            <h3 className="text-xl font-bold text-white mb-4">Secure Environment</h3>
+            <p className="text-gray-300">Providing a secure testing environment with robust communication channels and detailed reporting systems.</p>
+          </div>
+        </div>
+
+        {/* Scope Section */}
         <div className="mt-20">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="relative">
-              <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-red-600 text-white">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+          <h2 className="text-2xl font-bold text-white mb-8">Program Scope</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            {[
+              'Web Applications',
+              'Mobile Applications',
+              'APIs',
+              'Backend Infrastructure',
+              'SaaS Solutions',
+              'Cloud Services'
+            ].map((item, index) => (
+              <div key={index} className="bg-gray-800 p-4 rounded-lg">
+                <p className="text-white text-center">{item}</p>
               </div>
-              <div className="ml-16">
-                <h3 className="text-lg font-medium text-white">Advanced Security Solutions</h3>
-                <p className="mt-2 text-base text-gray-300">
-                  We provide comprehensive security assessments and solutions tailored to your organization's needs.
-                </p>
-              </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            {/* Feature 2 */}
-            <div className="relative">
-              <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-red-600 text-white">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div className="ml-16">
-                <h3 className="text-lg font-medium text-white">Expert Network</h3>
-                <p className="mt-2 text-base text-gray-300">
-                  Access our network of verified security researchers and penetration testers.
-                </p>
-              </div>
+        {/* What We Offer */}
+        <div className="mt-20">
+          <h2 className="text-2xl font-bold text-white mb-8">What We Offer</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-red-500 mb-3">Rewards</h3>
+              <p className="text-gray-300">Competitive compensation for validated security vulnerabilities based on severity and impact.</p>
             </div>
-
-            {/* Feature 3 */}
-            <div className="relative">
-              <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-red-600 text-white">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <div className="ml-16">
-                <h3 className="text-lg font-medium text-white">Guaranteed Results</h3>
-                <p className="mt-2 text-base text-gray-300">
-                  Our platform ensures quality results with a structured reporting and verification process.
-                </p>
-              </div>
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-red-500 mb-3">Recognition</h3>
+              <p className="text-gray-300">Public acknowledgment and recognition for companies contributing to security improvements.</p>
+            </div>
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-xl font-bold text-red-500 mb-3">Safe Harbor</h3>
+              <p className="text-gray-300">Legal protection guarantee for companies reporting vulnerabilities within program guidelines.</p>
             </div>
           </div>
         </div>

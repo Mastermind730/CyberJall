@@ -16,13 +16,13 @@ export const Navbar: FC = () => {
               <Link href="/">
                 <div className="flex items-center">
                   <Image
-                    src="/logo.png"
+                    src="/image.png"
                     alt="CyberJall Logo"
-                    width={40}
-                    height={40}
+                    width={65}
+                    height={65}
                     className="cursor-pointer"
                   />
-                  <span className="ml-2 text-white text-xl font-bold">CyberJall</span>
+                  
                 </div>
               </Link>
             </div>
