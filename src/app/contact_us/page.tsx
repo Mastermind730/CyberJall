@@ -35,7 +35,7 @@ const ContactPage = () => {
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-red-950 overflow-hidden relative">
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute  inset-0 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
           animate={{ 
@@ -68,12 +68,12 @@ const ContactPage = () => {
         />
       </div>
 
-      <div className="container px-6 py-12 mx-auto relative z-10">
+      <div className="container  px-6 py-12 mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mt-10 mb-16"
         >
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
