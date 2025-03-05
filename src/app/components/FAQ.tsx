@@ -1,46 +1,39 @@
+"use client";
 import React, { useState } from 'react';
 import { ChevronDown, Shield, Search, Clock, FileText, Globe } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
-
-interface FAQProps{
-    question:string;
-    answer:string[];
-    icon:LucideIcon
-
+interface FAQProps {
+    question: string;
+    answer: string[];
+    icon: LucideIcon
 }
 
-
-
-const FAQItem:React.FC<FAQProps> = ({ question, answer, icon: Icon }) => {
+const FAQItem: React.FC<FAQProps> = ({ question, answer, icon: Icon }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-200 py-4">
+    <div className="border-b border-gray-800/50 py-4">
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        className="flex w-full items-center justify-between text-left hover:bg-gray-50 transition-colors p-4 rounded-lg"
+        className="flex w-full items-center justify-between text-left hover:bg-red-900/10 transition-colors p-4 rounded-lg group"
       >
         <div className="flex items-center space-x-4">
-          <Icon className="text-blue-600 w-6 h-6" />
-          <h3 className="text-lg font-semibold text-gray-800">{question}</h3>
+          <Icon className="text-red-500 w-6 h-6 group-hover:text-red-400 transition-colors" />
+          <h3 className="text-lg font-semibold text-gray-200 group-hover:text-red-300 transition-colors">{question}</h3>
         </div>
         <ChevronDown 
-          className={`w-5 h-5 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          className={`w-5 h-5 text-gray-500 transform transition-all ${isOpen ? 'rotate-180 text-red-500' : 'group-hover:text-red-400'}`} 
         />
       </button>
       {isOpen && (
-        <div className="px-4 pb-4 text-gray-600">
-          {typeof answer === 'string' ? (
-            <p>{answer}</p>
-          ) : (
-            <ul className="space-y-2 pl-10 list-disc">
-              {answer.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          )}
+        <div className="px-4 pb-4 text-gray-400">
+          <ul className="space-y-2 pl-10 list-disc">
+            {answer.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
@@ -102,29 +95,31 @@ const CyberJallFAQ = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-gray-800 mb-4">
-          Frequently Asked Questions
-        </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover how CyberJall ensures your web application's security with our comprehensive penetration testing services.
-        </p>
-      </div>
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-        {faqData.map((faq, index) => (
-          <FAQItem 
-            key={index} 
-            question={faq.question} 
-            answer={faq.answer} 
-            icon={faq.icon} 
-          />
-        ))}
-      </div>
-      <div className="text-center mt-12">
-        <p className="text-gray-600">
-          Have more questions? <Link href="/contact_us" className="text-blue-600 hover:underline">Contact our experts</Link>
-        </p>
+    <div className="bg-black min-h-screen py-16">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-red-500 mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Discover how CyberJall ensures your web application's security with our comprehensive penetration testing services.
+          </p>
+        </div>
+        <div className="bg-gray-900 shadow-2xl shadow-red-900/30 rounded-xl overflow-hidden border border-gray-800">
+          {faqData.map((faq, index) => (
+            <FAQItem 
+              key={index} 
+              question={faq.question} 
+              answer={faq.answer} 
+              icon={faq.icon} 
+            />
+          ))}
+        </div>
+        <div className="text-center mt-12">
+          <p className="text-gray-500">
+            Have more questions? <Link href="/contact_us" className="text-red-500 hover:text-red-400 transition-colors">Contact our experts</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
