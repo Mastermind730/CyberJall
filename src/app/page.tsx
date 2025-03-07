@@ -5,6 +5,7 @@ import { AboutUs } from './components/sections/AboutUs';
 import { SmartestChoice } from './components/sections/SmartestChoice';
 import { WhatWeOffer } from './components/sections/WhatWeOffer';
 import { Scope } from './components/sections/Scope';
+import { HowItWorks } from './components/sections/HowItWorks';
 
 const Home: NextPage = () => {
   return (
@@ -15,6 +16,7 @@ const Home: NextPage = () => {
       <SmartestChoice />
       <WhatWeOffer />
       <Scope />
+      <HowItWorks />
     </main>
   );
 };
