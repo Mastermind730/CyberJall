@@ -212,8 +212,11 @@ export default function Dashboard() {
   );
 }
 
+
+
+
 // Helper function to get appropriate icon for each asset type
-function getIconForAssetType(type) {
+function getIconForAssetType(type:string) {
   switch (type) {
     case 'Web App':
       return 'fa-globe';
