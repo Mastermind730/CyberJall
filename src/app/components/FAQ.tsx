@@ -102,7 +102,7 @@ const CyberJallFAQ = () => {
             Frequently Asked Questions
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Discover how CyberJall ensures your web application's security with our comprehensive penetration testing services.
+            Discover how CyberJall ensures your web application&apos;s security with our comprehensive penetration testing services.
           </p>
         </div>
         <div className="bg-gray-900 shadow-2xl shadow-red-900/30 rounded-xl overflow-hidden border border-gray-800">
