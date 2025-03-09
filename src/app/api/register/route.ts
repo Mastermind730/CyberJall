@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
 // import {PrismaClient} from "@/prisma/client"
 
@@ -13,7 +13,7 @@ try{
     }
     else{
 
-        const hashedPasswd =  await bcrypt.hash(password,12);
+        // const hashedPasswd =  await bcrypt.hash(password,12);
 
     //    const user  = await  prisma.user.create({
     //         name:name,
@@ -26,8 +26,8 @@ try{
 
     }
 }
-    catch(error:Error){
-        return NextResponse.json("Error registering user",{status:500})
+    catch(error:unknown){
+        return NextResponse.json(`Error registering user , ${error}`,{status:500})
     }
 
 

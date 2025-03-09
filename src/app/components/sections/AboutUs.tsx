@@ -36,11 +36,11 @@ export const AboutUs: FC = () => {
             </p>
             <div className="w-24 h-1.5 bg-gradient-to-r from-red-500 to-red-600 mx-auto rounded-full my-8"></div>
             <p className="mt-6 text-xl leading-8 text-gray-300 max-w-4xl mx-auto font-light">
-              Welcome to CyberJall, where security meets innovation. We're not just another Cyber Security platform,
-              we're a community-driven ecosystem passionate about making the digital world safer for everyone.
+              Welcome to CyberJall, where security meets innovation. We&apos;re not just another Cyber Security platform,
+              we&apos;re a community-driven ecosystem passionate about making the digital world safer for everyone.
             </p>
             <p className="mt-8 text-xl leading-8 text-gray-300 max-w-4xl mx-auto font-light">
-              At CyberJall, we believe that security is not a destination; it's a journey. That's why we've built 
+              At CyberJall, we believe that security is not a destination; it&apos;s a journey. That&apos;s why we&apos;ve built 
               a platform that fosters collaboration between security companies and organizations, empowering them 
               to identify and resolve vulnerabilities before they can be exploited.
             </p>

@@ -1,5 +1,5 @@
 'use client';
-import Image from 'next/image';
+// import Image from 'next/image';
 import type { FC } from 'react';
 
 export const About: FC = () => {
@@ -21,7 +21,7 @@ export const About: FC = () => {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3 mb-20">
           <div className="bg-gray-800 p-6 rounded-lg">
             <h3 className="text-xl font-bold text-white mb-4">Business To Business</h3>
-            <p className="text-gray-300">India's pioneering B2B bug bounty platform connecting enterprises with security experts.</p>
+            <p className="text-gray-300">India&apos;s pioneering B2B bug bounty platform connecting enterprises with security experts.</p>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg">
             <h3 className="text-xl font-bold text-white mb-4">Business Collaboration</h3>

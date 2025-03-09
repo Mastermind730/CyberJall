@@ -76,7 +76,7 @@ export const SmartestChoice: FC = () => {
             <div className="mt-8">
               <h3 className="text-xl font-bold text-white mb-4">Business To Business</h3>
               <p className="text-gray-300 leading-relaxed">
-                CyberJall is India's first B2B bug bounty platform, designed specifically for enterprise collaboration. 
+                CyberJall is India&apos;s first B2B bug bounty platform, designed specifically for enterprise collaboration. 
                 Our platform streamlines the process of identifying and resolving security vulnerabilities, making it 
                 easier for businesses to maintain robust cybersecurity measures.
               </p>

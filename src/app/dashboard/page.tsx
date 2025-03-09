@@ -1,13 +1,13 @@
 // pages/dashboard.js
 "use client";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function Dashboard() {
-  const [companyName, setCompanyName] = useState('CyberTech Solutions');
-  const [userName, setUserName] = useState('John Doe');
+  // const [companyName, setCompanyName] = useState('CyberTech Solutions');
+  // const [userName, setUserName] = useState('John Doe');
   const [activeAssetType, setActiveAssetType] = useState('Web App');
 
   // Animation variants
