@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <!-- Background Elements -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3C00" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#FF8100" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3C00"/>
+      <stop offset="100%" stop-color="#FF8100"/>
+    </linearGradient>
+    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3C00" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#FF8100" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="400" cy="400" r="380" fill="url(#bgGradient)" opacity="0.2"/>
+
+  <!-- Digital Circle - Exterior Ring -->
+  <circle cx="400" cy="400" r="350" stroke="#FF6600" stroke-width="2" fill="none" stroke-dasharray="20 15" opacity="0.8"/>
+  
+  <!-- Additional Rings -->
+  <circle cx="400" cy="400" r="300" stroke="#FF6600" stroke-width="1.5" fill="none" stroke-dasharray="8 12" opacity="0.6"/>
+  <circle cx="400" cy="400" r="260" stroke="#FF3C00" stroke-width="2" fill="none" opacity="0.4"/>
+
+  <!-- Main Shield -->
+  <g filter="url(#glow)">
+    <path d="M400 150 L250 220 L250 350 C250 500 320 580 400 620 C480 580 550 500 550 350 L550 220 Z" fill="none" stroke="url(#shieldGradient)" stroke-width="12" stroke-linejoin="round" opacity="0.9"/>
+  </g>
+
+  <!-- Lock -->
+  <g transform="translate(320, 320) scale(0.8)">
+    <rect x="50" y="80" width="160" height="130" rx="15" ry="15" fill="#333" stroke="#FF6600" stroke-width="6"/>
+    <path d="M75 80 L75 50 C75 0 185 0 185 50 L185 80" fill="none" stroke="#FF6600" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="130" cy="145" r="25" fill="#FF6600" opacity="0.9"/>
+    <rect x="125" y="120" width="10" height="50" rx="5" ry="5" fill="#333" transform="rotate(-45, 130, 145)"/>
+  </g>
+
+  <!-- Binary Code Elements -->
+  <g opacity="0.5">
+    <!-- Left Side Binary -->
+    <text x="120" y="210" font-family="monospace" font-size="12" fill="#FF6600">01101100</text>
+    <text x="100" y="230" font-family="monospace" font-size="12" fill="#FF6600">10110101</text>
+    <text x="80" y="250" font-family="monospace" font-size="12" fill="#FF6600">11100011</text>
+    <text x="90" y="270" font-family="monospace" font-size="12" fill="#FF6600">00110110</text>
+    <text x="110" y="290" font-family="monospace" font-size="12" fill="#FF6600">10101010</text>
+    <text x="130" y="310" font-family="monospace" font-size="12" fill="#FF6600">11001100</text>
+    <text x="110" y="330" font-family="monospace" font-size="12" fill="#FF6600">01101001</text>
+    <text x="90" y="350" font-family="monospace" font-size="12" fill="#FF6600">10010110</text>
+    <text x="80" y="370" font-family="monospace" font-size="12" fill="#FF6600">11110000</text>
+    <text x="70" y="390" font-family="monospace" font-size="12" fill="#FF6600">00001111</text>
+    <text x="85" y="410" font-family="monospace" font-size="12" fill="#FF6600">10101010</text>
+    <text x="100" y="430" font-family="monospace" font-size="12" fill="#FF6600">11001100</text>
+    <text x="110" y="450" font-family="monospace" font-size="12" fill="#FF6600">10011001</text>
+    <text x="130" y="470" font-family="monospace" font-size="12" fill="#FF6600">01010101</text>
+    <text x="150" y="490" font-family="monospace" font-size="12" fill="#FF6600">11110000</text>
+    
+    <!-- Right Side Binary -->
+    <text x="600" y="210" font-family="monospace" font-size="12" fill="#FF6600">10101010</text>
+    <text x="620" y="230" font-family="monospace" font-size="12" fill="#FF6600">01100110</text>
+    <text x="640" y="250" font-family="monospace" font-size="12" fill="#FF6600">11001100</text>
+    <text x="630" y="270" font-family="monospace" font-size="12" fill="#FF6600">10011001</text>
+    <text x="610" y="290" font-family="monospace" font-size="12" fill="#FF6600">01010101</text>
+    <text x="590" y="310" font-family="monospace" font-size="12" fill="#FF6600">11001100</text>
+    <text x="610" y="330" font-family="monospace" font-size="12" fill="#FF6600">10110110</text>
+    <text x="630" y="350" font-family="monospace" font-size="12" fill="#FF6600">01001001</text>
+    <text x="650" y="370" font-family="monospace" font-size="12" fill="#FF6600">10101010</text>
+    <text x="670" y="390" font-family="monospace" font-size="12" fill="#FF6600">11110000</text>
+    <text x="650" y="410" font-family="monospace" font-size="12" fill="#FF6600">00001111</text>
+    <text x="630" y="430" font-family="monospace" font-size="12" fill="#FF6600">10101010</text>
+    <text x="610" y="450" font-family="monospace" font-size="12" fill="#FF6600">01100110</text>
+    <text x="590" y="470" font-family="monospace" font-size="12" fill="#FF6600">10011001</text>
+    <text x="570" y="490" font-family="monospace" font-size="12" fill="#FF6600">01010101</text>
+  </g>
+
+  <!-- Connection Lines -->
+  <g stroke="#FF6600" stroke-width="1.5" opacity="0.3">
+    <line x1="180" y1="220" x2="250" y2="260" />
+    <line x1="190" y1="280" x2="260" y2="300" />
+    <line x1="200" y1="340" x2="270" y2="320" />
+    <line x1="170" y1="400" x2="260" y2="380" />
+    <line x1="210" y1="450" x2="280" y2="420" />
+    
+    <line x1="620" y1="220" x2="550" y2="260" />
+    <line x1="610" y1="280" x2="540" y2="300" />
+    <line x1="600" y1="340" x2="530" y2="320" />
+    <line x1="630" y1="400" x2="540" y2="380" />
+    <line x1="590" y1="450" x2="520" y2="420" />
+  </g>
+
+  <!-- Network Nodes -->
+  <g>
+    <circle cx="180" cy="220" r="6" fill="#FF3C00" />
+    <circle cx="190" cy="280" r="6" fill="#FF3C00" />
+    <circle cx="200" cy="340" r="6" fill="#FF3C00" />
+    <circle cx="170" cy="400" r="6" fill="#FF3C00" />
+    <circle cx="210" cy="450" r="6" fill="#FF3C00" />
+    
+    <circle cx="620" cy="220" r="6" fill="#FF3C00" />
+    <circle cx="610" cy="280" r="6" fill="#FF3C00" />
+    <circle cx="600" cy="340" r="6" fill="#FF3C00" />
+    <circle cx="630" cy="400" r="6" fill="#FF3C00" />
+    <circle cx="590" cy="450" r="6" fill="#FF3C00" />
+  </g>
+
+  <!-- Small Shield Decorations -->
+  <g opacity="0.7">
+    <path d="M220 180 L200 200 L200 230 C200 260 210 270 220 280 C230 270 240 260 240 230 L240 200 Z" fill="none" stroke="#FF6600" stroke-width="2" />
+    <path d="M580 180 L560 200 L560 230 C560 260 570 270 580 280 C590 270 600 260 600 230 L600 200 Z" fill="none" stroke="#FF6600" stroke-width="2" />
+    <path d="M180 520 L160 540 L160 570 C160 600 170 610 180 620 C190 610 200 600 200 570 L200 540 Z" fill="none" stroke="#FF6600" stroke-width="2" />
+    <path d="M620 520 L600 540 L600 570 C600 600 610 610 620 620 C630 610 640 600 640 570 L640 540 Z" fill="none" stroke="#FF6600" stroke-width="2" />
+  </g>
+
+  <!-- Central Glow -->
+  <circle cx="400" cy="400" r="120" fill="url(#glowGradient)" opacity="0.1" filter="url(#glow)"/>
+
+  <!-- Pulse Animation -->
+  <circle cx="400" cy="400" r="220" stroke="#FF6600" stroke-width="3" fill="none" opacity="0.3">
+    <animate attributeName="r" values="220;240;220" dur="4s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="4s" repeatCount="indefinite" />
+  </circle>
+</svg>
