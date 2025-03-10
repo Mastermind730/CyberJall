@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { ChevronDown, Shield, Search, Clock, FileText, Globe } from 'lucide-react';
+import { ChevronDown, Shield, Search, Clock, FileText, Globe, Settings, AlertCircle, Server, Check, Users, ArrowRight } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
@@ -58,7 +58,8 @@ const CyberJallFAQ = () => {
         "Prevent data breaches, financial loss, and reputational damage.",
         "Identify security gaps before attackers can exploit them.",
         "Ensure compliance with industry regulations.",
-        "Strengthen customer trust through proactive security measures."
+        "Strengthen customer trust through proactive security measures.",
+        "Reduce downtime by preventing security incidents that disrupt business operations."
       ],
       icon: Search
     },
@@ -68,7 +69,8 @@ const CyberJallFAQ = () => {
         "At least once a year.",
         "When launching new web applications or making significant updates.",
         "After integrating third-party services handling sensitive data.",
-        "Following a security incident or vulnerability suspicion."
+        "Following a security incident or vulnerability suspicion.",
+        "When regulatory bodies require periodic security assessments."
       ],
       icon: Clock
     },
@@ -91,6 +93,61 @@ const CyberJallFAQ = () => {
         "Provides audit-ready reports from verified security providers."
       ],
       icon: Globe
+    },
+    {
+      question: "What is the Difference Between Automated and Manual Penetration Testing?",
+      answer: [
+        "Automated testing uses security tools to scan for known vulnerabilities quickly but may miss complex threats.",
+        "Manual testing is performed by ethical hackers who simulate real-world attack scenarios to uncover hidden weaknesses.",
+        "CyberJall's approach: We provide access to providers that offer both methods for a thorough security evaluation."
+      ],
+      icon: Settings
+    },
+    {
+      question: "Will Penetration Testing Affect My Web Application's Performance?",
+      answer: [
+        "No, professional penetration testers follow a structured methodology to ensure minimal disruption.",
+        "Testing can be scheduled during off-peak hours to prevent impact on daily operations."
+      ],
+      icon: AlertCircle
+    },
+    {
+      question: "Can I Customize My Penetration Testing Scope?",
+      answer: [
+        "Yes! CyberJalls platform allows businesses to select security providers and customize testing parameters.",
+        "Targeted application areas (e.g., login, payment gateway, APIs).",
+        "Depth of testing (basic scanning vs. advanced exploitation).",
+        "Compliance-focused testing for industry-specific security needs."
+      ],
+      icon: Server
+    },
+    {
+      question: "What Happens If Vulnerabilities Are Found?",
+      answer: [
+        "A detailed remediation plan from cybersecurity professionals.",
+        "Re-testing services to ensure issues are resolved.",
+        "Continuous security monitoring (optional) to prevent future risks."
+      ],
+      icon: Check
+    },
+    {
+      question: "How is CyberJall Different From Hiring an In-House Security Team?",
+      answer: [
+        "Hiring an in-house team is costly and time-consuming.",
+        "CyberJall offers on-demand access to verified security experts without long-term hiring commitments.",
+        "Our marketplace lets you compare multiple providers and choose the best fit for your business."
+      ],
+      icon: Users
+    },
+    {
+      question: "How Do I Get Started With Penetration Testing on CyberJall?",
+      answer: [
+        "Explore our marketplace to find security experts.",
+        "Select a package that fits your security needs.",
+        "Define your testing scope and schedule an assessment.",
+        "Receive a detailed report with remediation steps."
+      ],
+      icon: ArrowRight
     }
   ];
 
