@@ -6,9 +6,12 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState('hero');
+  const [isMounted, setIsMounted] = useState(false);
+
 
   useEffect(() => {
     setIsLoaded(true);
+    setIsMounted(true);
     
     const handleScroll = () => {
       const sections = ['hero', 'about', 'mission', 'features', 'cta'];
@@ -28,6 +31,11 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+   // Return a simple loading state or null while client-side code isn't ready
+   if (!isMounted) {
+    return null; // Return nothing during SSR to prevent hydration mismatch
+  }
 
   return (
     <div className="bg-black text-white min-h-screen">
@@ -571,7 +579,7 @@ export default function Home() {
           </svg>
         </div>
         
-        <div className="container mx-auto px-6 relative z-10">
+        <div id='why-choose-us' className="container mx-auto px-6 relative z-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
