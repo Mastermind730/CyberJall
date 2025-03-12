@@ -225,7 +225,7 @@ const NewNavbar = () => {
                         animate="visible"
                         exit="exit"
                       >
-                        {item?.items.map((subItem, subIndex) => (
+                        {item?.items?.map((subItem, subIndex) => (
                           <Link
                             key={subIndex}
                             href={subItem.link}
