@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 const NewNavbar = () => {
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState<null | string>(null);
 
-  const handleDropdownToggle = (menu) => {
+  const handleDropdownToggle = (menu:string) => {
     if (activeDropdown === menu) {
       setActiveDropdown(null);
     } else {
