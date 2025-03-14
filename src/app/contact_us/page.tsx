@@ -3,31 +3,53 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { verifyCaptcha } from '../api/ServerAction';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const ContactPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [workEmail, setWorkEmail] = useState("");
+  const [inquiryType, setInquiryType] = useState("business");
   const [message, setMessage] = useState("");
+
+  const recaptchaRef = React.useRef<ReCAPTCHA>(null);
+
 
   const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
-      name,
-      email,
+      fullName,
+      companyName,
+      workEmail,
+      inquiryType,
       message
     }
     console.log(data)
     try {
       const res = await axios.post("/api/sendEmail", data);
       console.log(res.data);
-      setEmail("");
-      setName("");
+      setFullName("");
+      setCompanyName("");
+      setWorkEmail("");
+      setInquiryType("business");
       setMessage("");
     } catch (err) {
       console.log("error submitting form", err);
     }
   }
+
+  const handleCaptchaSubmission = async (token: string | null) => {
+    if (token) {
+        try {
+            await verifyCaptcha(token);
+            
+        } catch (error) {
+            console.error('Error verifying captcha:', error);
+        }
+    }
+};
 
   useEffect(() => {
     setIsLoaded(true);
@@ -35,7 +57,7 @@ const ContactPage = () => {
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-red-950 overflow-hidden relative">
-      <div className="absolute  inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
           animate={{ 
@@ -68,7 +90,7 @@ const ContactPage = () => {
         />
       </div>
 
-      <div className="container  px-6 py-12 mx-auto relative z-10">
+      <div className="container px-6 py-12 mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -212,29 +234,62 @@ const ContactPage = () => {
             >
               <form onSubmit={sendEmail}>
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                    <div>
-                      <label className="block mb-2 text-sm font-medium text-neutral-300">Name</label>
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                        <input
-                          onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setName(e?.target?.value) }}
-                          type="text"
-                          placeholder="Your Name"
-                          className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
-                        />
-                      </motion.div>
-                    </div>
-                    <div>
-                      <label className="block mb-2 text-sm font-medium text-neutral-300">Email Address</label>
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                        <input
-                          onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setEmail(e?.target?.value) }}
-                          type="email"
-                          placeholder="you@example.com"
-                          className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
-                        />
-                      </motion.div>
-                    </div>
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-neutral-300">Full Name*</label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setFullName(e?.target?.value) }}
+                        value={fullName}
+                        type="text"
+                        placeholder="Your Full Name"
+                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        required
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-neutral-300">Company Name*</label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setCompanyName(e?.target?.value) }}
+                        value={companyName}
+                        type="text"
+                        placeholder="Your Company Name"
+                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        required
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-neutral-300">Work Email*</label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <input
+                        onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setWorkEmail(e?.target?.value) }}
+                        value={workEmail}
+                        type="email"
+                        placeholder="you@company.com"
+                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        required
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-neutral-300">Inquiry Type*</label>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <select
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setInquiryType(e?.target?.value) }}
+                        value={inquiryType}
+                        className="block w-full px-5 py-3 text-white bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        required
+                      >
+                        <option value="business">I am a Business – Want to know more / Service Request</option>
+                        <option value="provider">I am a Service Provider – Want to list my company on this platform / Partnership</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </motion.div>
                   </div>
 
                   <div>
@@ -242,11 +297,26 @@ const ContactPage = () => {
                     <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                       <textarea
                         onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setMessage(e?.target?.value) }}
+                        value={message}
                         className="block w-full h-32 px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg md:h-48 focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 resize-none transition-all duration-300"
                         placeholder="Share your vision with us..."
                         rows={4}
                       ></textarea>
                     </motion.div>
+                  </div>
+
+                  <div className="flex items-center">
+                    <div className="text-sm text-neutral-400">
+                      <span className="mr-2">Captcha</span>
+                      <span className="text-neutral-500">(Security purpose – anti spam protection)</span>
+                      <ReCAPTCHA
+                    
+                    sitekey={"process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!"}
+                    ref={recaptchaRef}
+                    onChange={handleCaptchaSubmission}
+                />
+               
+                    </div>
                   </div>
 
                   <motion.div

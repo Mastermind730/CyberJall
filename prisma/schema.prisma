@@ -13,3 +13,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum Rewards{
+  Bounty
+}
+
+enum Severity{
+  low
+  medium 
+  high
+  critical
+}
+model Contacts{
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  name String
+  company_name String
+  email String @unique
+  contact String 
+  message String
+  createdAt   DateTime @default(now()) @map("createdAt")
+  updatedAt   DateTime @updatedAt @map("updatedAt")
+
+}
+
+model Programs{
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  program String
+  launched_on DateTime
+  rewards Rewards
+}
+
+model Reports{
+    id String @id @default(auto()) @map("_id")@db.ObjectId
+    name String
+    email String
+    title String
+    severity Severity
+    type String
+    detail String
+    steps String[]
+    impact String
+    affected_system String
+    poc Bytes?
+    createdAt   DateTime @default(now()) @map("createdAt")
+  updatedAt   DateTime @updatedAt @map("updatedAt")
+}
+
+model User{
+      id String @id @default(auto()) @map("_id")@db.ObjectId
+    name String 
+    work_email String
+    company_name String
+    contact String
+    message String
+    password String
+}
+model Validated_User{
+      id String @id @default(auto()) @map("_id")@db.ObjectId
+    name String 
+    work_email String
+    company_name String
+    contact String
+    message String
+    password String
+}

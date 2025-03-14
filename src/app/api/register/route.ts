@@ -1,5 +1,6 @@
-// import bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prismadb"
 // import {PrismaClient} from "@/prisma/client"
 
 
@@ -13,16 +14,29 @@ try{
     }
     else{
 
-        // const hashedPasswd =  await bcrypt.hash(password,12);
 
-    //    const user  = await  prisma.user.create({
-    //         name:name,
-    //         email:email,
-    //         password:hashedPasswd
-    //     });
+       const user = await prisma.validated_users.findFirst({
+        where:{
+            email:email
+        }
+       })
+
+        if(user){
+            return NextResponse.json("user already exists",{status:401});
+        }else{
+            const hashedPasswd =  await bcrypt.hash(password,12);
+
+            const new_user  = await  prisma.user.create({
+                name:name,
+                email:email,
+                password:hashedPasswd
+            });
+
+            return NextResponse.json(new_user,{status:200});
+
+        }
 
 
-        return NextResponse.json("user",{status:200});
 
     }
 }
