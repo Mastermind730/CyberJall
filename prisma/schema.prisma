@@ -61,7 +61,7 @@ model Reports{
 
 model User{
       id String @id @default(auto()) @map("_id")@db.ObjectId
-    name String 
+    // name String 
     work_email String
     company_name String
     contact String
@@ -70,7 +70,7 @@ model User{
 }
 model Validated_User{
       id String @id @default(auto()) @map("_id")@db.ObjectId
-    name String 
+    // name String 
     work_email String
     company_name String
     contact String

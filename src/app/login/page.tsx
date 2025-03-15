@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect, ReactHTMLElement } from 'react';
-import Head from 'next/head';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  
+
   const router = useRouter();
 
   const [binaryStrings] = useState(() => {
@@ -22,7 +23,7 @@ export default function Login() {
   });
 
   useEffect(() => {
-    setIsMounted(true)
+    setIsMounted(true);
     const timer = setTimeout(() => {
       setAnimationComplete(true);
     }, 1000);
@@ -32,36 +33,44 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
-      // Simulate login process
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-  
-      // Handle login logic here
       const body = { email, password };
-      const response = await axios.post("/api/login", body);
-  
-      console.log('Login attempt with:', email, password);
-      if(response.data){
-      console.log('Response:', response.data);
-      router.push("/dashboard");
+      const response = await axios.post('/api/login', body);
+
+      if (response.data) {
+        toast.success('User successfully logged in!', {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Login failed:', error);
+      toast.error('Login failed. Please check your credentials.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
-      setIsLoading(false); // Ensure loading state is reset
+      setIsLoading(false);
     }
   };
 
- // Return a simple loading state or null while client-side code isn't ready
- if (!isMounted) {
-  return null; // Return nothing during SSR to prevent hydration mismatch
-}
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center overflow-hidden relative">
-     
-
+      <ToastContainer />
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           {Array.from({ length: 20 }).map((_, i) => (

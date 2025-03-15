@@ -2,18 +2,24 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Page = () => {
   const [formData, setFormData] = useState({
     companyName: "",
     email: "",
-    phoneNumber: "",
+    contact: "",
     password: "",
     confirmPassword: "",
   });
 
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,24 +51,50 @@ const Page = () => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
       setIsSubmitting(true);
-      // Mock API call
-      setTimeout(() => {
-        console.log("Form submitted:", formData);
+
+      try {
+        const response = await axios.post("/api/register", formData);
+
+        if (response.data) {
+          toast.success("Registration successful! Redirecting to login...", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+
+          setTimeout(() => {
+            router.push("/login");
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("Registration failed:", error);
+        toast.error("Registration failed. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } finally {
         setIsSubmitting(false);
-        // Reset form or redirect
-      }, 1500);
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 overflow-hidden relative">
+      <ToastContainer />
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(5)].map((_, i) => (
@@ -261,6 +293,7 @@ const Page = () => {
                   className="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg py-2 font-semibold hover:bg-gradient-to-r hover:from-red-700 hover:to-orange-600 transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  disabled={isSubmitting}
                 >
                   {isSubmitting ? "Submitting..." : "Sign Up"}
                 </motion.button>
