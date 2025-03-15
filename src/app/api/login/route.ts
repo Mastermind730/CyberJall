@@ -19,6 +19,7 @@ export async function POST(req: Request) {
         email: email,
       },
     });
+    console.log(user)
     if (!user) {
       return NextResponse.json("Invalid email", { status: 404 });
     } else {

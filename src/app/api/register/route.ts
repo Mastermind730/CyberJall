@@ -15,7 +15,7 @@ try{
     else{
 
 
-       const user = await prisma.validated_users.findFirst({
+       const user = await prisma.user.findFirst({
         where:{
             email:email
         }
@@ -26,7 +26,7 @@ try{
         }else{
             const hashedPasswd =  await bcrypt.hash(password,12);
 
-            const new_user  = await  prisma.user.create({
+            const new_user  = await  prisma.validated_user.create({
                 name:name,
                 email:email,
                 password:hashedPasswd

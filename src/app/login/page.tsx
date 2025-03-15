@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, ReactHTMLElement } from 'react';
 import Head from 'next/head';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,6 +11,8 @@ export default function Login() {
   const [animationComplete, setAnimationComplete] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
+  const router = useRouter();
+
   const [binaryStrings] = useState(() => {
     return Array.from({ length: 15 }, () => 
       Array.from({ length: 15 }, () => 
@@ -25,15 +29,28 @@ export default function Login() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
+  
+    try {
+      // Simulate login process
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+  
       // Handle login logic here
+      const body = { email, password };
+      const response = await axios.post("/api/login", body);
+  
       console.log('Login attempt with:', email, password);
-    }, 1500);
+      if(response.data){
+      console.log('Response:', response.data);
+      router.push("/dashboard");
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false); // Ensure loading state is reset
+    }
   };
 
  // Return a simple loading state or null while client-side code isn't ready
