@@ -47,6 +47,8 @@ export default function Login() {
           pauseOnHover: true,
           draggable: true,
         });
+        // console.log(response.data.token)
+        localStorage.setItem("token",response.data.token)
         router.push('/dashboard');
       }
     } catch (error) {

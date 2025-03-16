@@ -51,7 +51,17 @@ export async function POST(req: Request) {
             { expiresIn: "4h" }
         );
 
-        return NextResponse.json({ token }, { status: 200 });
+        const response = NextResponse.json({ message: "Login successful" });
+  response.cookies.set("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
+    sameSite: "strict",
+    maxAge: 3600, // 1 hour
+    path: "/",
+  });
+
+  return response;
+      
 
     } catch (error: unknown) {
         if (error instanceof Error) {
