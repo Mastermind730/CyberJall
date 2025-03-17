@@ -6,6 +6,10 @@ import { SmartestChoice } from './components/sections/SmartestChoice';
 import { WhatWeOffer } from './components/sections/WhatWeOffer';
 import { Scope } from './components/sections/Scope';
 import { HowItWorks } from './components/sections/HowItWorks';
+import { GetStarted } from './components/sections/GetStarted';
+import { SecurityFeatures } from './components/sections/SecurityFeatures';
+import { HowWeWork } from './components/sections/HowWeWork';
+import { PlatformFeatures } from './components/sections/PlatformFeatures';
 
 const Home: NextPage = () => {
   return (
@@ -17,6 +21,10 @@ const Home: NextPage = () => {
       <WhatWeOffer />
       <Scope />
       <HowItWorks />
+      <GetStarted />
+      <SecurityFeatures />
+      <HowWeWork />
+      <PlatformFeatures />
     </main>
   );
 };
