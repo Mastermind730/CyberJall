@@ -35,6 +35,8 @@ const NewNavbar = () => {
       type: "dropdown", 
       items: [
         { name: "Web Application Security Testing", link: "/services/web-security" },
+        { name: "Network Pen Testing", link: "/services/network" },
+        { name: "Cloud Pen Testing", link: "/services/cloud" },
         { 
           name: "VPE Services", 
           link: "/services/vpe", 
