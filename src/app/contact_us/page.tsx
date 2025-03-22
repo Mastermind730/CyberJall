@@ -146,7 +146,7 @@ const ContactPage = () => {
                   ),
                   title: 'Email',
                   text: 'Direct line to our team',
-                  contact: 'connect@blazetech.com',
+                  contact: 'chetantest2226@gmail.com',
                   delay: 0.1,
                   gradient: 'from-red-600 to-black'
                 },
@@ -158,7 +158,7 @@ const ContactPage = () => {
                   ),
                   title: 'Phone',
                   text: 'Mon-Fri, 8am-5pm',
-                  contact: '+1 (888) BLAZE-TX',
+                  contact: '+917709869493',
                   delay: 0.2,
                   gradient: 'from-black to-red-700'
                 },
@@ -171,7 +171,7 @@ const ContactPage = () => {
                   ),
                   title: 'Headquarters',
                   text: 'Visit our innovation hub',
-                  contact: '1337 Forge Street, Austin, TX',
+                  contact: 'Pune, Maharashtra',
                   delay: 0.3,
                   gradient: 'from-red-800 to-black'
                 },

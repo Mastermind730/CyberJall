@@ -1,10 +1,10 @@
-// pages/cloud-pentesting.js
+// pages/api-pentesting.js
 "use client";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Cloud, Check, Server, Lock, Database, FileSearch } from 'lucide-react';
+import { Shield, Lock, CheckCircle, Code, Server, Database, AlertTriangle, Key, FileSearch } from 'lucide-react';
 
-export default function CloudPentesting() {
+export default function ApiPentesting() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -17,18 +17,18 @@ export default function CloudPentesting() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+    <div className="min-h-screen bg-gray-900 mt-10 text-white overflow-hidden">
       {/* Hero Section */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute left-0 top-0 w-full h-full bg-gradient-to-br from-red-900/70 via-black/80 to-orange-900/70"></div>
           <svg className="absolute left-0 top-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
-              <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
-                <path d="M 8 0 L 0 0 0 8" fill="none" stroke="white" strokeWidth="0.5" />
+              <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse">
+                <circle cx="5" cy="5" r="1" fill="white" />
               </pattern>
             </defs>
-            <rect width="100" height="100" fill="url(#grid)" />
+            <rect width="100" height="100" fill="url(#dots)" />
           </svg>
         </div>
 
@@ -40,13 +40,13 @@ export default function CloudPentesting() {
             className="text-center mb-12"
           >
             <div className="flex justify-center mb-6">
-              <Shield className="w-16 h-16 text-orange-500" />
+              <Code className="w-16 h-16 text-orange-500" />
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 mb-6">
-              Cloud Pen Testing
+              API Pen Testing
             </h1>
             <p className="text-xl md:text-2xl font-medium max-w-3xl mx-auto text-gray-300">
-              Find the Right Cloud Security Partner on CyberJall
+              Find the Right API Security Partner on CyberJall
             </p>
           </motion.div>
 
@@ -63,7 +63,7 @@ export default function CloudPentesting() {
               variants={fadeIn}
               className="text-lg md:text-xl mb-8 text-gray-200"
             >
-              Your cloud infrastructure is the backbone of your business. Ensuring it is secure against cyber threats is critical to preventing data breaches, financial losses, and compliance failures. CyberJall connects you with top-tier cloud security providers who specialize in identifying vulnerabilities and strengthening cloud environments.
+              APIs are the backbone of modern applications, enabling seamless communication between services, platforms, and users. However, misconfigured or vulnerable APIs can expose your business to data breaches, unauthorized access, and compliance risks. CyberJall connects you with top API security experts to help secure your APIs against cyber threats.
             </motion.p>
             
             <motion.div
@@ -89,18 +89,38 @@ export default function CloudPentesting() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">
-              Why Your Business Needs Cloud Penetration Testing
+              Why Your Business Needs API Security Testing
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto"></div>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {[
-              { icon: <Cloud className="w-10 h-10" />, title: "Identify Misconfigurations" },
-              { icon: <Lock className="w-10 h-10" />, title: "Protect Sensitive Data" },
-              { icon: <Check className="w-10 h-10" />, title: "Meet Compliance Requirements" },
-              { icon: <Server className="w-10 h-10" />, title: "Strengthen API & Application Security" },
-              { icon: <Shield className="w-10 h-10" />, title: "Mitigate Cloud-Based Threats" }
+              { 
+                icon: <Key className="w-10 h-10" />, 
+                title: "Prevent Unauthorized Access", 
+                description: "Identify and fix authentication & authorization flaws."
+              },
+              { 
+                icon: <Lock className="w-10 h-10" />, 
+                title: "Secure Sensitive Data", 
+                description: "Protect APIs from data leaks, injection attacks, and exposure of critical business information."
+              },
+              { 
+                icon: <CheckCircle className="w-10 h-10" />, 
+                title: "Ensure Compliance", 
+                description: "Meet security requirements for GDPR, PCI-DSS, HIPAA, ISO 27001, and SOC 2."
+              },
+              { 
+                icon: <AlertTriangle className="w-10 h-10" />, 
+                title: "Defend Against OWASP API Top 10 Threats", 
+                description: "Protect your APIs from the latest attack techniques."
+              },
+              { 
+                icon: <Server className="w-10 h-10" />, 
+                title: "Enhance API Performance & Stability", 
+                description: "Reduce security risks that could impact API uptime and reliability."
+              }
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -117,6 +137,9 @@ export default function CloudPentesting() {
                   <h3 className="text-xl font-semibold mb-2 text-white group-hover:text-orange-300 transition-colors duration-300">
                     {item.title}
                   </h3>
+                  <p className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                    {item.description}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -128,9 +151,10 @@ export default function CloudPentesting() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-black">
         <div className="absolute inset-0">
           <svg className="absolute w-full h-full opacity-5" viewBox="0 0 800 800">
-            <circle cx="400" cy="400" r="200" fill="none" stroke="url(#redOrangeGradient)" strokeWidth="100" />
+            <path d="M0,100 L800,100 M0,200 L800,200 M0,300 L800,300 M0,400 L800,400 M0,500 L800,500 M0,600 L800,600 M0,700 L800,700" stroke="url(#apiGradient)" strokeWidth="2" />
+            <path d="M100,0 L100,800 M200,0 L200,800 M300,0 L300,800 M400,0 L400,800 M500,0 L500,800 M600,0 L600,800 M700,0 L700,800" stroke="url(#apiGradient)" strokeWidth="2" />
             <defs>
-              <linearGradient id="redOrangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="apiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ef4444" />
                 <stop offset="100%" stopColor="#f97316" />
               </linearGradient>
@@ -153,19 +177,19 @@ export default function CloudPentesting() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { 
-                icon: <Cloud className="w-12 h-12" />, 
-                title: "Cloud Infrastructure", 
-                description: "Comprehensive assessment of your AWS, Azure, Google Cloud, or multi-cloud environments."
+                icon: <Code className="w-12 h-12" />, 
+                title: "API Security Assessment", 
+                description: "Comprehensive evaluation of REST, GraphQL, SOAP, and microservices APIs for security vulnerabilities."
               },
               { 
-                icon: <Database className="w-12 h-12" />, 
-                title: "Database Security", 
-                description: "In-depth evaluation of cloud database configurations, access controls, and encryption."
+                icon: <AlertTriangle className="w-12 h-12" />, 
+                title: "OWASP API Top 10 Testing", 
+                description: "In-depth testing against the OWASP API Security Top 10 to identify critical vulnerabilities."
               },
               { 
                 icon: <FileSearch className="w-12 h-12" />, 
-                title: "Compliance Assurance", 
-                description: "Expert testing to verify your cloud environment meets industry standards and regulations."
+                title: "API Documentation Review", 
+                description: "Expert analysis of API specifications to identify security gaps and design flaws before implementation."
               }
             ].map((item, index) => (
               <motion.div
@@ -208,20 +232,20 @@ export default function CloudPentesting() {
             
             {[
               { 
-                title: "Request Security Assessment", 
-                description: "Tell us about your cloud environment and security needs through our simple form."
+                title: "Describe Your API Security Needs", 
+                description: "Share details about your APIs, technology stack, and security requirements."
               },
               { 
-                title: "Get Matched With Top Providers", 
-                description: "CyberJall connects you with verified security experts specializing in cloud penetration testing."
+                title: "Get Matched With Security Experts", 
+                description: "CyberJall connects you with verified API security specialists."
               },
               { 
                 title: "Compare & Select Your Partner", 
-                description: "Review detailed proposals, expertise, and pricing to find your ideal security partner."
+                description: "Review proposals, methodologies, and pricing to find your ideal security partner."
               },
               { 
-                title: "Comprehensive Testing & Reporting", 
-                description: "Expert penetration testers identify vulnerabilities and provide actionable recommendations."
+                title: "Expert Testing & Remediation Guidance", 
+                description: "Receive comprehensive vulnerability assessment and actionable security recommendations."
               }
             ].map((item, index) => (
               <motion.div
@@ -250,13 +274,15 @@ export default function CloudPentesting() {
         </div>
       </section>
 
-      {/* Why Choose CyberJall Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-black relative">
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <svg className="absolute top-0 left-0 w-full h-full opacity-10" viewBox="0 0 800 800">
-            <path d="M0,400 C0,200 200,0 400,0 C600,0 800,200 800,400 C800,600 600,800 400,800 C200,800 0,600 0,400 Z" fill="none" stroke="url(#whyChooseGradient)" strokeWidth="8" />
+      {/* Compare & Choose Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black relative">
+        <div className="absolute inset-0 overflow-hidden">
+          <svg className="absolute top-0 left-0 w-full h-full opacity-10" viewBox="0 0 100 100">
+            <path d="M0,50 Q25,25 50,50 Q75,75 100,50" stroke="url(#compareGradient)" strokeWidth="1" fill="none" />
+            <path d="M0,30 Q25,55 50,30 Q75,5 100,30" stroke="url(#compareGradient)" strokeWidth="1" fill="none" />
+            <path d="M0,70 Q25,95 50,70 Q75,45 100,70" stroke="url(#compareGradient)" strokeWidth="1" fill="none" />
             <defs>
-              <linearGradient id="whyChooseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="compareGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#ef4444" />
                 <stop offset="100%" stopColor="#f97316" />
               </linearGradient>
@@ -272,23 +298,63 @@ export default function CloudPentesting() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Why Choose CyberJall for Cloud Security?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Compare & Choose API Security Providers</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto mb-8"></div>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              On CyberJall, you can explore and compare API security experts based on:
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {[
+              { title: "Testing Approach" },
+              { title: "Industry Expertise" },
+              { title: "Security Standards & Certifications" },
+              { title: "Pricing & Packages" },
+              { title: "Client Reviews & Ratings" }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-gradient-to-br from-gray-800 to-black p-6 rounded-xl border border-red-500/20 hover:border-orange-500/30 shadow-lg hover:shadow-orange-500/10 transition-all duration-300 text-center group"
+              >
+                <h3 className="text-lg font-semibold text-white group-hover:text-orange-300 transition-colors duration-300">{item.title}</h3>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose CyberJall Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-black relative">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Why Choose CyberJall for API Security?</h2>
             <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto"></div>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               { 
-                title: "Verified Cybersecurity Providers", 
-                description: "Work with industry-leading penetration testers and consultants."
+                title: "Verified API Security Experts", 
+                description: "Work with certified cybersecurity professionals."
               },
               { 
-                title: "Customizable Service Packages", 
-                description: "Choose the security services that match your business needs."
+                title: "Customizable Testing Packages", 
+                description: "Choose API security services based on your business needs."
               },
               { 
-                title: "Transparent Pricing & Contracts", 
-                description: "Compare offerings with clear pricing structures."
+                title: "Transparent Pricing & Reporting", 
+                description: "Clear insights into vulnerabilities and remediation steps."
               },
               { 
                 title: "One Platform for All Cybersecurity Needs", 
@@ -318,7 +384,7 @@ export default function CloudPentesting() {
           >
             <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-2xl p-6 inline-block">
               <p className="text-lg md:text-xl font-medium text-white mb-6">
-                <span className="text-orange-500">🔒</span> Protect your cloud infrastructure today! Browse top Cloud Security providers on CyberJall now.
+                <span className="text-orange-500">🔒</span> Secure your APIs today! Browse top API Security Testing providers on CyberJall now.
               </p>
               <button className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105">
                 Browse Providers
