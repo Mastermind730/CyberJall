@@ -7,9 +7,9 @@ declare global {
 
 // Initialize PrismaClient
 // const client = globalThis.prisma || new PrismaClient();
-const client = globalThis.prisma || new PrismaClient();
+const client = new PrismaClient();
 
 // In development, store the PrismaClient instance in `globalThis` to avoid multiple instances
-if (process.env.NODE_ENV !== "production") globalThis.prisma = client;
+// if (process.env.NODE_ENV !== "production") globalThis.prisma = client;
 
 export default client;
