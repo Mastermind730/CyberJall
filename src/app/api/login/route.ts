@@ -12,6 +12,7 @@ const loginSchema = z.object({
 
 export async function POST(req: Request) {
     try {
+        // Parse and validate the request body
         const body = await req.json();
         const validationResult = loginSchema.safeParse(body);
 
@@ -24,6 +25,7 @@ export async function POST(req: Request) {
 
         const { email, password } = validationResult.data;
 
+        // Find the user by email
         const user = await prisma.user.findFirst({
             where: {
                 work_email: email,
@@ -37,6 +39,7 @@ export async function POST(req: Request) {
             );
         }
 
+        // Validate the password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return NextResponse.json(
@@ -45,25 +48,32 @@ export async function POST(req: Request) {
             );
         }
 
+        // Ensure JWT_SECRET is defined
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET environment variable is not defined");
+        }
+
+        // Generate a JWT token
         const token = jwt.sign(
             { userId: user.id, email: user.work_email },
-            process.env.JWT_SECRET!,
+            process.env.JWT_SECRET,
             { expiresIn: "4h" }
         );
 
+        // Set the token in a cookie
         const response = NextResponse.json({ message: "Login successful" });
-  response.cookies.set("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
-    sameSite: "strict",
-    maxAge: 3600, // 1 hour
-    path: "/",
-  });
+        response.cookies.set("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
+            sameSite: "strict",
+            maxAge: 3600, // 1 hour
+            path: "/",
+        });
 
-  return response;
-      
+        return response;
 
     } catch (error: unknown) {
+        // Handle known errors
         if (error instanceof Error) {
             console.error("Login failed:", error.message);
             return NextResponse.json(
@@ -71,6 +81,7 @@ export async function POST(req: Request) {
                 { status: 500 }
             );
         } else {
+            // Handle unknown errors
             console.error("Unknown error occurred:", error);
             return NextResponse.json(
                 { error: "Internal server error" },
