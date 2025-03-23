@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import axios from "axios";
@@ -7,21 +7,37 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface FormData {
+  companyName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
+}
+
+interface FormErrors {
+  companyName?: string;
+  email?: string;
+  phoneNumber?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
 const Page = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     companyName: "",
     email: "",
-    contact: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
 
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -29,8 +45,8 @@ const Page = () => {
     });
   };
 
-  const validateForm = () => {
-    const errors = {};
+  const validateForm = (): FormErrors => {
+    const errors: FormErrors = {};
     if (!formData.companyName.trim()) errors.companyName = "Company name is required";
     if (!formData.email.trim()) {
       errors.email = "Email is required";
@@ -51,7 +67,7 @@ const Page = () => {
     return errors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const errors = validateForm();
     setFormErrors(errors);
@@ -191,7 +207,8 @@ const Page = () => {
                     onChange={handleChange}
                     className={`w-full bg-black/10 border ${
                       formErrors.companyName ? "border-red-400" : "border-red-500/30"
-                    } rounded-lg py-2 px-4 text-white placeholder-red-300/60 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent`}
+                    } 
+                      rounded-lg py-2 px-4 text-white placeholder-red-300/60 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent`}
                     placeholder="Enter your company name"
                   />
                   {formErrors.companyName && (

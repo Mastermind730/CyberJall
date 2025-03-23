@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // pages/index.js
 "use client";
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
+import { useState, useEffect, SetStateAction } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, AlertTriangle, Search, Code, Database, FileText, CheckCircle, ArrowRight, Lock, Zap, Eye, Terminal, ChevronDown } from 'lucide-react';
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [activeFaq, setActiveFaq] = useState(null);
+  const [activeFaq, setActiveFaq] = useState<number| null>();
 
   useEffect(() => {
     setIsVisible(true);
@@ -123,7 +122,7 @@ export default function Home() {
     }
   ];
 
-  const toggleFaq = (index) => {
+  const toggleFaq = (index: number | null) => {
     if (activeFaq === index) {
       setActiveFaq(null);
     } else {
