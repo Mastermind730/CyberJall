@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from "axios";
 
 export async function verifyCaptcha(token:unknown) {
@@ -10,7 +11,7 @@ export async function verifyCaptcha(token:unknown) {
     } else {
       throw new Error("Failed Captcha");
     }
-  } catch (error:any) {
+  } catch (error:unknown) {
     throw new Error("Failed to verify captcha");
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // pages/api-pentesting.js
 "use client";
 import { useState, useEffect } from 'react';

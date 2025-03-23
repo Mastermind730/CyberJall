@@ -158,7 +158,7 @@ export default function Home() {
                 Identify, Assess & Secure Your Network Against Cyber Threats
               </p>
               <p className="text-lg text-gray-400 mb-8">
-                A simulated cyberattack on your organization's internal and external networks to identify security weaknesses before real hackers do.
+                A simulated cyberattack on your organization&apos;s internal and external networks to identify security weaknesses before real hackers do.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <motion.button 
@@ -244,7 +244,7 @@ export default function Home() {
               What is <span className="text-red-600">Network Penetration Testing?</span>
             </h2>
             <p className="text-lg text-gray-300 mb-8">
-              Network penetration testing is a simulated cyberattack on an organization's internal and external networks to identify security weaknesses. It helps businesses prevent unauthorized access, data breaches, and downtime by strengthening network defenses against cyber threats.
+              Network penetration testing is a simulated cyberattack on an organization&apos;s internal and external networks to identify security weaknesses. It helps businesses prevent unauthorized access, data breaches, and downtime by strengthening network defenses against cyber threats.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
               <motion.div 
