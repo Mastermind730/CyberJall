@@ -52,7 +52,7 @@ const NewNavbar = () => {
       ]
     },
     { name: "Contact Us", link: "/contact_us", type: "link" },
-    { name: "Log in", link: "/sign-in", type: "link" }
+    { name: "Log in", link: "/login", type: "link" }
   ];
 
   // Animation variants
