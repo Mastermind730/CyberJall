@@ -6,6 +6,7 @@ import type { FC } from 'react';
 
 export const Navbar: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
 
   return (
     <nav className="bg-gray-900 fixed w-full z-50">
@@ -22,7 +23,6 @@ export const Navbar: FC = () => {
                     height={65}
                     className="cursor-pointer"
                   />
-                  
                 </div>
               </Link>
             </div>
@@ -39,9 +39,40 @@ export const Navbar: FC = () => {
               <Link href="/services" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                 Services
               </Link>
-              <Link href="/marketplace" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                Marketplace
-              </Link>
+              
+              {/* Company Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                >
+                  Company
+                  <svg
+                    className={`ml-2 h-4 w-4 transition-transform ${isCompanyDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {isCompanyDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
+                    <div className="py-1" role="menu">
+                      <Link
+                        href="/why-choose-cyberjall"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                        role="menuitem"
+                        onClick={() => setIsCompanyDropdownOpen(false)}
+                      >
+                        Why Choose CyberJall
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Link href="/contact_us" className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium">
                 Contact Us
               </Link>
@@ -85,6 +116,9 @@ export const Navbar: FC = () => {
             </Link>
             <Link href="/marketplace" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
               Marketplace
+            </Link>
+            <Link href="/why-choose-cyberjall" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+              Why Choose CyberJall
             </Link>
             <Link href="/contact_us" className="bg-red-600 text-white hover:bg-red-700 block px-3 py-2 rounded-md text-base font-medium">
               Contact Us
