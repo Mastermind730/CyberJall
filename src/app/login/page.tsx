@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -199,8 +200,7 @@ export default function Login() {
           </button>
 
           <div className="flex justify-between mt-6 text-sm">
-            <a href="#" className="text-gray-400 hover:text-orange-500 transition-colors">Forgot Password?</a>
-            <a href="#" className="text-gray-400 hover:text-orange-500 transition-colors">Create Account</a>
+            <Link href="/register" className="text-gray-400 hover:text-orange-500 transition-colors">Create Account</Link>
           </div>
         </form>
 
