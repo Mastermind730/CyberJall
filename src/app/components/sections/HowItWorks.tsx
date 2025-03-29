@@ -90,7 +90,7 @@ export const HowItWorks: FC = () => {
           <h2 className="text-4xl font-bold text-white mb-6">How It Works</h2>
           <div className="w-24 h-1 bg-red-600 mx-auto mb-8"></div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            In today's digital world, cybersecurity isn't optional it's essential. But finding the right security services can be complex, costly, and time consuming. That's why we built CyberJall Infotech, a unique cybersecurity marketplace that simplifies the process for businesses while opening new opportunities for security providers.
+            In today&apos;s digital world, cybersecurity isn&apos;t optional it&apos;s essential. But finding the right security services can be complex, costly, and time consuming. That&apos;s why we built CyberJall Infotech, a unique cybersecurity marketplace that simplifies the process for businesses while opening new opportunities for security providers.
           </p>
         </div>
 

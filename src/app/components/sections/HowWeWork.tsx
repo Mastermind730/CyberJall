@@ -114,7 +114,7 @@ export const HowWeWork: React.FC = () => {
             How We Work
           </h2>
           <p className="text-lg text-gray-400 leading-relaxed">
-            Here\'s a simplified overview of how bug bounty platforms typically work
+            Here&apos;s a simplified overview of how bug bounty platforms typically work
           </p>
         </div>
 

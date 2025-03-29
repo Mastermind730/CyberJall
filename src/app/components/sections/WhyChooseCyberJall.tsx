@@ -142,7 +142,7 @@ export const WhyChooseCyberJall: FC = () => {
                 At CyberJall, we are redefining the way businesses access and integrate cybersecurity services. Our innovative marketplace bridges the gap between top-tier cybersecurity providers and organizations seeking tailored, collaborative security solutions.
               </p>
               <p>
-                We believe cybersecurity shouldn't be fragmented or complex. That's why we provide a centralized, transparent, and flexible platform where businesses can build customized security packages with multiple trusted providers all in one seamless subscription. With a commitment to trust, efficiency, and innovation, we empower businesses to strengthen their defenses while enabling cybersecurity experts to expand their reach and credibility.
+                We believe cybersecurity shouldn&apos;t be fragmented or complex. That&apos;s why we provide a centralized, transparent, and flexible platform where businesses can build customized security packages with multiple trusted providers all in one seamless subscription. With a commitment to trust, efficiency, and innovation, we empower businesses to strengthen their defenses while enabling cybersecurity experts to expand their reach and credibility.
               </p>
               <p className="text-xl font-medium text-red-400">
                 Join us in shaping the future of cybersecurity collaboration.

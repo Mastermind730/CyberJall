@@ -23,8 +23,8 @@ export const SecurityFeatures: React.FC = () => {
             Shedding Light on Your Security Blind Spots
           </h2>
           <p className="text-lg text-gray-400 leading-relaxed">
-            Today's relentless cyber threats demand a security strategy that is just as relentless and proactive. 
-            That's why we've engineered an all-in-one platform that gives you everything you need to secure your digital innovation.
+            Today&apos;s relentless cyber threats demand a security strategy that is just as relentless and proactive. 
+            That&apos;s why we&apos;ve engineered an all-in-one platform that gives you everything you need to secure your digital innovation.
           </p>
         </div>
 
