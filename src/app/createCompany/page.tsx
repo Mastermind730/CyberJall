@@ -1,0 +1,343 @@
+// pages/company-profile.js
+"use client";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { CldUploadButton } from 'next-cloudinary';
+
+export default function CompanyProfile() {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  
+  const { 
+    register, 
+    handleSubmit, 
+    setValue, 
+    watch, 
+    formState: { errors } 
+  } = useForm({
+    defaultValues: {
+      companyName: '',
+      companyOverview: '',
+      servicesOffered: '',
+      expertiseCertifications: '',
+      caseStudies: '',
+      website: '',
+      logoUrl: '',
+    }
+  });
+  
+  // Watch the logoUrl to display the preview
+  const logoUrl = watch('logoUrl');
+  
+  const handleLogoUpload = (result) => {
+    if (result?.info?.secure_url) {
+      setValue('logoUrl', result?.info?.secure_url, {
+        shouldValidate: true
+      });
+      setIsUploading(false);
+      setUploadProgress(100);
+    }
+  };
+  
+  const onSubmit = (data) => {
+    console.log('Form Data:', data);
+    // Here you would typically send this data to your backend
+    alert('Company profile submitted successfully!');
+  };
+  
+  return (
+    <div className="min-h-screen bg-black text-white">
+      
+      <motion.div 
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative h-64 bg-gradient-to-r from-red-800 via-red-600 to-orange-500 overflow-hidden"
+      >
+        <div className="absolute inset-0">
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="rgba(0,0,0,0.2)" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+          </svg>
+        </div>
+        <div className="container mx-auto px-6 h-full flex items-center justify-between">
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
+            <h1 className="text-4xl md:text-5xl font-bold drop-shadow-lg">Company Profile</h1>
+            <p className="mt-2 text-lg md:text-xl">Showcase your cybersecurity expertise</p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 100, delay: 0.8 }}
+            className="hidden md:block"
+          >
+            <div className="w-24 h-24 bg-black bg-opacity-20 rounded-full flex items-center justify-center">
+              <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+      
+      {/* Form Content */}
+      <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
+        >
+          <div className="p-8">
+            <h2 className="text-2xl font-bold mb-6 text-center text-orange-500">Complete Your Company Profile</h2>
+            
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              {/* Company Name */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Company Name</label>
+                <input
+                  {...register("companyName", { 
+                    required: "Company name is required" 
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Enter your company name"
+                />
+                {errors.companyName && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.companyName.message}</p>
+                )}
+              </motion.div>
+              
+              {/* Logo Upload with Cloudinary */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="space-y-2"
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Company Logo</label>
+                <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0">
+                  <div className="flex-1 w-full">
+                    <div className="flex flex-col items-center px-4 py-6 bg-gray-800 text-orange-400 rounded-lg border border-gray-700 border-dashed cursor-pointer hover:bg-gray-700 transition-colors">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                      </svg>
+                      {/* <span className="mt-2 text-base">Upload to Cloudinary</span> */}
+                      <CldUploadButton 
+                        uploadPreset="CompanyLogo"
+                        onUpload={handleLogoUpload}
+                        onProgress={(progress) => {
+                          setIsUploading(true);
+                          setUploadProgress(Math.round(progress));
+                        }}
+                      />
+                    </div>
+
+                    {/* Upload Progress Bar */}
+                    {isUploading && (
+                      <div className="mt-3">
+                        <div className="w-full bg-gray-700 rounded-full h-2.5">
+                          <motion.div 
+                            className="bg-gradient-to-r from-red-600 to-orange-500 h-2.5 rounded-full"
+                            initial={{ width: '0%' }}
+                            animate={{ width: `${uploadProgress}%` }}
+                            transition={{ duration: 0.3 }}
+                          ></motion.div>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1 text-right">{uploadProgress}% uploaded</p>
+                      </div>
+                    )}
+                    
+                    {/* Hidden field for storing logo URL */}
+                    <input 
+                      type="hidden" 
+                      {...register("logoUrl")}
+                    />
+                  </div>
+                  
+                  {logoUrl && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="relative w-24 h-24 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex-shrink-0"
+                    >
+                      <img 
+                        src={logoUrl} 
+                        alt="Company logo" 
+                        className="w-full h-full object-contain" 
+                      />
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+              
+              {/* Company Overview */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.8 }}
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Company Overview</label>
+                <textarea
+                  {...register("companyOverview", { 
+                    required: "Company overview is required",
+                    minLength: {
+                      value: 50,
+                      message: "Please provide at least 50 characters"
+                    }
+                  })}
+                  rows="4"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Provide a brief introduction about your company"
+                ></textarea>
+                {errors.companyOverview && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.companyOverview.message}</p>
+                )}
+              </motion.div>
+              
+              {/* Services Offered */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.9 }}
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Services Offered</label>
+                <textarea
+                  {...register("servicesOffered", { 
+                    required: "Services offered is required" 
+                  })}
+                  rows="4"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="List and describe the key cybersecurity services you provide (e.g., penetration testing, threat intelligence, incident response, compliance consulting, etc.)"
+                ></textarea>
+                {errors.servicesOffered && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.servicesOffered.message}</p>
+                )}
+              </motion.div>
+              
+              {/* Expertise & Certifications */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 1.0 }}
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Expertise & Certifications</label>
+                <textarea
+                  {...register("expertiseCertifications", { 
+                    required: "Expertise and certifications is required" 
+                  })}
+                  rows="4"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Mention relevant certifications (e.g., ISO 27001, CISSP, CEH), partnerships, industry experience, and any notable achievements"
+                ></textarea>
+                {errors.expertiseCertifications && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.expertiseCertifications.message}</p>
+                )}
+              </motion.div>
+              
+              {/* Case Studies & Testimonials */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 1.1 }}
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Case Studies & Testimonials</label>
+                <textarea
+                  {...register("caseStudies", { 
+                    required: "Case studies is required" 
+                  })}
+                  rows="4"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Include success stories, notable clients, or testimonials to establish credibility and showcase past achievements"
+                ></textarea>
+                {errors.caseStudies && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.caseStudies.message}</p>
+                )}
+              </motion.div>
+              
+              {/* Website */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 1.2 }}
+              >
+                <label className="block text-orange-400 mb-2 font-medium">Website</label>
+                <input
+                  type="url"
+                  {...register("website", { 
+                    required: "Website URL is required",
+                    pattern: {
+                      value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+                      message: "Please enter a valid URL"
+                    }
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Enter your company website link"
+                />
+                {errors.website && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.website.message}</p>
+                )}
+              </motion.div>
+              
+              {/* Submit Button */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.3 }}
+                className="pt-4"
+              >
+                <button
+                  type="submit"
+                  className="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-lg shadow-lg hover:from-red-700 hover:to-orange-600 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                >
+                  Submit Company Profile
+                </button>
+              </motion.div>
+            </form>
+          </div>
+          
+          {/* Decorative Elements */}
+          <div className="relative h-8 bg-gradient-to-r from-red-800 via-red-600 to-orange-500">
+            <svg className="absolute bottom-0 left-0 w-full h-16 -mb-8" viewBox="0 0 1440 320">
+              <path fill="#111827" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,197.3C672,192,768,160,864,170.7C960,181,1056,235,1152,245.3C1248,256,1344,224,1392,208L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+          </div>
+        </motion.div>
+        
+        {/* Cybersecurity Decorative Icons */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-3xl mx-auto">
+          {[
+            { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title: "Security" },
+            { icon: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z", title: "Monitoring" },
+            { icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", title: "Protection" },
+            { icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2", title: "Compliance" },
+          ].map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.4 + index * 0.1 }}
+              className="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-900 shadow-lg border border-gray-800"
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center mb-3">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path>
+                </svg>
+              </div>
+              <p className="text-center font-medium text-orange-400">{item.title}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
