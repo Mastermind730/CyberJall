@@ -77,3 +77,22 @@ model Validated_User{
     message String
     password String
 }
+// Company Name: [Service Provider Name]
+// Logo: [Attach Logo]
+// Company Overview : [Provide a brief introduction about the company]
+// Services Offered : [List and describe the key cybersecurity services they provide, such as penetration testing, threat intelligence, incident response, compliance consulting, etc.]
+// Expertise & Certifications : [Mention relevant certifications (e.g., ISO 27001, CISSP, CEH), partnerships, industry experience, and any notable achievements.]
+// Case Studies & Testimonials : [Include success stories, notable clients, or testimonials to establish credibility and showcase past achievements.]
+// Website: [Company Website Link]
+
+model Company{
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  company_name String
+  logo String
+  overview String @db.String
+  services_offered Json
+  expertise_and_certifications Json
+  case_studies Json
+  website String
+
+}

@@ -1,10 +1,10 @@
 // pages/company-profile.js
 "use client";
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { CldUploadButton } from 'next-cloudinary';
+import Image from 'next/image';
 
 export default function CompanyProfile() {
   const [isUploading, setIsUploading] = useState(false);
@@ -14,26 +14,37 @@ export default function CompanyProfile() {
     register, 
     handleSubmit, 
     setValue, 
-    watch, 
+    watch,
+    control,
     formState: { errors } 
   } = useForm({
     defaultValues: {
-      companyName: '',
-      companyOverview: '',
-      servicesOffered: '',
-      expertiseCertifications: '',
-      caseStudies: '',
+      company_name: '',
+      overview: '',
+      services_offered: [{ name: '', description: '' }],
+      expertise_and_certifications: [{ type: '', name: '' }],
+      case_studies: [{ title: '', client: '', challenge: '', solution: '', result: '' }],
       website: '',
-      logoUrl: '',
+      logo: '',
     }
   });
   
-  // Watch the logoUrl to display the preview
-  const logoUrl = watch('logoUrl');
+  // Field arrays for structured data
+  const { fields: serviceFields, append: appendService, remove: removeService } = 
+    useFieldArray({ control, name: "services_offered" });
+  
+  const { fields: certFields, append: appendCert, remove: removeCert } = 
+    useFieldArray({ control, name: "expertise_and_certifications" });
+  
+  const { fields: caseFields, append: appendCase, remove: removeCase } = 
+    useFieldArray({ control, name: "case_studies" });
+  
+  // Watch the logo to display the preview
+  const logo = watch('logo');
   
   const handleLogoUpload = (result) => {
     if (result?.info?.secure_url) {
-      setValue('logoUrl', result?.info?.secure_url, {
+      setValue('logo', result?.info?.secure_url, {
         shouldValidate: true
       });
       setIsUploading(false);
@@ -106,14 +117,14 @@ export default function CompanyProfile() {
               >
                 <label className="block text-orange-400 mb-2 font-medium">Company Name</label>
                 <input
-                  {...register("companyName", { 
+                  {...register("company_name", { 
                     required: "Company name is required" 
                   })}
                   className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                   placeholder="Enter your company name"
                 />
-                {errors.companyName && (
-                  <p className="mt-1 text-red-500 text-sm">{errors.companyName.message}</p>
+                {errors.company_name && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.company_name.message}</p>
                 )}
               </motion.div>
               
@@ -131,7 +142,6 @@ export default function CompanyProfile() {
                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                       </svg>
-                      {/* <span className="mt-2 text-base">Upload to Cloudinary</span> */}
                       <CldUploadButton 
                         uploadPreset="CompanyLogo"
                         onUpload={handleLogoUpload}
@@ -160,18 +170,20 @@ export default function CompanyProfile() {
                     {/* Hidden field for storing logo URL */}
                     <input 
                       type="hidden" 
-                      {...register("logoUrl")}
+                      {...register("logo")}
                     />
                   </div>
                   
-                  {logoUrl && (
+                  {logo && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       className="relative w-24 h-24 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex-shrink-0"
                     >
-                      <img 
-                        src={logoUrl} 
+                      <Image
+                        width={70}
+                        height={70}
+                        src={logo} 
                         alt="Company logo" 
                         className="w-full h-full object-contain" 
                       />
@@ -188,7 +200,7 @@ export default function CompanyProfile() {
               >
                 <label className="block text-orange-400 mb-2 font-medium">Company Overview</label>
                 <textarea
-                  {...register("companyOverview", { 
+                  {...register("overview", { 
                     required: "Company overview is required",
                     minLength: {
                       value: 50,
@@ -199,69 +211,215 @@ export default function CompanyProfile() {
                   className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                   placeholder="Provide a brief introduction about your company"
                 ></textarea>
-                {errors.companyOverview && (
-                  <p className="mt-1 text-red-500 text-sm">{errors.companyOverview.message}</p>
+                {errors.overview && (
+                  <p className="mt-1 text-red-500 text-sm">{errors.overview.message}</p>
                 )}
               </motion.div>
               
-              {/* Services Offered */}
+              {/* Services Offered (JSON Structure) */}
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.9 }}
+                className="space-y-4"
               >
-                <label className="block text-orange-400 mb-2 font-medium">Services Offered</label>
-                <textarea
-                  {...register("servicesOffered", { 
-                    required: "Services offered is required" 
-                  })}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="List and describe the key cybersecurity services you provide (e.g., penetration testing, threat intelligence, incident response, compliance consulting, etc.)"
-                ></textarea>
-                {errors.servicesOffered && (
-                  <p className="mt-1 text-red-500 text-sm">{errors.servicesOffered.message}</p>
-                )}
+                <div className="flex justify-between items-center">
+                  <label className="block text-orange-400 font-medium">Services Offered</label>
+                  <button
+                    type="button"
+                    onClick={() => appendService({ name: '', description: '' })}
+                    className="px-3 py-1 bg-orange-600 rounded-lg text-white text-sm hover:bg-orange-700 transition-colors"
+                  >
+                    + Add Service
+                  </button>
+                </div>
+                
+                {serviceFields.map((field, index) => (
+                  <div key={field.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-orange-400 font-medium">Service #{index + 1}</h4>
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => removeService(index)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Service Name</label>
+                      <input
+                        {...register(`services_offered.${index}.name`, { required: "Service name required" })}
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="e.g., Penetration Testing"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Service Description</label>
+                      <textarea
+                        {...register(`services_offered.${index}.description`, { required: "Description required" })}
+                        rows="3"
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="Describe this service in detail"
+                      ></textarea>
+                    </div>
+                  </div>
+                ))}
               </motion.div>
               
-              {/* Expertise & Certifications */}
+              {/* Expertise & Certifications (JSON Structure) */}
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 1.0 }}
+                className="space-y-4"
               >
-                <label className="block text-orange-400 mb-2 font-medium">Expertise & Certifications</label>
-                <textarea
-                  {...register("expertiseCertifications", { 
-                    required: "Expertise and certifications is required" 
-                  })}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Mention relevant certifications (e.g., ISO 27001, CISSP, CEH), partnerships, industry experience, and any notable achievements"
-                ></textarea>
-                {errors.expertiseCertifications && (
-                  <p className="mt-1 text-red-500 text-sm">{errors.expertiseCertifications.message}</p>
-                )}
+                <div className="flex justify-between items-center">
+                  <label className="block text-orange-400 font-medium">Expertise & Certifications</label>
+                  <button
+                    type="button"
+                    onClick={() => appendCert({ type: '', name: '' })}
+                    className="px-3 py-1 bg-orange-600 rounded-lg text-white text-sm hover:bg-orange-700 transition-colors"
+                  >
+                    + Add Certification
+                  </button>
+                </div>
+                
+                {certFields.map((field, index) => (
+                  <div key={field.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-orange-400 font-medium">Certification #{index + 1}</h4>
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCert(index)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Type</label>
+                      <select
+                        {...register(`expertise_and_certifications.${index}.type`, { required: "Type required" })}
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="">Select type</option>
+                        <option value="certification">Certification</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="expertise">Expertise</option>
+                        <option value="achievement">Achievement</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Name/Description</label>
+                      <input
+                        {...register(`expertise_and_certifications.${index}.name`, { required: "Name required" })}
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="e.g., CISSP, ISO 27001, etc."
+                      />
+                    </div>
+                  </div>
+                ))}
               </motion.div>
               
-              {/* Case Studies & Testimonials */}
+              {/* Case Studies (JSON Structure) */}
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 1.1 }}
+                className="space-y-4"
               >
-                <label className="block text-orange-400 mb-2 font-medium">Case Studies & Testimonials</label>
-                <textarea
-                  {...register("caseStudies", { 
-                    required: "Case studies is required" 
-                  })}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Include success stories, notable clients, or testimonials to establish credibility and showcase past achievements"
-                ></textarea>
-                {errors.caseStudies && (
-                  <p className="mt-1 text-red-500 text-sm">{errors.caseStudies.message}</p>
-                )}
+                <div className="flex justify-between items-center">
+                  <label className="block text-orange-400 font-medium">Case Studies & Testimonials</label>
+                  <button
+                    type="button"
+                    onClick={() => appendCase({ title: '', client: '', challenge: '', solution: '', result: '' })}
+                    className="px-3 py-1 bg-orange-600 rounded-lg text-white text-sm hover:bg-orange-700 transition-colors"
+                  >
+                    + Add Case Study
+                  </button>
+                </div>
+                
+                {caseFields.map((field, index) => (
+                  <div key={field.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-orange-400 font-medium">Case Study #{index + 1}</h4>
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCase(index)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-gray-300 mb-1">Title</label>
+                        <input
+                          {...register(`case_studies.${index}.title`, { required: "Title required" })}
+                          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="Case study title"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm text-gray-300 mb-1">Client (optional)</label>
+                        <input
+                          {...register(`case_studies.${index}.client`)}
+                          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="Client name or industry"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Challenge</label>
+                      <textarea
+                        {...register(`case_studies.${index}.challenge`, { required: "Challenge required" })}
+                        rows="2"
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="Describe the challenge faced"
+                      ></textarea>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Solution</label>
+                      <textarea
+                        {...register(`case_studies.${index}.solution`, { required: "Solution required" })}
+                        rows="2"
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="Describe your solution"
+                      ></textarea>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Results</label>
+                      <textarea
+                        {...register(`case_studies.${index}.result`, { required: "Results required" })}
+                        rows="2"
+                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="Describe the outcomes achieved"
+                      ></textarea>
+                    </div>
+                  </div>
+                ))}
               </motion.div>
               
               {/* Website */}

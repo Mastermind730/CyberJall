@@ -1,4 +1,3 @@
-// pages/company/[id].js
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -6,7 +5,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, Star, ChevronDown, ChevronUp } from 'lucide-react';
 
 // This would typically come from an API or database
-// Example data for a single company
 const companyData = {
   id: 1,
   name: "CyberShield Security Solutions",
