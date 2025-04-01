@@ -1,33 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import Link from 'next/link';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState('hero');
   const [isMounted, setIsMounted] = useState(false);
-  const [companies,setCompanies]=useState();
-
-
-  useEffect(()=>{
-    const fetchCompanies=async ()=>{
-      const response = await axios.get("/api/company");
-      const data = response.data;
-      console.log(data);
-    }
-    fetchCompanies();
-  })
-  
-
-
+ 
 
   useEffect(() => {
     setIsLoaded(true);
     setIsMounted(true);
     
     const handleScroll = () => {
-      const sections = ['hero', 'about', 'mission', 'features', 'cta'];
+      const sections = ['hero', 'about', 'mission', 'features', 'partners', 'cta'];
       
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -45,17 +33,13 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-   // Return a simple loading state or null while client-side code isn't ready
-   if (!isMounted) {
+  // Return a simple loading state or null while client-side code isn't ready
+  if (!isMounted) {
     return null; // Return nothing during SSR to prevent hydration mismatch
   }
 
   return (
     <div className="bg-black text-white min-h-screen">
-     
-
-      
-
       <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-red-900 opacity-80"></div>
@@ -575,200 +559,247 @@ export default function Home() {
                 initial={{ scale: 1 }}
                 animate={{ scale: [1, 1.5, 1], opacity: [0.7, 0.3, 0.7] }}
                 transition={{ duration: 2, repeat: Infinity }}
-              />
-            </svg>
-          </motion.div>
-        </div>
-      </section>
-
-      <section id="features" className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black to-gray-900"></div>
-          <svg width="100%" height="100%" className="absolute inset-0 opacity-10">
-            <pattern id="hexagons" width="50" height="43.4" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
-              <path d="M25,0 L50,14.4 L50,43.4 L25,57.8 L0,43.4 L0,14.4 Z" fill="none" stroke="#FF4500" strokeWidth="0.5" />
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#hexagons)" />
-          </svg>
-        </div>
-        
-        <div id='why-choose-us' className="container mx-auto px-6 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">CyberJall</span></h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-red-500 to-orange-500 mx-auto"></div>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />,
-                title: "Enhanced Security",
-                description: "Access comprehensive, multi-layered security solutions from multiple trusted providers through a single platform."
-              },
-              {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />,
-                title: "Verified Providers",
-                description: "Every security provider on our platform undergoes rigorous vetting to ensure top-tier expertise and reliability."
-              },
-              {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />,
-                title: "Transparent Pricing",
-                description: "Our marketplace offers clear, upfront pricing with no hidden fees, making budgeting for cybersecurity services straightforward."
-              },
-              {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />,
-                title: "Customized Solutions",
-                description: "Mix and match services to create a tailored security package that addresses your specific business needs and challenges."
-              },
-              {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />,
-                title: "Seamless Integration",
-                description: "Our platform simplifies the integration of multiple cybersecurity services, eliminating technical complexity."
-              },
-              {
-                icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />,
-                title: "Real-time Monitoring",
-                description: "Track the performance and status of all your security services through a single, intuitive dashboard."
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
+                />
+                </svg>
+              </motion.div>
+            </div>
+          </section>
+    
+          <section id="features" className="py-20 relative overflow-hidden bg-black">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-gray-900 opacity-90"></div>
+              <div className="absolute right-0 top-1/3 w-64 h-64 bg-red-900 rounded-full filter blur-3xl opacity-20"></div>
+            </div>
+            
+            <div className="container mx-auto px-6 relative z-10">
+              <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true, margin: "-100px" }}
-                className="bg-gradient-to-br from-gray-900 to-black p-1 rounded-xl"
+                className="text-center mb-16"
               >
-                <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl border border-red-500/10 h-full">
-                  <div className="mb-4 text-red-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      {feature.icon}
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-gray-300">{feature.description}</p>
-                </div>
+                <h2 className="text-3xl md:text-5xl font-bold mb-6">Key <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Features</span></h2>
+                <div className="h-1 w-20 bg-gradient-to-r from-red-500 to-orange-500 mx-auto"></div>
               </motion.div>
-            ))}
-          </div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {[
-              { value: "100+", label: "Security Providers" },
-              { value: "500+", label: "Businesses Protected" },
-              { value: "99.9%", label: "Service Uptime" },
-              { value: "24/7", label: "Support Available" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 100, 
-                    delay: index * 0.1 + 0.2 
-                  }}
-                  viewport={{ once: true }}
-                  className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2"
-                >
-                  {stat.value}
-                </motion.div>
-                <div className="text-gray-300">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <section id="cta" className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-black"></div>
-          <motion.div
-            animate={{ 
-              rotate: 360,
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              rotate: { duration: 40, repeat: Infinity, ease: "linear" },
-              scale: { duration: 8, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className="absolute -right-40 -bottom-40 w-96 h-96 bg-red-600 opacity-10 rounded-full filter blur-3xl"
-          ></motion.div>
-        </div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="bg-gradient-to-r from-gray-900 to-black p-1 rounded-2xl max-w-4xl mx-auto"
-          >
-            <div className="bg-gradient-to-r from-gray-900 to-black rounded-2xl p-10 md:p-16 border border-red-500/20 relative overflow-hidden">
-              <div className="absolute inset-0 overflow-hidden">
-                <svg width="100%" height="100%" className="opacity-10">
-                  <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="orange" strokeWidth="0.5" />
-                  </pattern>
-                  <rect width="100%" height="100%" fill="url(#smallGrid)" />
-                </svg>
-              </div>
               
-              <div className="relative">
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  viewport={{ once: true }}
-                  className="text-center mb-8"
+              <div className="grid md:grid-cols-3 gap-8">
+                {[
+                  {
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    ),
+                    title: "Trusted Providers",
+                    description: "Vetted cybersecurity experts with proven track records and transparent ratings."
+                  },
+                  {
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                      </svg>
+                    ),
+                    title: "Custom Packages",
+                    description: "Mix and match services from multiple providers in one subscription."
+                  },
+                  {
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    ),
+                    title: "Transparent Pricing",
+                    description: "Clear, upfront costs with no hidden fees or surprise charges."
+                  },
+                  {
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    ),
+                    title: "Seamless Integration",
+                    description: "Easy onboarding and coordination between multiple services."
+                  },
+                  {
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    ),
+                    title: "Performance Monitoring",
+                    description: "Real-time tracking and reporting of all security services."
+                  },
+                  {
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    ),
+                    title: "24/7 Support",
+                    description: "Dedicated assistance whenever you need it."
+                  }
+                ].map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    className="bg-gray-900 rounded-xl p-8 border border-gray-800 hover:border-red-500/30 transition-all duration-300"
+                  >
+                    <div className="text-red-500 mb-4">{feature.icon}</div>
+                    <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                    <p className="text-gray-300">{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+    
+          <section id="partners" className="py-20 relative overflow-hidden bg-gradient-to-b from-gray-900 to-black">
+            <div className="container mx-auto px-6 relative z-10">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="text-center mb-16"
+              >
+                <h2 className="text-3xl md:text-5xl font-bold mb-6">Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Partners</span></h2>
+                <div className="h-1 w-20 bg-gradient-to-r from-red-500 to-orange-500 mx-auto"></div>
+              </motion.div>
+              
+
+<section id="partners" className="py-20 relative overflow-hidden bg-gradient-to-b from-gray-900 to-black">
+  <div className="container mx-auto px-6 relative z-10">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true, margin: "-100px" }}
+      className="text-center mb-16"
+    >
+      <h2 className="text-3xl md:text-5xl font-bold mb-6">Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Partners</span></h2>
+      <div className="h-1 w-20 bg-gradient-to-r from-red-500 to-orange-500 mx-auto"></div>
+    </motion.div>
+    
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+      {[1, 2, 3, 4].map((i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: i * 0.1 }}
+          viewport={{ once: true }}
+          className="bg-gray-900 rounded-xl p-6 flex items-center justify-center border border-gray-800 hover:border-red-500/30 transition-all duration-300"
+        >
+          <div className="text-gray-300 font-medium">Partner {i}</div>
+        </motion.div>
+      ))}
+    </div>
+    
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.4 }}
+      viewport={{ once: true, margin: "-100px" }}
+      className="text-center"
+    >
+      <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+        We partner with the most trusted names in cybersecurity to bring you comprehensive protection.
+      </p>
+      <Link href="/companies">
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-gradient-to-r from-red-600 to-orange-500 px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-red-600/30"
+        >
+          View All Partners
+        </motion.button>
+      </Link>
+    </motion.div>
+  </div>
+</section>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="mt-16 text-center"
+              >
+                <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+                  We partner with the most trusted names in cybersecurity to bring you comprehensive protection.
+                </p>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-r from-red-600 to-orange-500 px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-red-600/30"
                 >
-                  <h2 className="text-3xl md:text-4xl font-bold mb-6">Get Started with CyberJall Today</h2>
-                  <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                    Take control of your cybersecurity needs with a trusted marketplace that connects you with top-tier service providers.
-                  </p>
-                </motion.div>
+                  Become a Partner
+                </motion.button>
+              </motion.div>
+            </div>
+          </section>
+    
+          <section id="cta" className="py-32 relative overflow-hidden bg-black">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-red-900 opacity-80"></div>
+              <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-red-500 rounded-full filter blur-3xl opacity-20"></div>
+              <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-500 rounded-full filter blur-3xl opacity-15"></div>
+            </div>
+            
+            <div className="container mx-auto px-6 relative z-10 text-center">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true, margin: "-100px" }}
+              >
+                <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Transform Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Security</span>?</h2>
+                <div className="h-1 w-20 bg-gradient-to-r from-red-500 to-orange-500 mx-auto mb-8"></div>
+                <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-12">
+                  Join hundreds of businesses who have already strengthened their cybersecurity with our collaborative marketplace.
+                </p>
                 
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col sm:flex-row justify-center gap-4"
-                >
+                <div className="flex flex-col sm:flex-row justify-center gap-6">
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="bg-gradient-to-r from-red-600 to-orange-500 px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-red-600/30"
                   >
-                    Request Demo
+                    Get Started Now
                   </motion.button>
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 rounded-full font-semibold text-lg border border-orange-500 shadow-lg shadow-orange-600/10"
+                    className="px-8 py-4 rounded-full font-semibold text-lg border border-red-500 shadow-lg shadow-red-600/10"
                   >
-                    Learn More
+                    Request Demo
                   </motion.button>
-                </motion.div>
-              </div>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
+          </section>
+    
+          {/* Navigation dots */}
+          <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-50 hidden md:block">
+            {['hero', 'about', 'mission', 'features', 'partners', 'cta'].map((section) => (
+              <motion.button
+                key={section}
+                onClick={() => {
+                  document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="block w-3 h-3 rounded-full my-4 focus:outline-none"
+                initial={{ backgroundColor: '#4B5563' }}
+                animate={{ backgroundColor: currentSection === section ? '#EF4444' : '#4B5563' }}
+                whileHover={{ scale: 1.5 }}
+                transition={{ duration: 0.2 }}
+                aria-label={`Go to ${section} section`}
+              />
+            ))}
+          </div>
         </div>
-      </section>
-
-      
-    </div>
-  );
-}
+      );
+    }

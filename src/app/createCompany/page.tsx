@@ -46,6 +46,8 @@ export default function CompanyProfile() {
   const logo = watch('logo');
   
   const handleLogoUpload = (result) => {
+    console.log(result,"result")
+    console.log(result.info)
     if (result?.info?.secure_url) {
       setValue('logo', result?.info?.secure_url, {
         shouldValidate: true
@@ -59,6 +61,7 @@ export default function CompanyProfile() {
     try {
       setIsSubmitting(true);
       setSubmitStatus({ type: 'info', message: 'Submitting your company profile...' });
+      console.log(logo)
       
       console.log(data,"data");
       const response = await axios.post('/api/createCompany', data);
@@ -216,11 +219,11 @@ export default function CompanyProfile() {
                       </svg>
                       <CldUploadButton 
                         uploadPreset="CompanyLogo"
-                        onUpload={handleLogoUpload}
-                        onProgress={(progress) => {
-                          setIsUploading(true);
-                          setUploadProgress(Math.round(progress));
-                        }}
+                        onSuccess={handleLogoUpload}
+                        // onProgress={(progress) => {
+                        //   setIsUploading(true);
+                        //   setUploadProgress(Math.round(progress));
+                        // }}
                       />
                     </div>
 
