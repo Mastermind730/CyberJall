@@ -5,10 +5,13 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { CldUploadButton } from 'next-cloudinary';
 import Image from 'next/image';
+import axios from 'axios'; // Import axios
 
 export default function CompanyProfile() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
   
   const { 
     register, 
@@ -52,10 +55,47 @@ export default function CompanyProfile() {
     }
   };
   
-  const onSubmit = (data) => {
-    console.log('Form Data:', data);
-    // Here you would typically send this data to your backend
-    alert('Company profile submitted successfully!');
+  const onSubmit = async (data) => {
+    try {
+      setIsSubmitting(true);
+      setSubmitStatus({ type: 'info', message: 'Submitting your company profile...' });
+      
+      console.log(data,"data");
+      const response = await axios.post('/api/createCompany', data);
+      
+      console.log('API Response:', response.data);
+      setSubmitStatus({ 
+        type: 'success', 
+        message: 'Company profile submitted successfully!' 
+      });
+      
+    
+      
+    } catch (error) {
+      console.error('Submission error:', error);
+      
+      if (error.response) {
+        const errorMessage = error.response.data.error || 'Failed to submit company profile';
+        setSubmitStatus({ 
+          type: 'error', 
+          message: errorMessage 
+        });
+      } else if (error.request) {
+        // The request was made but no response was received
+        setSubmitStatus({ 
+          type: 'error', 
+          message: 'No response from server. Please check your connection and try again.' 
+        });
+      } else {
+        // Something happened in setting up the request
+        setSubmitStatus({ 
+          type: 'error', 
+          message: 'An unexpected error occurred. Please try again later.' 
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -107,6 +147,38 @@ export default function CompanyProfile() {
         >
           <div className="p-8">
             <h2 className="text-2xl font-bold mb-6 text-center text-orange-500">Complete Your Company Profile</h2>
+            
+            {/* Status Messages */}
+            {submitStatus.message && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mb-6 p-4 rounded-lg ${
+                  submitStatus.type === 'success' ? 'bg-green-900 text-green-200' :
+                  submitStatus.type === 'error' ? 'bg-red-900 text-red-200' :
+                  'bg-blue-900 text-blue-200'
+                }`}
+              >
+                <div className="flex items-center">
+                  {submitStatus.type === 'success' && (
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  )}
+                  {submitStatus.type === 'error' && (
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  )}
+                  {submitStatus.type === 'info' && (
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  )}
+                  <span>{submitStatus.message}</span>
+                </div>
+              </motion.div>
+            )}
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {/* Company Name */}
@@ -455,9 +527,24 @@ export default function CompanyProfile() {
               >
                 <button
                   type="submit"
-                  className="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-lg shadow-lg hover:from-red-700 hover:to-orange-600 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  disabled={isSubmitting}
+                  className={`w-full py-4 px-6 ${
+                    isSubmitting 
+                      ? 'bg-gray-600 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 transform hover:scale-105'
+                  } text-white font-bold rounded-lg shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-orange-300`}
                 >
-                  Submit Company Profile
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </div>
+                  ) : (
+                    "Submit Company Profile"
+                  )}
                 </button>
               </motion.div>
             </form>
@@ -466,35 +553,10 @@ export default function CompanyProfile() {
           {/* Decorative Elements */}
           <div className="relative h-8 bg-gradient-to-r from-red-800 via-red-600 to-orange-500">
             <svg className="absolute bottom-0 left-0 w-full h-16 -mb-8" viewBox="0 0 1440 320">
-              <path fill="#111827" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,197.3C672,192,768,160,864,170.7C960,181,1056,235,1152,245.3C1248,256,1344,224,1392,208L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+              <path fill="#111827" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
             </svg>
           </div>
         </motion.div>
-        
-        {/* Cybersecurity Decorative Icons */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-3xl mx-auto">
-          {[
-            { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title: "Security" },
-            { icon: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z", title: "Monitoring" },
-            { icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", title: "Protection" },
-            { icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2", title: "Compliance" },
-          ].map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.4 + index * 0.1 }}
-              className="flex flex-col items-center justify-center p-4 rounded-xl bg-gray-900 shadow-lg border border-gray-800"
-            >
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center mb-3">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path>
-                </svg>
-              </div>
-              <p className="text-center font-medium text-orange-400">{item.title}</p>
-            </motion.div>
-          ))}
-        </div>
       </div>
     </div>
   );

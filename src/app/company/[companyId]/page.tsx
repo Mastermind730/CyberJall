@@ -1,80 +1,19 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, Star, ChevronDown, ChevronUp } from 'lucide-react';
-
-// This would typically come from an API or database
-const companyData = {
-  id: 1,
-  name: "CyberShield Security Solutions",
-  logo: "/company-logos/cybershield.svg", 
-  overview: "CyberShield Security Solutions is a leading cybersecurity firm established in 2010, dedicated to protecting organizations from evolving digital threats. With over 200 security professionals worldwide, we've helped more than 500 enterprises safeguard their critical assets and maintain business continuity in the face of sophisticated cyber attacks.",
-  services: [
-    {
-      title: "Penetration Testing",
-      description: "Our team of ethical hackers simulates real-world cyber attacks to identify vulnerabilities in your systems before malicious actors can exploit them."
-    },
-    {
-      title: "Threat Intelligence",
-      description: "Stay ahead of emerging threats with our advanced threat intelligence services that provide actionable insights on potential risks to your organization."
-    },
-    {
-      title: "Incident Response",
-      description: "When security incidents occur, our rapid response team works 24/7 to contain breaches, minimize damage, and restore normal operations."
-    },
-    {
-      title: "Compliance Consulting",
-      description: "Navigate complex regulatory requirements with our dedicated compliance experts specializing in GDPR, HIPAA, PCI DSS, and more."
-    },
-    {
-      title: "Security Architecture",
-      description: "Design robust security frameworks tailored to your organization's unique needs, ensuring comprehensive protection across your digital infrastructure."
-    }
-  ],
-  expertise: [
-    "ISO 27001 Certified Organization",
-    "CISSP, CEH, and CISM Certified Professionals",
-    "Microsoft Gold Security Partner",
-    "AWS Security Competency Partner",
-    "Google Cloud Security Partner",
-    "Member of Global Cyber Alliance",
-    "Recognized in Gartner Magic Quadrant for Managed Security Services"
-  ],
-  caseStudies: [
-    {
-      title: "Financial Services Security Transformation",
-      client: "Major European Bank",
-      description: "Implemented a comprehensive security overhaul that reduced security incidents by 73% and achieved regulatory compliance across 27 countries."
-    },
-    {
-      title: "Healthcare Data Protection Program",
-      client: "Regional Healthcare Network",
-      description: "Designed and deployed a multi-layered security framework protecting sensitive patient data for a network serving over 2 million patients annually."
-    },
-    {
-      title: "Retail Breach Response and Recovery",
-      client: "International Retail Chain",
-      description: "Successfully contained and remediated a sophisticated cyber attack, restoring operations within 24 hours and preventing data exfiltration."
-    }
-  ],
-  testimonials: [
-    {
-      quote: "CyberShield's expertise transformed our security posture. Their team's dedication and technical knowledge have made them an invaluable partner in our digital transformation journey.",
-      author: "Sarah Chen",
-      position: "CIO, Global Financial Services Corporation"
-    },
-    {
-      quote: "When we experienced a potentially devastating cyber attack, CyberShield's incident response team was there within hours. Their swift action saved us millions in potential damages and kept our reputation intact.",
-      author: "Michael Rodriguez",
-      position: "CISO, Healthcare Technologies Inc."
-    }
-  ],
-  website: "https://www.cybershield-security.com"
-};
+import axios from 'axios';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }) => {
+  // Get initials from company name
+  const initials = name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .substring(0, 2);
+
   return (
     <svg width="100" height="100" viewBox="0 0 100 100" className="w-full h-full">
       <defs>
@@ -91,7 +30,7 @@ const LogoPlaceholder = ({ name }) => {
       <circle cx="50" cy="35" r="15" fill="#333" />
       <rect x="35" y="50" width="30" height="20" fill="#333" />
       <path d="M35,50 L50,35 L65,50 Z" fill="#333" />
-      <text x="50" y="42" fontFamily="Arial" fontSize="12" fontWeight="bold" fill="white" textAnchor="middle">CS</text>
+      <text x="50" y="42" fontFamily="Arial" fontSize="12" fontWeight="bold" fill="white" textAnchor="middle">{initials}</text>
     </svg>
   );
 };
@@ -137,19 +76,84 @@ const AnimatedSection = ({ title, icon, children, delay = 0 }) => {
   );
 };
 
-export default function CompanyDetails() {
+interface IParams {
+  companyId: string
+}
+
+export default function CompanyDetails({ params }: { params: Promise<IParams> }) {
   const [mounted, setMounted] = useState(false);
+  const [company, setCompany] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
+  const { companyId } = use(params);
+
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`/api/company/${companyId}`);
+        setCompany(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching company data:", err);
+        setError("Failed to load company data. Please try again later.");
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
     setMounted(true);
-  }, []);
-  
+  }, [companyId]);
+
   if (!mounted) return null;
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-red-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl">Loading company profile...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-900 text-gray-100 flex items-center justify-center">
+        <div className="text-center max-w-lg p-6 bg-zinc-800 rounded-lg">
+          <p className="text-xl text-red-500 mb-4">Error</p>
+          <p>{error}</p>
+          <Link href="/ourPartners" className="mt-6 inline-block bg-red-900 hover:bg-red-800 px-4 py-2 rounded-full transition-colors">
+            Return to Companies
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!company) return null;
+  
+  // Transform services array if needed
+  const services = Array.isArray(company.services_offered) 
+    ? company.services_offered.map(service => ({
+        title: service,
+        description: `Professional ${service} services tailored to your business needs.`
+      }))
+    : [];
+  
+  // Format case studies if needed
+  const caseStudies = Array.isArray(company.case_studies) 
+    ? company.case_studies.map(study => ({
+        title: study.title,
+        client: "Client",
+        description: study.description + (study.results ? ` Results: ${study.results}` : "")
+      }))
+    : [];
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-900 text-gray-100">
-    
-      
       {/* Navigation Bar */}
       <nav className="sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur border-b border-zinc-800">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -158,15 +162,17 @@ export default function CompanyDetails() {
             <span>Back to Companies</span>
           </Link>
           
-          <a 
-            href={companyData.website} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center bg-red-900 hover:bg-red-800 px-4 py-2 rounded-full transition-colors"
-          >
-            <Globe size={18} className="mr-2" />
-            <span>Visit Website</span>
-          </a>
+          {company.website && (
+            <Link
+              href={company.website} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center bg-red-900 hover:bg-red-800 px-4 py-2 rounded-full transition-colors"
+            >
+              <Globe size={18} className="mr-2" />
+              <span>Visit Website</span>
+            </Link>
+          )}
         </div>
       </nav>
       
@@ -200,7 +206,11 @@ export default function CompanyDetails() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7 }}
             >
-              <LogoPlaceholder name={companyData.name} />
+              {company.logo ? (
+                <img src={company.logo} alt={company.company_name} className="w-full h-full object-contain" />
+              ) : (
+                <LogoPlaceholder name={company.company_name} />
+              )}
             </motion.div>
             
             {/* Company Name and Overview */}
@@ -211,7 +221,7 @@ export default function CompanyDetails() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
               >
-                {companyData.name}
+                {company.company_name}
               </motion.h1>
               
               <motion.p 
@@ -220,7 +230,7 @@ export default function CompanyDetails() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.7, delay: 0.2 }}
               >
-                {companyData.overview}
+                {company.overview}
               </motion.p>
             </div>
           </div>
@@ -230,100 +240,73 @@ export default function CompanyDetails() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         {/* Services Section */}
-        <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {companyData.services.map((service, index) => (
-              <motion.div
-                key={index}
-                className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              >
-                <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
-                <p className="text-gray-300">{service.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </AnimatedSection>
+        {services.length > 0 && (
+          <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              {services.map((service, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 * index }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                >
+                  <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
+                  <p className="text-gray-300">{service.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </AnimatedSection>
+        )}
         
         {/* Expertise Section */}
-        <AnimatedSection title="Expertise & Certifications" icon={Award} delay={0.5}>
-          <div className="flex flex-wrap gap-4 mt-6">
-            {companyData.expertise.map((item, index) => (
-              <motion.div
-                key={index}
-                className="bg-zinc-800 rounded-full px-4 py-2 flex items-center text-sm"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.05 * index }}
-                whileHover={{ scale: 1.05, backgroundColor: '#7f1d1d' }}
-              >
-                <div className="w-2 h-2 rounded-full bg-red-600 mr-2"></div>
-                {item}
-              </motion.div>
-            ))}
-          </div>
-        </AnimatedSection>
+        {company.expertise_and_certifications && company.expertise_and_certifications.length > 0 && (
+          <AnimatedSection title="Expertise & Certifications" icon={Award} delay={0.5}>
+            <div className="flex flex-wrap gap-4 mt-6">
+              {company.expertise_and_certifications.map((item, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-zinc-800 rounded-full px-4 py-2 flex items-center text-sm"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.05 * index }}
+                  whileHover={{ scale: 1.05, backgroundColor: '#7f1d1d' }}
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-600 mr-2"></div>
+                  {item}
+                </motion.div>
+              ))}
+            </div>
+          </AnimatedSection>
+        )}
         
         {/* Case Studies Section */}
-        <AnimatedSection title="Case Studies" icon={FileText} delay={0.7}>
-          <div className="mt-6 space-y-6">
-            {companyData.caseStudies.map((study, index) => (
-              <motion.div
-                key={index}
-                className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-lg p-6 border-l-4 border-red-800"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
-              >
-                <div className="flex flex-wrap justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-white">{study.title}</h3>
-                  <span className="text-sm font-medium bg-red-900 bg-opacity-30 text-red-400 px-3 py-1 rounded-full">
-                    {study.client}
-                  </span>
-                </div>
-                <p className="text-gray-300">{study.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </AnimatedSection>
-        
-        {/* Testimonials Section */}
-        <AnimatedSection title="Testimonials" icon={Star} delay={0.9}>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {companyData.testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                className="bg-black bg-opacity-40 rounded-lg p-6 border border-zinc-800 relative"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 * index }}
-                whileHover={{ y: -5, boxShadow: "0 10px 30px -15px rgba(139, 0, 0, 0.5)" }}
-              >
-                {/* Quote marks */}
-                <div className="absolute top-4 left-4 text-6xl text-red-900 opacity-20">"</div>
-                
-                <div className="relative z-10">
-                  <p className="italic text-gray-300 mb-6">{testimonial.quote}</p>
-                  
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 rounded-full bg-red-900 flex items-center justify-center mr-3">
-                      <span className="font-bold text-white">
-                        {testimonial.author.split(' ').map(name => name[0]).join('')}
+        {caseStudies.length > 0 && (
+          <AnimatedSection title="Case Studies" icon={FileText} delay={0.7}>
+            <div className="mt-6 space-y-6">
+              {caseStudies.map((study, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-lg p-6 border-l-4 border-red-800"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 * index }}
+                >
+                  <div className="flex flex-wrap justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-white">{study.title}</h3>
+                    {study.client && (
+                      <span className="text-sm font-medium bg-red-900 bg-opacity-30 text-red-400 px-3 py-1 rounded-full">
+                        {study.client}
                       </span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white">{testimonial.author}</p>
-                      <p className="text-sm text-gray-400">{testimonial.position}</p>
-                    </div>
+                    )}
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </AnimatedSection>
+                  <p className="text-gray-300">{study.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </AnimatedSection>
+        )}
       </main>
       
       {/* Contact Section */}
@@ -335,7 +318,7 @@ export default function CompanyDetails() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7 }}
           >
-            Ready to secure your business?
+            Ready to work with {company.company_name}?
           </motion.h2>
           
           <motion.p 
@@ -344,7 +327,7 @@ export default function CompanyDetails() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            Contact our team of experts to discuss your cybersecurity needs and how we can help protect your organization.
+            Contact their team of experts to discuss how they can help transform your business.
           </motion.p>
           
           <motion.div
@@ -353,17 +336,17 @@ export default function CompanyDetails() {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <a 
-              href="#contact" 
+              href={company.website || "#contact"} 
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-white text-red-900 hover:bg-gray-200 font-bold px-8 py-4 rounded-full inline-flex items-center shadow-lg transition-colors"
             >
               <Shield size={20} className="mr-2" />
-              Get Protected Now
+              Get Started Today
             </a>
           </motion.div>
         </div>
       </section>
-      
-     
     </div>
   );
 }

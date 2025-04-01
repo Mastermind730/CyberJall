@@ -7,6 +7,19 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState('hero');
   const [isMounted, setIsMounted] = useState(false);
+  const [companies,setCompanies]=useState();
+
+
+  useEffect(()=>{
+    const fetchCompanies=async ()=>{
+      const response = await axios.get("/api/company");
+      const data = response.data;
+      console.log(data);
+    }
+    fetchCompanies();
+  })
+  
+
 
 
   useEffect(() => {
