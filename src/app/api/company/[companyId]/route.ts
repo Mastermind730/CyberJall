@@ -5,7 +5,6 @@ import prisma from "@/lib/prismadb";
 interface IParams{
     companyId:string
 }
-// 67ead40f320d9870dde6569e
 export async function GET(req: Request, { params }: { params: IParams }) {
     try {
         const { companyId } = params;
