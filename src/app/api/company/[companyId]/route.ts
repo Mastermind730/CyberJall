@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 
 
-interface IParams{
-    companyId:string
-}
-export async function GET(req: Request, { params }: { params: IParams }) {
-    try {
-        const { companyId } = params;
 
+export async function GET(req: Request, { params }: { params: Promise<{ companyId: string }> }) {
+    try {
+        const { companyId } = await params
         const company = await prisma.company.findUnique({
             where: {
                 id: companyId
