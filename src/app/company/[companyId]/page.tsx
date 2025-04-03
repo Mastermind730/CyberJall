@@ -84,9 +84,9 @@ const AnimatedSection = ({ title, icon, children, delay = 0 }: AnimatedSectionPr
   );
 };
 
-interface CompanyParams {
-  companyId: string;
-}
+// interface CompanyParams {
+//   companyId: string;
+// }
 
 // Define Company interface
 interface Company {
@@ -103,7 +103,8 @@ interface Company {
   }[];
 }
 
-export default function CompanyDetails({ params }: { params: CompanyParams }) {
+export default function CompanyDetails(params: Promise<{ comanyId: string }>
+) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
