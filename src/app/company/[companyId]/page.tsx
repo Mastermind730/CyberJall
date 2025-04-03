@@ -103,7 +103,7 @@ interface Company {
   }[];
 }
 
-export default function CompanyDetails(params: Promise<{ comanyId: string }>
+export default function CompanyDetails({params}:{params: Promise<{ comanyId: string }>}
 ) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
