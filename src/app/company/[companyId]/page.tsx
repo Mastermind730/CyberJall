@@ -84,7 +84,7 @@ const AnimatedSection = ({ title, icon, children, delay = 0 }: AnimatedSectionPr
   );
 };
 
-interface IParams {
+interface CompanyParams {
   companyId: string;
 }
 
@@ -103,7 +103,7 @@ interface Company {
   }[];
 }
 
-export default function CompanyDetails({ params }: { params: IParams }) {
+export default function CompanyDetails({ params }: { params: CompanyParams }) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
