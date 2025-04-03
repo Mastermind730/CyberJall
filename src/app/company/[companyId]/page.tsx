@@ -2,11 +2,11 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Globe, Shield, Award, FileText, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
 
 // SVG placeholder for company logo
-const LogoPlaceholder = ({ name }) => {
+const LogoPlaceholder = ({ name }: { name: string }) => {
   // Get initials from company name
   const initials = name
     .split(' ')
@@ -35,8 +35,16 @@ const LogoPlaceholder = ({ name }) => {
   );
 };
 
+// Type for AnimatedSection props
+interface AnimatedSectionProps {
+  title: string;
+  icon: React.ComponentType<{ className?: string; size?: number }>;
+  children: React.ReactNode;
+  delay?: number;
+}
+
 // Animated section component for reuse
-const AnimatedSection = ({ title, icon, children, delay = 0 }) => {
+const AnimatedSection = ({ title, icon, children, delay = 0 }: AnimatedSectionProps) => {
   const [isOpen, setIsOpen] = useState(true);
   
   const IconComponent = icon;
@@ -77,16 +85,31 @@ const AnimatedSection = ({ title, icon, children, delay = 0 }) => {
 };
 
 interface IParams {
-  companyId: string
+  companyId: string;
 }
 
-export default function CompanyDetails({ params }: { params: Promise<IParams> }) {
+// Define Company interface
+interface Company {
+  company_name: string;
+  overview: string;
+  logo?: string;
+  website?: string;
+  services_offered?: string[];
+  expertise_and_certifications?: string[];
+  case_studies?: {
+    title: string;
+    description: string;
+    results?: string;
+  }[];
+}
+
+export default function CompanyDetails({ params }: { params: IParams }) {
   const [mounted, setMounted] = useState(false);
-  const [company, setCompany] = useState(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | undefined>();
   
-  const { companyId } = use(params);
+  const companyId = params.companyId;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,8 +158,21 @@ export default function CompanyDetails({ params }: { params: Promise<IParams> })
   
   if (!company) return null;
   
+  // Define Service interface
+  interface Service {
+    title: string;
+    description: string;
+  }
+  
+  // Define CaseStudy interface
+  interface CaseStudy {
+    title: string;
+    client: string;
+    description: string;
+  }
+  
   // Transform services array if needed
-  const services = Array.isArray(company.services_offered) 
+  const services: Service[] = Array.isArray(company.services_offered) 
     ? company.services_offered.map(service => ({
         title: service,
         description: `Professional ${service} services tailored to your business needs.`
@@ -144,7 +180,7 @@ export default function CompanyDetails({ params }: { params: Promise<IParams> })
     : [];
   
   // Format case studies if needed
-  const caseStudies = Array.isArray(company.case_studies) 
+  const caseStudies: CaseStudy[] = Array.isArray(company.case_studies) 
     ? company.case_studies.map(study => ({
         title: study.title,
         client: "Client",
@@ -335,7 +371,7 @@ export default function CompanyDetails({ params }: { params: Promise<IParams> })
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
           >
-            <a 
+            <Link
               href={company.website || "#contact"} 
               target="_blank"
               rel="noopener noreferrer"
@@ -343,7 +379,7 @@ export default function CompanyDetails({ params }: { params: Promise<IParams> })
             >
               <Shield size={20} className="mr-2" />
               Get Started Today
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>

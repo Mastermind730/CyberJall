@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import type { FC } from 'react';
 
@@ -12,7 +12,7 @@ interface Slide {
 export const Hero: FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides: Slide[] = [
+  const slides = useMemo<Slide[]>(() => [
     {
       image: '/1.jpg',
       title: 'Find & Customize Trusted Cybersecurity Services in One Place',
@@ -28,14 +28,13 @@ export const Hero: FC = () => {
       title: 'Your Cybersecurity, Your Way – Build, Bundle & Protect with Experts',
       description: 'Customize cybersecurity services from multiple trusted providers and manage them effortlessly through one unified platform..'
     }
-  ];
-
+  ], []); // Empty dependency array means this will only be calculated once
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides]);
 
   return (
     <div className="relative w-full overflow-hidden bg-gray-900">
