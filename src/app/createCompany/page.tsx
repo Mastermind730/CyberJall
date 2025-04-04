@@ -498,9 +498,9 @@ export default function CompanyProfile() {
                           className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                           placeholder="Case study title"
                         />
-                        {errors.case_studies?.[index]?.title && (
+                        {/* {errors.case_studies?.[index]?.title && (
                           <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.title?.message}</p>
-                        )}
+                        )} */}
                       </div>
                       
                       <div>
@@ -521,9 +521,9 @@ export default function CompanyProfile() {
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe the challenge faced"
                       ></textarea>
-                      {errors.case_studies?.[index]?.challenge && (
+                      {/* {errors.case_studies?.[index]?.challenge && (
                         <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.challenge?.message}</p>
-                      )}
+                      )} */}
                     </div>
                     
                     <div>
@@ -534,9 +534,9 @@ export default function CompanyProfile() {
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe your solution"
                       ></textarea>
-                      {errors.case_studies?.[index]?.solution && (
+                      {/* {errors.case_studies?.[index]?.solution && (
                         <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.solution?.message}</p>
-                      )}
+                      )} */}
                     </div>
                     
                     <div>
@@ -547,9 +547,9 @@ export default function CompanyProfile() {
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe the outcomes achieved"
                       ></textarea>
-                      {errors.case_studies?.[index]?.result && (
+                      {/* {errors.case_studies?.[index]?.result && (
                         <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.result?.message}</p>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 ))}
