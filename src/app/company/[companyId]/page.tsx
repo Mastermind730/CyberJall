@@ -1,10 +1,9 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
-import { PageProps } from 'next/types';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }: { name: string }) => {
@@ -101,17 +100,17 @@ interface Company {
 }
 
 // For Next.js App Router, params should be properly typed
-interface CompanyPageParams {
-  companyId: string;
-}
+// interface CompanyPageParams {
+//   companyId: string;
+// }
 
-export default function CompanyDetails({ params }: PageProps<CompanyPageParams>) {
+export default function CompanyDetails({ params }: Promise<{companyId:string}>) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>();
   
-  const companyId = params.companyId;
+  const companyId = use(params.companyId);
 
   useEffect(() => {
     const fetchData = async () => {
