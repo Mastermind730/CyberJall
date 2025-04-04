@@ -103,15 +103,17 @@ interface Company {
 // interface CompanyPageParams {
 //   companyId: string;
 // }
+type Params = Promise<{ companyId: string }>
 
-export default function CompanyDetails({ params }: Promise<{companyId:string}>) {
+export default function CompanyDetails(props: { params: Params }) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>();
   
-  const companyId = use(params.companyId);
 
+  const params = use(props.params);
+  const companyId = params.companyId;
   useEffect(() => {
     const fetchData = async () => {
       try {
