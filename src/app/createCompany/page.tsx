@@ -435,9 +435,9 @@ export default function CompanyProfile() {
                         <option value="expertise">Expertise</option>
                         <option value="achievement">Achievement</option>
                       </select>
-                      {errors.expertise_and_certifications?.[index]?.type && (
+                      {/* {errors.expertise_and_certifications?.[index]?.type && (
                         <p className="mt-1 text-red-500 text-sm">{errors.expertise_and_certifications[index]?.type?.message}</p>
-                      )}
+                      )} */}
                     </div>
                     
                     <div>
