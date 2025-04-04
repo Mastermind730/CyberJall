@@ -447,9 +447,9 @@ export default function CompanyProfile() {
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="e.g., CISSP, ISO 27001, etc."
                       />
-                      {errors.expertise_and_certifications?.[index]?.name && (
+                      {/* {errors.expertise_and_certifications?.[index]?.name && (
                         <p className="mt-1 text-red-500 text-sm">{errors.expertise_and_certifications[index]?.name?.message}</p>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 ))}
