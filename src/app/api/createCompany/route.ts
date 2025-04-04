@@ -40,11 +40,11 @@ export  async function POST(req: Request) {
   } catch (error: unknown) {
     console.error("Error creating company:", error);
     
-    if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: "A company with this name already exists" },
-        { status: 409 }
-      );
+    // if (error.code === 'P2002') {
+    //   return NextResponse.json(
+    //     { error: "A company with this name already exists" },
+    //     { status: 409 }
+    //   );
     }
     
     return NextResponse.json(
