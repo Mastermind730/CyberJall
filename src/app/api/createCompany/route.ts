@@ -1,4 +1,5 @@
 import prisma from "@/lib/prismadb";
+import Error from "next/error";
 import { NextResponse } from "next/server";
 
 export  async function POST(req: Request) {
@@ -45,10 +46,10 @@ export  async function POST(req: Request) {
     //     { error: "A company with this name already exists" },
     //     { status: 409 }
     //   );
-    }
+    // }
     
     return NextResponse.json(
-      { error: "Internal server error", details: error.message },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
