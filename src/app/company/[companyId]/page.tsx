@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
+import { PageProps } from 'next/types';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }: { name: string }) => {
@@ -99,14 +100,12 @@ interface Company {
   }[];
 }
 
-// Define the component props interface
-interface CompanyDetailsProps {
-  params: {
-    companyId: string;
-  };
+// For Next.js App Router, params should be properly typed
+interface CompanyPageParams {
+  companyId: string;
 }
 
-export default function CompanyDetails({ params }: CompanyDetailsProps) {
+export default function CompanyDetails({ params }: PageProps<CompanyPageParams>) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
