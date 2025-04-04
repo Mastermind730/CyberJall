@@ -250,10 +250,7 @@ export default function CompanyProfile() {
                       <CldUploadButton 
                         uploadPreset="CompanyLogo"
                         onSuccess={handleLogoUpload}
-                        onUpload={() => {
-                          setIsUploading(true);
-                          setUploadProgress(0);
-                        }}
+                        
                         options={{
                           multiple: false,
                           resourceType: "image",
