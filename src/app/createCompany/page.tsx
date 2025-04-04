@@ -1,17 +1,52 @@
-// pages/company-profile.js
+// pages/company-profile.tsx
 "use client";
 import { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import { CldUploadButton } from 'next-cloudinary';
+import { CldUploadButton, CldUploadWidgetResults } from 'next-cloudinary';
 import Image from 'next/image';
-import axios from 'axios'; // Import axios
+import axios, { AxiosError } from 'axios';
+
+// Define interfaces for form data
+interface ServiceOffered {
+  name: string;
+  description: string;
+}
+
+interface ExpertiseCertification {
+  type: string;
+  name: string;
+}
+
+interface CaseStudy {
+  title: string;
+  client: string;
+  challenge: string;
+  solution: string;
+  result: string;
+}
+
+interface CompanyFormData {
+  company_name: string;
+  overview: string;
+  services_offered: ServiceOffered[];
+  expertise_and_certifications: ExpertiseCertification[];
+  case_studies: CaseStudy[];
+  website: string;
+  logo: string;
+}
+
+// Define type for submission status
+interface SubmitStatus {
+  type: 'success' | 'error' | 'info' | '';
+  message: string;
+}
 
 export default function CompanyProfile() {
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>({ type: '', message: '' });
   
   const { 
     register, 
@@ -20,7 +55,7 @@ export default function CompanyProfile() {
     watch,
     control,
     formState: { errors } 
-  } = useForm({
+  } = useForm<CompanyFormData>({
     defaultValues: {
       company_name: '',
       overview: '',
@@ -45,52 +80,46 @@ export default function CompanyProfile() {
   // Watch the logo to display the preview
   const logo = watch('logo');
   
-  const handleLogoUpload = (result) => {
-    console.log(result,"result")
-    console.log(result.info)
-    if (result?.info?.secure_url) {
-      setValue('logo', result?.info?.secure_url, {
-        shouldValidate: true
-      });
-      setIsUploading(false);
-      setUploadProgress(100);
+  const handleLogoUpload = (result: CldUploadWidgetResults) => {
+    if (result && typeof result.info !== 'string') {
+      const info = result.info as { secure_url: string };
+      if (info?.secure_url) {
+        setValue('logo', info.secure_url, {
+          shouldValidate: true
+        });
+        setIsUploading(false);
+        setUploadProgress(100);
+      }
     }
   };
   
-  const onSubmit = async (data) => {
+  const onSubmit: SubmitHandler<CompanyFormData> = async (data) => {
     try {
       setIsSubmitting(true);
       setSubmitStatus({ type: 'info', message: 'Submitting your company profile...' });
-      console.log(logo)
       
-      console.log(data,"data");
       const response = await axios.post('/api/createCompany', data);
       
-      console.log('API Response:', response.data);
       setSubmitStatus({ 
         type: 'success', 
         message: 'Company profile submitted successfully!' 
       });
       
-    
-      
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Submission error:', error);
       
-      if (error.response) {
-        const errorMessage = error.response.data.error || 'Failed to submit company profile';
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error || 'Failed to submit company profile';
         setSubmitStatus({ 
           type: 'error', 
           message: errorMessage 
         });
-      } else if (error.request) {
-        // The request was made but no response was received
+      } else if (error instanceof Error) {
         setSubmitStatus({ 
           type: 'error', 
-          message: 'No response from server. Please check your connection and try again.' 
+          message: error.message || 'An unexpected error occurred. Please try again later.' 
         });
       } else {
-        // Something happened in setting up the request
         setSubmitStatus({ 
           type: 'error', 
           message: 'An unexpected error occurred. Please try again later.' 
@@ -220,10 +249,15 @@ export default function CompanyProfile() {
                       <CldUploadButton 
                         uploadPreset="CompanyLogo"
                         onSuccess={handleLogoUpload}
-                        // onProgress={(progress) => {
-                        //   setIsUploading(true);
-                        //   setUploadProgress(Math.round(progress));
-                        // }}
+                        onUpload={() => {
+                          setIsUploading(true);
+                          setUploadProgress(0);
+                        }}
+                        options={{
+                          multiple: false,
+                          resourceType: "image",
+                          maxFileSize: 5000000,
+                        }}
                       />
                     </div>
 
@@ -256,11 +290,10 @@ export default function CompanyProfile() {
                       className="relative w-24 h-24 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex-shrink-0"
                     >
                       <Image
-                        width={70}
-                        height={70}
-                        src={logo} 
-                        alt="Company logo" 
-                        className="w-full h-full object-contain" 
+                        src={logo}
+                        alt="Company logo"
+                        fill
+                        className="object-contain"
                       />
                     </motion.div>
                   )}
@@ -282,7 +315,7 @@ export default function CompanyProfile() {
                       message: "Please provide at least 50 characters"
                     }
                   })}
-                  rows="4"
+                  rows={4}
                   className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                   placeholder="Provide a brief introduction about your company"
                 ></textarea>
@@ -333,16 +366,22 @@ export default function CompanyProfile() {
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="e.g., Penetration Testing"
                       />
+                      {errors.services_offered?.[index]?.name && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.services_offered[index]?.name?.message}</p>
+                      )}
                     </div>
                     
                     <div>
                       <label className="block text-sm text-gray-300 mb-1">Service Description</label>
                       <textarea
                         {...register(`services_offered.${index}.description`, { required: "Description required" })}
-                        rows="3"
+                        rows={3}
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe this service in detail"
                       ></textarea>
+                      {errors.services_offered?.[index]?.description && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.services_offered[index]?.description?.message}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -395,6 +434,9 @@ export default function CompanyProfile() {
                         <option value="expertise">Expertise</option>
                         <option value="achievement">Achievement</option>
                       </select>
+                      {errors.expertise_and_certifications?.[index]?.type && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.expertise_and_certifications[index]?.type?.message}</p>
+                      )}
                     </div>
                     
                     <div>
@@ -404,6 +446,9 @@ export default function CompanyProfile() {
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="e.g., CISSP, ISO 27001, etc."
                       />
+                      {errors.expertise_and_certifications?.[index]?.name && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.expertise_and_certifications[index]?.name?.message}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -452,6 +497,9 @@ export default function CompanyProfile() {
                           className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                           placeholder="Case study title"
                         />
+                        {errors.case_studies?.[index]?.title && (
+                          <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.title?.message}</p>
+                        )}
                       </div>
                       
                       <div>
@@ -468,30 +516,39 @@ export default function CompanyProfile() {
                       <label className="block text-sm text-gray-300 mb-1">Challenge</label>
                       <textarea
                         {...register(`case_studies.${index}.challenge`, { required: "Challenge required" })}
-                        rows="2"
+                        rows={2}
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe the challenge faced"
                       ></textarea>
+                      {errors.case_studies?.[index]?.challenge && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.challenge?.message}</p>
+                      )}
                     </div>
                     
                     <div>
                       <label className="block text-sm text-gray-300 mb-1">Solution</label>
                       <textarea
                         {...register(`case_studies.${index}.solution`, { required: "Solution required" })}
-                        rows="2"
+                        rows={2}
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe your solution"
                       ></textarea>
+                      {errors.case_studies?.[index]?.solution && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.solution?.message}</p>
+                      )}
                     </div>
                     
                     <div>
                       <label className="block text-sm text-gray-300 mb-1">Results</label>
                       <textarea
                         {...register(`case_studies.${index}.result`, { required: "Results required" })}
-                        rows="2"
+                        rows={2}
                         className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="Describe the outcomes achieved"
                       ></textarea>
+                      {errors.case_studies?.[index]?.result && (
+                        <p className="mt-1 text-red-500 text-sm">{errors.case_studies[index]?.result?.message}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -546,18 +603,11 @@ export default function CompanyProfile() {
                       Processing...
                     </div>
                   ) : (
-                    "Submit Company Profile"
+                    'Submit Company Profile'
                   )}
                 </button>
               </motion.div>
             </form>
-          </div>
-          
-          {/* Decorative Elements */}
-          <div className="relative h-8 bg-gradient-to-r from-red-800 via-red-600 to-orange-500">
-            <svg className="absolute bottom-0 left-0 w-full h-16 -mb-8" viewBox="0 0 1440 320">
-              <path fill="#111827" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-            </svg>
           </div>
         </motion.div>
       </div>
