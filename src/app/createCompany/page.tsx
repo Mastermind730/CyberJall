@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // pages/company-profile.tsx
 "use client";
 import { useState } from 'react';
