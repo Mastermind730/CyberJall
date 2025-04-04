@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { useForm, useFieldArray, SubmitHandler } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import { CldUploadButton } from 'next-cloudinary';
+import { CldUploadButton, CloudinaryUploadWidgetResults } from 'next-cloudinary';
 import Image from 'next/image';
 import axios, { AxiosError } from 'axios';
 
@@ -81,7 +81,7 @@ export default function CompanyProfile() {
   // Watch the logo to display the preview
   const logo = watch('logo');
   
-  const handleLogoUpload = (result: { info: { secure_url: string; }; }) => {
+  const handleLogoUpload = (result:CloudinaryUploadWidgetResults) => {
     if (result && typeof result.info !== 'string') {
       const info = result.info as { secure_url: string };
       if (info?.secure_url) {
