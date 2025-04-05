@@ -25,8 +25,8 @@ const NewNavbar = () => {
       items: [
         { name: "Why Choose CyberJall", link: "/company#why-choose-us" },
         { name: "Our Clients", link: "/company#clients" },
-        { name: "Our Service Partners", link: "/company#partners" },
-        { name: "Get Free Consultation", link: "/services#consultation" }
+        { name: "Our Service Partners", link: "/ourPartners" },
+        { name: "Get Free Consultation", link: "/contact_us" }
       ]
     },
     { 
@@ -34,7 +34,7 @@ const NewNavbar = () => {
       link: "/services", 
       type: "dropdown", 
       items: [
-        { name: "Web Application Security Testing", link: "/services/web-security" },
+        { name: "Web Application Security Testing", link: "/services#consultation" },
         { name: "Network Pen Testing", link: "/services/network" },
         { name: "Cloud Pen Testing", link: "/services/cloud" },
         { 
