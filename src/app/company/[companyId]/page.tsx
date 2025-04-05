@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
+import Image from 'next/image';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }: { name: string }) => {
@@ -120,6 +121,7 @@ export default function CompanyDetails(props: { params: Params }) {
         setLoading(true);
         const response = await axios.get(`/api/company/${companyId}`);
         setCompany(response.data);
+
         setLoading(false);
       } catch (err) {
         console.error("Error fetching company data:", err);
@@ -131,6 +133,7 @@ export default function CompanyDetails(props: { params: Params }) {
     fetchData();
     setMounted(true);
   }, [companyId]);
+  console.log(company?.services_offered,"company")
 
   if (!mounted) return null;
   
@@ -174,12 +177,27 @@ export default function CompanyDetails(props: { params: Params }) {
     description: string;
   }
   
-  // Transform services array if needed
   const services: Service[] = Array.isArray(company.services_offered) 
-    ? company.services_offered.map(service => ({
-        title: service,
-        description: `Professional ${service} services tailored to your business needs.`
-      }))
+    ? company.services_offered.map(service => {
+        // Handle potential nested objects or unexpected data types
+        console.log(service);
+        let title = service.name;
+        let description = service.description;
+        
+        // Convert any object or non-string values to strings
+        if (typeof title === 'object' && title !== null) {
+          title = title.name || "Unknown Service";
+        }
+        
+        if (typeof description === 'object' && description !== null) {
+          description = JSON.stringify(description);
+        }
+        
+        return {
+          title: String(title),
+          description: String(description)
+        };
+      })
     : [];
   
   // Format case studies if needed
@@ -246,7 +264,7 @@ export default function CompanyDetails(props: { params: Params }) {
               transition={{ duration: 0.7 }}
             >
               {company.logo ? (
-                <img src={company.logo} alt={company.company_name} className="w-full h-full object-contain" />
+                <Image width={80} height={80} src={company.logo} alt={company.company_name} className="w-full h-full object-contain" />
               ) : (
                 <LogoPlaceholder name={company.company_name} />
               )}
@@ -281,21 +299,32 @@ export default function CompanyDetails(props: { params: Params }) {
         {/* Services Section */}
         {services.length > 0 && (
           <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                >
-                  <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
-                  <p className="text-gray-300">{service.description}</p>
-                </motion.div>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+  {services.map((service, index) => {
+    // Ensure title and description are strings
+    // const title = typeof service.title === 'object' 
+    //   ? (service.title.name || "Unknown Service") 
+    //   : String(service.title);
+    
+    // const description = typeof service.description === 'object'
+    //   ? JSON.stringify(service.description)
+    //   : String(service.description);
+    
+    return (
+      <motion.div
+        key={index}
+        className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 * index }}
+        whileHover={{ y: -5, transition: { duration: 0.2 } }}
+      >
+        <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
+        <p className="text-gray-300">{service.description}</p>
+      </motion.div>
+    );
+  })}
+</div>
           </AnimatedSection>
         )}
         

@@ -82,6 +82,7 @@ export default function CompanyProfile() {
   const logo = watch('logo');
   
   const handleLogoUpload = (result:CloudinaryUploadWidgetResults) => {
+    console.log(result);
     if (result && typeof result.info !== 'string') {
       const info = result.info as { secure_url: string };
       if (info?.secure_url) {
@@ -93,7 +94,9 @@ export default function CompanyProfile() {
       }
     }
   };
-  
+  console.log("After setValue:", watch('logo'));
+  console.log(logo)
+
   const onSubmit: SubmitHandler<CompanyFormData> = async (data) => {
     try {
       setIsSubmitting(true);

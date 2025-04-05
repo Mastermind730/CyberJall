@@ -173,59 +173,84 @@ export default function Partners() {
                   }}
                   className="bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-800 hover:border-red-500 transition-all duration-300"
                 >
-                  <Link
-                    href={partner?.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block h-full"
-                  >
-                    <div className="p-6 h-full flex flex-col justify-between">
-                      <div>
-                        <div className="flex justify-center mb-4 h-32 items-center">
-                          {partner.logo && partner.logo !== "" ? (
-                            <Image
-                              width={60}
-                              height={60}
-                              src={partner.logo}
-                              alt={`${partner.company_name} logo`}
-                              className="max-h-24 max-w-full object-contain"
-                            />
-                          ) : (
-                            <div
-                              className={`w-24 h-24 rounded-full bg-gradient-to-br ${getRandomColor(
-                                partner.id
-                              )} flex items-center justify-center text-white text-2xl font-bold shadow-lg`}
-                            >
-                              {getInitials(partner.company_name)}
-                            </div>
-                          )}
-                        </div>
-                        <h3 className="text-xl font-semibold text-white text-center mt-2">
-                          {partner.company_name}
-                        </h3>
-                      </div>
-
-                      <div className="mt-6 flex justify-center">
-                        <span className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-500 rounded-full hover:from-red-700 hover:to-orange-600 transition-colors duration-300 shadow-lg">
-                          Visit Website
-                          <svg
-                            className="ml-2 h-4 w-4"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                  <div className="p-6 h-full flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-center mb-4 h-32 items-center">
+                        {partner.logo && partner.logo !== "" ? (
+                          <Image
+                            width={60}
+                            height={60}
+                            src={partner.logo}
+                            alt={`${partner.company_name} logo`}
+                            className="max-h-24 max-w-full object-contain"
+                          />
+                        ) : (
+                          <div
+                            className={`w-24 h-24 rounded-full bg-gradient-to-br ${getRandomColor(
+                              partner.id
+                            )} flex items-center justify-center text-white text-2xl font-bold shadow-lg`}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </span>
+                            {getInitials(partner.company_name)}
+                          </div>
+                        )}
                       </div>
+                      <h3 className="text-xl font-semibold text-white text-center mt-2">
+                        {partner.company_name}
+                      </h3>
                     </div>
-                  </Link>
+
+                    <div className="mt-6 flex justify-center gap-3">
+                      <Link
+                        href={`/company/${partner.id}`}
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-700 to-red-500 rounded-full hover:from-red-800 hover:to-red-600 transition-colors duration-300 shadow-lg"
+                      >
+                        View Company
+                        <svg
+                          className="ml-2 h-4 w-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      </Link>
+                      
+                      <Link
+                        href={partner.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-500 rounded-full hover:from-red-700 hover:to-orange-600 transition-colors duration-300 shadow-lg"
+                      >
+                        Visit Website
+                        <svg
+                          className="ml-2 h-4 w-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
