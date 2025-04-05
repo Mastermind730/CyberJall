@@ -85,43 +85,77 @@ const AnimatedSection = ({ title, icon, children, delay = 0 }: AnimatedSectionPr
   );
 };
 
-// Define Company interface
+// Define types for all possible data structures
+interface ServiceObject {
+  name: string;
+  description: string;
+}
+
+interface ExpertiseObject {
+  type: string;
+  name: string;
+}
+
+interface CaseStudySimple {
+  title: string;
+  description: string;
+  results?: string;
+}
+
+interface CaseStudyDetailed {
+  title: string;
+  client?: string;
+  challenge?: string;
+  solution?: string;
+  result?: string;
+}
+
+// Define Company interface with flexible types
 interface Company {
+  id: string;
   company_name: string;
   overview: string;
   logo?: string;
   website?: string;
-  services_offered?: string[];
-  expertise_and_certifications?: string[];
-  case_studies?: {
-    title: string;
-    description: string;
-    results?: string;
-  }[];
+  services_offered: Array<string | ServiceObject>;
+  expertise_and_certifications?: Array<string | ExpertiseObject>;
+  case_studies?: Array<CaseStudySimple | CaseStudyDetailed>;
 }
 
-// For Next.js App Router, params should be properly typed
-// interface CompanyPageParams {
-//   companyId: string;
-// }
-type Params = Promise<{ companyId: string }>
+// Helper type for display
+interface FormattedService {
+  title: string;
+  description: string;
+}
 
-export default function CompanyDetails(props: { params: Params }) {
+interface FormattedExpertise {
+  name: string;
+}
+
+interface FormattedCaseStudy {
+  title: string;
+  client?: string;
+  description: string;
+}
+
+// For Next.js App Router
+type Params = { companyId: string }
+
+export default function CompanyDetails(props: { params: Promise<Params> }) {
   const [mounted, setMounted] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>();
   
-
   const params = use(props.params);
   const companyId = params.companyId;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/company/${companyId}`);
+        const response = await axios.get<Company>(`/api/company/${companyId}`);
         setCompany(response.data);
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching company data:", err);
@@ -133,7 +167,6 @@ export default function CompanyDetails(props: { params: Params }) {
     fetchData();
     setMounted(true);
   }, [companyId]);
-  console.log(company?.services_offered,"company")
 
   if (!mounted) return null;
   
@@ -164,50 +197,54 @@ export default function CompanyDetails(props: { params: Params }) {
   
   if (!company) return null;
   
-  // Define Service interface
-  interface Service {
-    title: string;
-    description: string;
-  }
+  // Process services data to handle both formats
+  const formattedServices: FormattedService[] = company.services_offered.map(service => {
+    if (typeof service === 'string') {
+      return {
+        title: service,
+        description: `Specialized ${service} solutions tailored to meet your business requirements.`
+      };
+    } else {
+      return {
+        title: service.name,
+        description: service.description || `Specialized service tailored to meet your business requirements.`
+      };
+    }
+  });
   
-  // Define CaseStudy interface
-  interface CaseStudy {
-    title: string;
-    client: string;
-    description: string;
-  }
+  // Process expertise data to handle both formats
+  const formattedExpertise: FormattedExpertise[] = company.expertise_and_certifications?.map(expertise => {
+    if (typeof expertise === 'string') {
+      return { name: expertise };
+    } else {
+      return { name: expertise.name };
+    }
+  }) || [];
   
-  const services: Service[] = Array.isArray(company.services_offered) 
-    ? company.services_offered.map(service => {
-        // Handle potential nested objects or unexpected data types
-        console.log(service);
-        let title = service.name;
-        let description = service.description;
-        
-        // Convert any object or non-string values to strings
-        if (typeof title === 'object' && title !== null) {
-          title = title.name || "Unknown Service";
-        }
-        
-        if (typeof description === 'object' && description !== null) {
-          description = JSON.stringify(description);
-        }
-        
-        return {
-          title: String(title),
-          description: String(description)
-        };
-      })
-    : [];
-  
-  // Format case studies if needed
-  const caseStudies: CaseStudy[] = Array.isArray(company.case_studies) 
-    ? company.case_studies.map(study => ({
+  // Process case studies to handle both formats
+  const formattedCaseStudies: FormattedCaseStudy[] = company.case_studies?.map(study => {
+    if ('description' in study) {
+      return {
         title: study.title,
-        client: "Client",
+        client: 'Client',
         description: study.description + (study.results ? ` Results: ${study.results}` : "")
-      }))
-    : [];
+      };
+    } else {
+      // Handle the detailed format
+      const detailedStudy = study as CaseStudyDetailed;
+      const description = [
+        detailedStudy.challenge ? `Challenge: ${detailedStudy.challenge}` : '',
+        detailedStudy.solution ? `Solution: ${detailedStudy.solution}` : '',
+        detailedStudy.result ? `Results: ${detailedStudy.result}` : ''
+      ].filter(Boolean).join('. ');
+      
+      return {
+        title: detailedStudy.title,
+        client: detailedStudy.client || 'Client',
+        description
+      };
+    }
+  }) || [];
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-900 text-gray-100">
@@ -264,7 +301,7 @@ export default function CompanyDetails(props: { params: Params }) {
               transition={{ duration: 0.7 }}
             >
               {company.logo ? (
-                <Image width={80} height={80} src={company.logo} alt={company.company_name} className="w-full h-full object-contain" />
+                <Image width={256} height={256} src={company.logo} alt={company.company_name} className="w-full h-full object-contain" />
               ) : (
                 <LogoPlaceholder name={company.company_name} />
               )}
@@ -297,42 +334,31 @@ export default function CompanyDetails(props: { params: Params }) {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         {/* Services Section */}
-        {services.length > 0 && (
+        {formattedServices.length > 0 && (
           <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-  {services.map((service, index) => {
-    // Ensure title and description are strings
-    // const title = typeof service.title === 'object' 
-    //   ? (service.title.name || "Unknown Service") 
-    //   : String(service.title);
-    
-    // const description = typeof service.description === 'object'
-    //   ? JSON.stringify(service.description)
-    //   : String(service.description);
-    
-    return (
-      <motion.div
-        key={index}
-        className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 * index }}
-        whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      >
-        <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
-        <p className="text-gray-300">{service.description}</p>
-      </motion.div>
-    );
-  })}
-</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              {formattedServices.map((service, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 * index }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                >
+                  <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
+                  <p className="text-gray-300">{service.description}</p>
+                </motion.div>
+              ))}
+            </div>
           </AnimatedSection>
         )}
         
         {/* Expertise Section */}
-        {company.expertise_and_certifications && company.expertise_and_certifications.length > 0 && (
+        {formattedExpertise.length > 0 && (
           <AnimatedSection title="Expertise & Certifications" icon={Award} delay={0.5}>
             <div className="flex flex-wrap gap-4 mt-6">
-              {company.expertise_and_certifications.map((item, index) => (
+              {formattedExpertise.map((item, index) => (
                 <motion.div
                   key={index}
                   className="bg-zinc-800 rounded-full px-4 py-2 flex items-center text-sm"
@@ -342,7 +368,7 @@ export default function CompanyDetails(props: { params: Params }) {
                   whileHover={{ scale: 1.05, backgroundColor: '#7f1d1d' }}
                 >
                   <div className="w-2 h-2 rounded-full bg-red-600 mr-2"></div>
-                  {item}
+                  {item.name}
                 </motion.div>
               ))}
             </div>
@@ -350,10 +376,10 @@ export default function CompanyDetails(props: { params: Params }) {
         )}
         
         {/* Case Studies Section */}
-        {caseStudies.length > 0 && (
+        {formattedCaseStudies.length > 0 && (
           <AnimatedSection title="Case Studies" icon={FileText} delay={0.7}>
             <div className="mt-6 space-y-6">
-              {caseStudies.map((study, index) => (
+              {formattedCaseStudies.map((study, index) => (
                 <motion.div
                   key={index}
                   className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-lg p-6 border-l-4 border-red-800"
