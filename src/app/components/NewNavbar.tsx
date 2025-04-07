@@ -1,19 +1,12 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 const NewNavbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<null | string>(null);
-
-  const handleDropdownToggle = (menu:string) => {
-    if (activeDropdown === menu) {
-      setActiveDropdown(null);
-    } else {
-      setActiveDropdown(menu);
-    }
-  };
-
+  const dropdownRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -38,7 +31,7 @@ const NewNavbar = () => {
         { name: "Network Pen Testing", link: "/services/network" },
         { name: "Cloud Pen Testing", link: "/services/cloud" },
         { 
-          name: "VPE Services", 
+          name: "VAPT Services", 
           link: "/services/vpe", 
           type: "nested",
           items: [
@@ -54,6 +47,42 @@ const NewNavbar = () => {
     { name: "Contact Us", link: "/contact_us", type: "link" },
     { name: "Log in", link: "/login", type: "link" }
   ];
+
+  // Create refs for all dropdowns
+  useEffect(() => {
+    navItems.forEach(item => {
+      if (item.type === "dropdown") {
+        dropdownRefs.current[item.name] = React.createRef();
+        
+        if (item.items) {
+          item.items.forEach(subItem => {
+            if (subItem.type === "nested") {
+              dropdownRefs.current[`${item.name}-${subItem.name}`] = React.createRef();
+            }
+          });
+        }
+      }
+    });
+  }, []);
+
+  // Handle mouseenter
+  const handleMouseEnter = (menu: string) => {
+    setActiveDropdown(menu);
+  };
+
+  // Handle mouseleave
+  const handleMouseLeave = (menu: string) => {
+    setActiveDropdown(null);
+  };
+
+  // For mobile menu
+  const handleDropdownToggle = (menu: string) => {
+    if (activeDropdown === menu) {
+      setActiveDropdown(null);
+    } else {
+      setActiveDropdown(menu);
+    }
+  };
 
   // Animation variants
   const dropdownVariants = {
@@ -218,7 +247,13 @@ const NewNavbar = () => {
           className="hidden md:flex space-x-8 items-center"
         >
           {navItems.map((item, index) => (
-            <div key={index} className="relative">
+            <div 
+              key={index} 
+              className="relative"
+              onMouseEnter={() => item.type === "dropdown" && handleMouseEnter(item.name)}
+              onMouseLeave={() => item.type === "dropdown" && handleMouseLeave(item.name)}
+              ref={item.type === "dropdown" ? dropdownRefs.current[item.name] : undefined}
+            >
               {item.type === "link" ? (
                 <Link
                   href={item.link} 
@@ -228,11 +263,9 @@ const NewNavbar = () => {
                 </Link>
               ) : (
                 <>
-                  <motion.button
-                    className="flex items-center text-red-300 hover:text-red-500 transition-colors"
-                    onClick={() => handleDropdownToggle(item.name)}
+                  <motion.div
+                    className="flex items-center text-red-300 hover:text-red-500 transition-colors cursor-pointer"
                     whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
                   >
                     {item.name}
                     <motion.svg 
@@ -248,89 +281,90 @@ const NewNavbar = () => {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </motion.svg>
-                  </motion.button>
+                  </motion.div>
                   
                   <AnimatePresence>
-  {activeDropdown === item.name && (
-    <motion.div
-      className="absolute top-full mt-2 py-2 w-72 bg-black bg-opacity-90 border border-red-600 rounded-lg shadow-lg shadow-red-600/30 z-50"
-      variants={dropdownVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
-      {item.items && item.items.map((subItem, subIndex) => (
-        <div key={subIndex} className="relative group">
-          {subItem.type === "nested" ? (
-            <div>
-              <motion.div
-                className="flex items-center justify-between px-4 py-2 text-red-300 hover:text-red-500 hover:bg-red-900/20 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent closing the parent dropdown
-                  handleDropdownToggle(`${item.name}-${subItem.name}`);
-                }}
-                whileHover={{ x: 5 }}
-              >
-                <span>{subItem.name}</span>
-                <motion.svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-4 w-4" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                  animate={{ 
-                    rotate: activeDropdown === `${item.name}-${subItem.name}` ? 90 : 0
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </motion.svg>
-              </motion.div>
-              
-              <AnimatePresence>
-                {activeDropdown === `${item.name}-${subItem.name}` && (
-                  <motion.div
-                    className="pl-4 bg-black bg-opacity-90 border-l-2 border-red-600"
-                    variants={nestedDropdownVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    onClick={(e) => e.stopPropagation()} // Prevent clicks from closing parent dropdown
-                  >
-                    {subItem.items && subItem.items.map((nestedItem, nestedIndex) => (
-                      <Link
-                        key={nestedIndex}
-                        href={nestedItem.link}
-                        className="block px-4 py-2 text-red-300 hover:text-red-500 hover:bg-red-900/20 text-sm"
+                    {activeDropdown === item.name && (
+                      <motion.div
+                        className="absolute top-full mt-2 py-2 w-72 bg-black bg-opacity-90 border border-red-600 rounded-lg shadow-lg shadow-red-600/30 z-50"
+                        variants={dropdownVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
                       >
-                        <motion.div
-                          whileHover={{ x: 5 }}
-                          className="flex items-center"
-                        >
-                          <span className="mr-2">•</span>
-                          {nestedItem.name}
-                        </motion.div>
-                      </Link>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <Link
-              href={subItem.link}
-              className="block px-4 py-2 text-red-300 hover:text-red-500 hover:bg-red-900/20"
-            >
-              <motion.div whileHover={{ x: 5 }}>
-                {subItem.name}
-              </motion.div>
-            </Link>
-          )}
-        </div>
-      ))}
-    </motion.div>
-  )}
-</AnimatePresence>
+                        {item.items && item.items.map((subItem, subIndex) => (
+                          <div 
+                            key={subIndex} 
+                            className="relative group"
+                            onMouseEnter={() => subItem.type === "nested" && handleMouseEnter(`${item.name}-${subItem.name}`)}
+                            onMouseLeave={() => subItem.type === "nested" && handleMouseLeave(`${item.name}-${subItem.name}`)}
+                            ref={subItem.type === "nested" ? dropdownRefs.current[`${item.name}-${subItem.name}`] : undefined}
+                          >
+                            {subItem.type === "nested" ? (
+                              <div>
+                                <motion.div
+                                  className="flex items-center justify-between px-4 py-2 text-red-300 hover:text-red-500 hover:bg-red-900/20 cursor-pointer"
+                                  whileHover={{ x: 5 }}
+                                >
+                                  <span>{subItem.name}</span>
+                                  <motion.svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    className="h-4 w-4" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor"
+                                    animate={{ 
+                                      rotate: activeDropdown === `${item.name}-${subItem.name}` ? 90 : 0
+                                    }}
+                                    transition={{ duration: 0.3 }}
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </motion.svg>
+                                </motion.div>
+                                
+                                <AnimatePresence>
+                                  {activeDropdown === `${item.name}-${subItem.name}` && (
+                                    <motion.div
+                                      className="pl-4 bg-black bg-opacity-90 border-l-2 border-red-600"
+                                      variants={nestedDropdownVariants}
+                                      initial="hidden"
+                                      animate="visible"
+                                      exit="exit"
+                                    >
+                                      {subItem.items && subItem.items.map((nestedItem, nestedIndex) => (
+                                        <Link
+                                          key={nestedIndex}
+                                          href={nestedItem.link}
+                                          className="block px-4 py-2 text-red-300 hover:text-red-500 hover:bg-red-900/20 text-sm"
+                                        >
+                                          <motion.div
+                                            whileHover={{ x: 5 }}
+                                            className="flex items-center"
+                                          >
+                                            <span className="mr-2">•</span>
+                                            {nestedItem.name}
+                                          </motion.div>
+                                        </Link>
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ) : (
+                              <Link
+                                href={subItem.link}
+                                className="block px-4 py-2 text-red-300 hover:text-red-500 hover:bg-red-900/20"
+                              >
+                                <motion.div whileHover={{ x: 5 }}>
+                                  {subItem.name}
+                                </motion.div>
+                              </Link>
+                            )}
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
             </div>
@@ -379,52 +413,87 @@ const NewNavbar = () => {
                 : "M4 6h16M4 12h16M4 18h16"
               }
               initial={false}
-                            animate={{ pathLength: 1 }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </svg>
-                      </motion.button>
-                    </div>
-                    
-                    {/* Mobile Menu */}
-                    <AnimatePresence>
-                      {mobileMenuOpen && (
-                        <motion.div
-                          className="md:hidden bg-black bg-opacity-95 overflow-hidden"
-                          variants={mobileMenuVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </svg>
+        </motion.button>
+      </div>
+      
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="md:hidden bg-black bg-opacity-95 overflow-hidden"
+            variants={mobileMenuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <div className="container mx-auto px-6 py-4 space-y-4">
+              {navItems.map((item, index) => (
+                <div key={index}>
+                  {item.type === "link" ? (
+                    <motion.a
+                      href={item.link}
+                      className="block py-2 text-red-300 hover:text-red-500 text-lg"
+                      variants={mobileItemVariants}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      {item.name}
+                    </motion.a>
+                  ) : (
+                    <div>
+                      <motion.button
+                        className="flex items-center justify-between w-full py-2 text-red-300 hover:text-red-500 text-lg"
+                        onClick={() => handleDropdownToggle(item.name + "-mobile")}
+                        variants={mobileItemVariants}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        {item.name}
+                        <motion.svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-5 w-5" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                          animate={{ 
+                            rotate: activeDropdown === item.name + "-mobile" ? 180 : 0
+                          }}
+                          transition={{ duration: 0.3 }}
                         >
-                          <div className="container mx-auto px-6 py-4 space-y-4">
-                            {navItems.map((item, index) => (
-                              <div key={index}>
-                                {item.type === "link" ? (
-                                  <motion.a
-                                    href={item.link}
-                                    className="block py-2 text-red-300 hover:text-red-500 text-lg"
-                                    variants={mobileItemVariants}
-                                    whileTap={{ scale: 0.97 }}
-                                  >
-                                    {item.name}
-                                  </motion.a>
-                                ) : (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </motion.svg>
+                      </motion.button>
+                      
+                      <AnimatePresence>
+                        {activeDropdown === item.name + "-mobile" && (
+                          <motion.div
+                            className="pl-4 mt-1 space-y-2 border-l-2 border-red-600"
+                            variants={dropdownVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                          >
+                            {item?.items?.map((subItem, subIndex) => (
+                              <div key={subIndex}>
+                                {subItem.type === "nested" ? (
                                   <div>
                                     <motion.button
-                                      className="flex items-center justify-between w-full py-2 text-red-300 hover:text-red-500 text-lg"
-                                      onClick={() => handleDropdownToggle(item.name + "-mobile")}
-                                      variants={mobileItemVariants}
+                                      className="flex items-center justify-between w-full py-2 text-red-300 hover:text-red-500"
+                                      onClick={() => handleDropdownToggle(`${item.name}-${subItem.name}-mobile`)}
+                                      variants={dropdownItemVariants}
                                       whileTap={{ scale: 0.97 }}
                                     >
-                                      {item.name}
+                                      {subItem.name}
                                       <motion.svg 
                                         xmlns="http://www.w3.org/2000/svg" 
-                                        className="h-5 w-5" 
+                                        className="h-4 w-4" 
                                         fill="none" 
                                         viewBox="0 0 24 24" 
                                         stroke="currentColor"
                                         animate={{ 
-                                          rotate: activeDropdown === item.name + "-mobile" ? 180 : 0
+                                          rotate: activeDropdown === `${item.name}-${subItem.name}-mobile` ? 180 : 0
                                         }}
                                         transition={{ duration: 0.3 }}
                                       >
@@ -433,126 +502,91 @@ const NewNavbar = () => {
                                     </motion.button>
                                     
                                     <AnimatePresence>
-                                      {activeDropdown === item.name + "-mobile" && (
+                                      {activeDropdown === `${item.name}-${subItem.name}-mobile` && (
                                         <motion.div
                                           className="pl-4 mt-1 space-y-2 border-l-2 border-red-600"
-                                          variants={dropdownVariants}
+                                          variants={nestedDropdownVariants}
                                           initial="hidden"
                                           animate="visible"
                                           exit="exit"
                                         >
-                                          {item?.items?.map((subItem, subIndex) => (
-                                            <div key={subIndex}>
-                                              {subItem.type === "nested" ? (
-                                                <div>
-                                                  <motion.button
-                                                    className="flex items-center justify-between w-full py-2 text-red-300 hover:text-red-500"
-                                                    onClick={() => handleDropdownToggle(`${item.name}-${subItem.name}-mobile`)}
-                                                    variants={dropdownItemVariants}
-                                                    whileTap={{ scale: 0.97 }}
-                                                  >
-                                                    {subItem.name}
-                                                    <motion.svg 
-                                                      xmlns="http://www.w3.org/2000/svg" 
-                                                      className="h-4 w-4" 
-                                                      fill="none" 
-                                                      viewBox="0 0 24 24" 
-                                                      stroke="currentColor"
-                                                      animate={{ 
-                                                        rotate: activeDropdown === `${item.name}-${subItem.name}-mobile` ? 180 : 0
-                                                      }}
-                                                      transition={{ duration: 0.3 }}
-                                                    >
-                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                    </motion.svg>
-                                                  </motion.button>
-                                                  
-                                                  <AnimatePresence>
-                                                    {activeDropdown === `${item.name}-${subItem.name}-mobile` && (
-                                                      <motion.div
-                                                        className="pl-4 mt-1 space-y-2 border-l-2 border-red-600"
-                                                        variants={nestedDropdownVariants}
-                                                        initial="hidden"
-                                                        animate="visible"
-                                                        exit="exit"
-                                                      >
-                                                        {subItem.items && subItem.items.map((nestedItem, nestedIndex) => (
-                                                          <motion.a
-                                                            key={nestedIndex}
-                                                            href={nestedItem.link}
-                                                            className="block py-2 text-red-300 hover:text-red-500 text-sm"
-                                                            variants={dropdownItemVariants}
-                                                            whileTap={{ scale: 0.97 }}
-                                                          >
-                                                            <span className="inline-block mr-2">•</span>
-                                                            {nestedItem.name}
-                                                          </motion.a>
-                                                        ))}
-                                                      </motion.div>
-                                                    )}
-                                                  </AnimatePresence>
-                                                </div>
-                                              ) : (
-                                                <motion.a
-                                                  href={subItem.link}
-                                                  className="block py-2 text-red-300 hover:text-red-500"
-                                                  variants={dropdownItemVariants}
-                                                  whileTap={{ scale: 0.97 }}
-                                                >
-                                                  {subItem.name}
-                                                </motion.a>
-                                              )}
-                                            </div>
+                                          {subItem.items && subItem.items.map((nestedItem, nestedIndex) => (
+                                            <motion.a
+                                              key={nestedIndex}
+                                              href={nestedItem.link}
+                                              className="block py-2 text-red-300 hover:text-red-500 text-sm"
+                                              variants={dropdownItemVariants}
+                                              whileTap={{ scale: 0.97 }}
+                                            >
+                                              <span className="inline-block mr-2">•</span>
+                                              {nestedItem.name}
+                                            </motion.a>
                                           ))}
                                         </motion.div>
                                       )}
                                     </AnimatePresence>
                                   </div>
+                                ) : (
+                                  <motion.a
+                                    href={subItem.link}
+                                    className="block py-2 text-red-300 hover:text-red-500"
+                                    variants={dropdownItemVariants}
+                                    whileTap={{ scale: 0.97 }}
+                                  >
+                                    {subItem.name}
+                                  </motion.a>
                                 )}
                               </div>
                             ))}
-                            
-                            <motion.button 
-                              className="w-full bg-gradient-to-r from-red-600 to-orange-500 px-6 py-3 rounded-full font-semibold shadow-lg shadow-red-600/30 text-lg"
-                              variants={mobileItemVariants}
-                              whileTap={{ scale: 0.97 }}
-                            >
-                              Get Started
-                            </motion.button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
+                </div>
+              ))}
               
-                            {/* Mobile Menu Additional Element - Pulsing Security Badge */}
-                            <motion.div
-                              className="mt-6 flex justify-center"
-                              variants={mobileItemVariants}
-                            >
-                              <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-600 flex items-center space-x-3">
-                                <motion.div
-                                  animate={{ 
-                                    scale: [1, 1.1, 1],
-                                    opacity: [1, 0.8, 1]
-                                  }}
-                                  transition={{
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    repeatType: "reverse"
-                                  }}
-                                >
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                  </svg>
-                                </motion.div>
-                                <div className="text-red-300 text-sm">
-                                  <p>24/7 Security Monitoring</p>
-                                  <p className="text-xs opacity-80">Certified Security Professionals</p>
-                                </div>
-                              </div>
-                            </motion.div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </nav>
-                );
-              };
-              
-              export default NewNavbar;
+              <motion.button 
+                className="w-full bg-gradient-to-r from-red-600 to-orange-500 px-6 py-3 rounded-full font-semibold shadow-lg shadow-red-600/30 text-lg"
+                variants={mobileItemVariants}
+                whileTap={{ scale: 0.97 }}
+              >
+                Get Started
+              </motion.button>
+
+              {/* Mobile Menu Additional Element - Pulsing Security Badge */}
+              <motion.div
+                className="mt-6 flex justify-center"
+                variants={mobileItemVariants}
+              >
+                <div className="bg-black bg-opacity-60 p-4 rounded-lg border border-red-600 flex items-center space-x-3">
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      opacity: [1, 0.8, 1]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </motion.div>
+                  <div className="text-red-300 text-sm">
+                    <p>24/7 Security Monitoring</p>
+                    <p className="text-xs opacity-80">Certified Security Professionals</p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+};
+
+export default NewNavbar;
