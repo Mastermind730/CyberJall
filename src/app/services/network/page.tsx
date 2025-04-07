@@ -121,6 +121,60 @@ export default function Home() {
       answer: "Explore CyberJall, browse & compare network pentesting providers, select the best-fit service based on your needs, and request a test & receive a detailed security assessment."
     }
   ];
+  const plans = [
+    {
+      title: "Prime Security Assessment",
+      duration: "4 Month Plan",
+      features: [
+        "One-time External Vulnerability Scanning",
+        "Firewall & Perimeter Security Testing",
+        "Basic DDoS Resilience Testing",
+        "Security Report with Risk Levels & Recommendation",
+        "Critical vulnerability identification and fixes",
+        "Fast-track security enhancement"
+      ],
+      icon: <Shield className="h-12 w-12" />,
+      popular: false
+    },
+    {
+      title: "Advanced Protection",
+      duration: "8 Month Plan",
+      features: [
+        "Quarterly Network Penetration Testing (2 rounds)",
+        "Internal & External Network Security Testing",
+        "Network Segmentation & Zero Trust Review",
+        "Wi-Fi Security Testing (If applicable)",
+        "Secure VPN & Remote Access Audit",
+        "Detailed technical reporting",
+        "Regular threat updates"
+      ],
+      icon: <Lock className="h-12 w-12" />,
+      popular: true
+    },
+    {
+      title: "Enterprise Shield",
+      duration: "12 Month Plan",
+      features: [
+        "Quarterly Network Security Testing (4 rounds)",
+        "Red Team Assessment (Real-world attack simulation)",
+        "Zero Trust Security Review & Implementation Support",
+        "Threat Intelligence & Continuous Network Monitoring",
+        "Continuous monitoring",
+        "SOC (Security Operations Center) Integration Recommendations",
+      ],
+      icon: <Database className="h-12 w-12" />,
+      popular: false
+    }
+  ];
+
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6 }
+    }
+  };
 
   const toggleFaq = (index: number | null) => {
     if (activeFaq === index) {
@@ -370,6 +424,59 @@ export default function Home() {
           </div>
         </div>
       </section>
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {plans.map((plan, index) => (
+                          <motion.div
+                            key={index}
+                            variants={fadeIn}
+                            className={`bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden transition-all duration-300 ${
+                              plan.popular ? 'border-2 border-red-500 relative' : 'border border-gray-800'
+                            }`}
+                          >
+                            {plan.popular && (
+                              <div className="absolute top-0 right-0">
+                                <div className="bg-red-500 text-white px-4 py-1 text-sm font-bold">
+                                  MOST POPULAR
+                                </div>
+                              </div>
+                            )}
+                            <div className="p-8">
+                              <div className="mb-6 text-center">
+                                <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                                  plan.popular ? 'bg-gradient-to-br from-red-600 to-orange-500' : 'bg-gray-800'
+                                }`}>
+                                  {plan.icon}
+                                </div>
+                                <h3 className="text-xl font-bold mb-1">{plan.title}</h3>
+                                <p className="text-gray-400 text-sm">{plan.duration}</p>
+                              </div>
+                              <div className="text-center mb-6">
+                                <p className="text-4xl font-bold">{plan.price}</p>
+                              </div>
+                              <ul className="space-y-3 mb-8">
+                                {plan.features.map((feature, i) => (
+                                  <li key={i} className="flex items-start">
+                                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                    <span className="text-gray-300">{feature}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.98 }}
+                                className={`w-full py-3 px-4 rounded-lg font-semibold transition ${
+                                  plan.popular 
+                                    ? 'bg-gradient-to-r from-red-600 to-orange-500 text-white' 
+                                    : 'bg-gray-800 text-white border border-gray-700 hover:border-red-500'
+                                }`}
+                              >
+                                Get Started
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                      
 
       {/* How It Works */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
