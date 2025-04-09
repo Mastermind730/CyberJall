@@ -1,15 +1,33 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
+// Define types for navigation items
+interface NestedItem {
+  name: string;
+  link: string;
+}
+
+interface SubItem {
+  name: string;
+  link: string;
+  type?: "nested";
+  items?: NestedItem[];
+}
+
+interface NavItem {
+  name: string;
+  link: string;
+  type: "link" | "dropdown";
+  items?: SubItem[];
+}
+
 const NewNavbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<null | string>(null);
-  const dropdownRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
-  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { name: "Home", link: "/", type: "link" },
     { 
       name: "Company", 
@@ -48,30 +66,13 @@ const NewNavbar = () => {
     { name: "Log in", link: "/login", type: "link" }
   ];
 
-  // Create refs for all dropdowns
-  useEffect(() => {
-    navItems.forEach(item => {
-      if (item.type === "dropdown") {
-        dropdownRefs.current[item.name] = React.createRef();
-        
-        if (item.items) {
-          item.items.forEach(subItem => {
-            if (subItem.type === "nested") {
-              dropdownRefs.current[`${item.name}-${subItem.name}`] = React.createRef();
-            }
-          });
-        }
-      }
-    });
-  }, []);
-
   // Handle mouseenter
   const handleMouseEnter = (menu: string) => {
     setActiveDropdown(menu);
   };
 
   // Handle mouseleave
-  const handleMouseLeave = (menu: string) => {
+  const handleMouseLeave = () => {
     setActiveDropdown(null);
   };
 
@@ -251,8 +252,7 @@ const NewNavbar = () => {
               key={index} 
               className="relative"
               onMouseEnter={() => item.type === "dropdown" && handleMouseEnter(item.name)}
-              onMouseLeave={() => item.type === "dropdown" && handleMouseLeave(item.name)}
-              ref={item.type === "dropdown" ? dropdownRefs.current[item.name] : undefined}
+              onMouseLeave={handleMouseLeave}
             >
               {item.type === "link" ? (
                 <Link
@@ -284,7 +284,7 @@ const NewNavbar = () => {
                   </motion.div>
                   
                   <AnimatePresence>
-                    {activeDropdown === item.name && (
+                    {activeDropdown === item.name && item.items && (
                       <motion.div
                         className="absolute top-full mt-2 py-2 w-72 bg-black bg-opacity-90 border border-red-600 rounded-lg shadow-lg shadow-red-600/30 z-50"
                         variants={dropdownVariants}
@@ -292,13 +292,12 @@ const NewNavbar = () => {
                         animate="visible"
                         exit="exit"
                       >
-                        {item.items && item.items.map((subItem, subIndex) => (
+                        {item.items.map((subItem, subIndex) => (
                           <div 
                             key={subIndex} 
                             className="relative group"
                             onMouseEnter={() => subItem.type === "nested" && handleMouseEnter(`${item.name}-${subItem.name}`)}
-                            onMouseLeave={() => subItem.type === "nested" && handleMouseLeave(`${item.name}-${subItem.name}`)}
-                            ref={subItem.type === "nested" ? dropdownRefs.current[`${item.name}-${subItem.name}`] : undefined}
+                            onMouseLeave={() => subItem.type === "nested" && handleMouseLeave()}
                           >
                             {subItem.type === "nested" ? (
                               <div>
@@ -323,7 +322,7 @@ const NewNavbar = () => {
                                 </motion.div>
                                 
                                 <AnimatePresence>
-                                  {activeDropdown === `${item.name}-${subItem.name}` && (
+                                  {activeDropdown === `${item.name}-${subItem.name}` && subItem.items && (
                                     <motion.div
                                       className="pl-4 bg-black bg-opacity-90 border-l-2 border-red-600"
                                       variants={nestedDropdownVariants}
@@ -331,7 +330,7 @@ const NewNavbar = () => {
                                       animate="visible"
                                       exit="exit"
                                     >
-                                      {subItem.items && subItem.items.map((nestedItem, nestedIndex) => (
+                                      {subItem.items.map((nestedItem, nestedIndex) => (
                                         <Link
                                           key={nestedIndex}
                                           href={nestedItem.link}
@@ -467,7 +466,7 @@ const NewNavbar = () => {
                       </motion.button>
                       
                       <AnimatePresence>
-                        {activeDropdown === item.name + "-mobile" && (
+                        {activeDropdown === item.name + "-mobile" && item.items && (
                           <motion.div
                             className="pl-4 mt-1 space-y-2 border-l-2 border-red-600"
                             variants={dropdownVariants}
@@ -475,7 +474,7 @@ const NewNavbar = () => {
                             animate="visible"
                             exit="exit"
                           >
-                            {item?.items?.map((subItem, subIndex) => (
+                            {item.items.map((subItem, subIndex) => (
                               <div key={subIndex}>
                                 {subItem.type === "nested" ? (
                                   <div>
@@ -502,7 +501,7 @@ const NewNavbar = () => {
                                     </motion.button>
                                     
                                     <AnimatePresence>
-                                      {activeDropdown === `${item.name}-${subItem.name}-mobile` && (
+                                      {activeDropdown === `${item.name}-${subItem.name}-mobile` && subItem.items && (
                                         <motion.div
                                           className="pl-4 mt-1 space-y-2 border-l-2 border-red-600"
                                           variants={nestedDropdownVariants}
@@ -510,7 +509,7 @@ const NewNavbar = () => {
                                           animate="visible"
                                           exit="exit"
                                         >
-                                          {subItem.items && subItem.items.map((nestedItem, nestedIndex) => (
+                                          {subItem.items.map((nestedItem, nestedIndex) => (
                                             <motion.a
                                               key={nestedIndex}
                                               href={nestedItem.link}
