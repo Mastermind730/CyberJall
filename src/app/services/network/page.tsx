@@ -450,9 +450,9 @@ export default function Home() {
                                 <h3 className="text-xl font-bold mb-1">{plan.title}</h3>
                                 <p className="text-gray-400 text-sm">{plan.duration}</p>
                               </div>
-                              <div className="text-center mb-6">
+                              {/* <div className="text-center mb-6">
                                 <p className="text-4xl font-bold">{plan.price}</p>
-                              </div>
+                              </div> */}
                               <ul className="space-y-3 mb-8">
                                 {plan.features.map((feature, i) => (
                                   <li key={i} className="flex items-start">
