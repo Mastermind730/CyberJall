@@ -344,7 +344,7 @@ export default function Home() {
                 <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
               </pattern>
             </defs>
-            <rect width="100" height="100" fill="url(#grid)" />
+            <rect width="100" height="100" fill="url(#gapirid)" />
           </svg>
         </div>
         

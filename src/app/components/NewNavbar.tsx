@@ -48,6 +48,7 @@ const NewNavbar = () => {
         { name: "Web Application Security Testing", link: "/services#consultation" },
         { name: "Network Pen Testing", link: "/services/network" },
         { name: "Cloud Pen Testing", link: "/services/cloud" },
+        {name:"API Testing",link:"/services/api_testing"},
         { 
           name: "VAPT Services", 
           link: "/services/vpe", 
