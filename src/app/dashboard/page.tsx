@@ -1,15 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useState } from "react";
-import Head from "next/head";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 
+interface User {
+  id: string;
+  work_email: string;
+  company_name: string;
+  contact: string;
+  message: string;
+  password: string;
+}
+
 export default function Dashboard() {
-  const [userName, setUserName] = useState("Chetanwanl2226");
   const [activeTab, setActiveTab] = useState("Tasks"); // State to manage active tab
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Get the user from localStorage and parse it
+    const storedUser = localStorage.getItem("user");
+    console.log(storedUser)
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        console.log(parsedUser)
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []); // Empty dependency array ensures this only runs once on mount
 
   // Dummy data for tabs
   const tasksData = [
@@ -70,7 +93,7 @@ export default function Dashboard() {
         },
       });
       if (response.status === 200) {
-        const user = response.data.user; // TypeScript will infer the type of `user` as `any` by default
+        const user = response.data.user;
         console.log("User details:", user);
       } else {
         console.error("Failed to fetch user details");
@@ -84,6 +107,19 @@ export default function Dashboard() {
       } else {
         console.error("Unknown error:", error);
       }
+    }
+  };
+
+  // Get the display name based on user data
+  const getUserDisplayName = () => {
+    if (!user) return "Guest";
+    
+    // Use company_name if available, otherwise fallback to email
+    if (user.company_name) {
+      return user.company_name;
+    } else {
+      // Extract name from email (everything before @)
+      return user.work_email?.split('@')[0] || "User";
     }
   };
 
@@ -113,11 +149,44 @@ export default function Dashboard() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-orange-500">
-                Good afternoon, {userName}
+                Good afternoon, {getUserDisplayName()}
               </h2>
-              <p className="text-gray-300">Set availability</p>
+              <p className="text-gray-300">
+                {user?.work_email || "Set your email"}
+              </p>
             </div>
           </motion.div>
+
+          {/* User Info Section */}
+          {user && (
+            <motion.div className="mb-8" variants={itemVariants}>
+              <h3 className="text-lg font-semibold text-orange-500 mb-4">
+                User Information
+              </h3>
+              <div className="bg-gray-800 rounded-xl p-6 border border-orange-600 border-opacity-20 shadow-lg">
+                {user.company_name && (
+                  <p className="text-gray-300 mb-2">
+                    <span className="font-semibold">Company:</span> {user.company_name}
+                  </p>
+                )}
+                {user.contact && (
+                  <p className="text-gray-300 mb-2">
+                    <span className="font-semibold">Contact:</span> {user.contact}
+                  </p>
+                )}
+                {user.work_email && (
+                  <p className="text-gray-300 mb-2">
+                    <span className="font-semibold">Email:</span> {user.work_email}
+                  </p>
+                )}
+                {user.message && (
+                  <p className="text-gray-300">
+                    <span className="font-semibold">Message:</span> {user.message}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          )}
 
           {/* Rewards Section */}
           <motion.div className="mb-8" variants={itemVariants}>

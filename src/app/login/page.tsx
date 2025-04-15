@@ -50,6 +50,8 @@ export default function Login() {
         });
         // console.log(response.data.token)
         localStorage.setItem("token",response.data.token)
+        localStorage.setItem("user",JSON.stringify(response.data.user))
+        // console.log(response.data.user)
         router.push('/dashboard');
       }
     } catch (error) {
