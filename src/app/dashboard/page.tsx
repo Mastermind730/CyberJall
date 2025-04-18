@@ -18,6 +18,7 @@ interface User {
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("Tasks"); // State to manage active tab
   const [user, setUser] = useState<User | null>(null);
+  const [logo,setLogo]=useState<string>("");
 
   useEffect(() => {
     // Get the user from localStorage and parse it
@@ -32,7 +33,19 @@ export default function Dashboard() {
         console.error("Error parsing user data:", error);
       }
     }
-  }, []); // Empty dependency array ensures this only runs once on mount
+  }, []); 
+
+  const getLogo= async()=>{
+      const res= await axios.post("/api/getCompany",user?.company_name);
+      const logo = await res.data.company_logo;
+      if(logo){
+        setLogo(logo);
+      }
+  }
+
+  useEffect(()=>{
+    getLogo();
+  })
 
   // Dummy data for tabs
   const tasksData = [
@@ -139,7 +152,7 @@ export default function Dashboard() {
             <div className="bg-gradient-to-br from-red-600 to-orange-500 rounded-full p-1 mr-4">
               <div className="bg-gray-900 rounded-full p-1">
                 <Image
-                  src="/logo.png"
+                  src={logo}
                   alt="User Icon"
                   width={50}
                   height={50}

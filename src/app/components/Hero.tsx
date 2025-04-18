@@ -58,7 +58,7 @@ export const Hero: FC = () => {
     return () => clearInterval(timer);
   }, [slides.length, isClient]);
 
-  const handleDotClick = (index) => {
+  const handleDotClick = (index:number) => {
     setIsAnimating(true);
     setTimeout(() => {
       setCurrentSlide(index);
