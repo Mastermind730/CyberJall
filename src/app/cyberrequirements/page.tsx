@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 // Zod schema for form validation
 const formSchema = z.object({
@@ -26,6 +27,19 @@ const formSchema = z.object({
   specialRequirements: z.string().optional(),
   
 });
+ interface SecurityAssessmentRequest {
+  companyName: string;
+  companySize: string;
+  confirmSubmission: boolean;
+  contactName: string;
+  email: string;
+  industry: string;
+  multipleProviders: boolean;
+  packageDuration: string;
+  providerPreferences: string[];
+  services: string[];
+    specialRequirements?: string;
+}
 
 // Services and Provider Preferences data
 const servicesData = [
@@ -60,10 +74,14 @@ const SvgIcon = (props:svgIconProps) => (
 
 export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [formData, setFormData] = useState(null);
+  const [formData, setFormData] = useState<SecurityAssessmentRequest>();
   const [activeSection, setActiveSection] = useState(1);
   const [formProgress, setFormProgress] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [loading,setIsLoading]=useState<boolean>(false);
+  const [submissionError,setSubmissionError]=useState<string|null>();
+ 
+    
 
 //   useEffect(() => {
 //     setMounted(true);
@@ -105,11 +123,28 @@ export default function Home() {
     setFormProgress(progressPercentage);
   }, [activeSection]);
 
-  const onSubmit = (data:unknown) => {
-    console.log(data);
-    // setFormData(data);
-    // setIsSubmitted(true);
-    // Here you would typically send the data to your API
+  const onSubmit = async (data:SecurityAssessmentRequest) => {
+    setIsLoading(true);
+    setSubmissionError(null);
+    
+    try {
+      const response = await axios.post('/api/requestPackage', data);
+      console.log(response,"res")
+      // Update state to show success message
+      setFormData(data);
+      setIsSubmitted(true);
+      
+
+      
+     
+      return response.data;
+    } catch (error) {
+      console.error('Error submitting security assessment form:', error);
+      
+      
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const watchServices = watch('services');
@@ -180,7 +215,7 @@ export default function Home() {
   };
 
   // Render check icon for completed sections
-  const renderSectionIcon = (sectionNumber) => {
+  const renderSectionIcon = (sectionNumber:number) => {
     if (sectionNumber < activeSection) {
       return (
         <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
@@ -1070,7 +1105,7 @@ export default function Home() {
                         </div>
                         <div className="ml-3">
                           <label htmlFor="confirm-submission" className="text-gray-300">
-                            I confirm that the information provided is accurate and I agree to CyberJall's Terms of Service and Privacy Policy.
+                            I confirm that the information provided is accurate and I agree to CyberJall&apos;s Terms of Service and Privacy Policy.
                           </label>
                           {errors.confirmSubmission && (
                             <p className="mt-1 text-red-400 text-sm">{errors.confirmSubmission.message}</p>

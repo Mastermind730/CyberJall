@@ -96,3 +96,20 @@ model Company{
   website String
 
 }
+
+model SecurityAssessmentRequest {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyName        String
+  industry           String
+  companySize        String
+  contactName        String
+  email              String
+  services           String[]
+  providerPreferences String[]
+  multipleProviders  Boolean
+  packageDuration    String
+  specialRequirements String?
+  confirmSubmission  Boolean
+  createdAt          DateTime @default(now()) @map("createdAt")
+  updatedAt          DateTime @updatedAt @map("updatedAt")
+}
