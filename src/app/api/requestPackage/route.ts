@@ -1,5 +1,3 @@
-// pages/api/submit-security-assessment.ts
-import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from "@/lib/prismadb"
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
