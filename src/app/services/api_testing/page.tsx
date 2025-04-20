@@ -2,11 +2,12 @@
 // pages/api-pentesting.js
 "use client";
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Shield, Lock, CheckCircle, Code, Server, Database, AlertTriangle, Key, FileSearch } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Shield, Lock, CheckCircle, Code, Server, Database, AlertTriangle, Key, FileSearch, X } from 'lucide-react';
 
 export default function ApiPentesting() {
   const [isVisible, setIsVisible] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -16,6 +17,229 @@ export default function ApiPentesting() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
+
+  // Form dialog component
+  const FormDialog = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+      onClick={() => setShowForm(false)}
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden relative"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Decorative Elements */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-500"></div>
+        <div className="absolute -top-32 -right-32 w-64 h-64 bg-red-500 rounded-full opacity-10 blur-3xl"></div>
+        <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-orange-500 rounded-full opacity-10 blur-3xl"></div>
+
+        {/* Form Header */}
+        <div className="relative p-8 bg-gradient-to-r from-red-600 to-red-700 overflow-hidden">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 opacity-20">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute bg-white/20 rounded-full"
+                  style={{
+                    width: Math.random() * 100 + 50 + 'px',
+                    height: Math.random() * 100 + 50 + 'px',
+                    top: Math.random() * 100 + '%',
+                    left: Math.random() * 100 + '%',
+                    animation: `float ${Math.random() * 10 + 10}s infinite linear`
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          <motion.button 
+            onClick={() => setShowForm(false)}
+            className="absolute right-6 top-6 text-white/80 hover:text-white transition-colors"
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <X size={24} />
+          </motion.button>
+
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <h2 className="text-3xl font-bold text-white">Book a Free Consultation</h2>
+            <p className="text-center mt-3 text-lg text-red-100">with our Cyber Security Specialist</p>
+          </motion.div>
+        </div>
+
+        {/* Form Content */}
+        <div className="p-8 relative">
+          <form className="grid grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Name Input */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="group"
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 group-hover:border-red-300"
+                  placeholder="Your name"
+                />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Work Email Input */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="group"
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-1">Work Email</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 group-hover:border-red-300"
+                  placeholder="you@company.com"
+                />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Phone Input */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="group"
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <div className="relative flex">
+                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gradient-to-r from-red-50 to-orange-50 text-gray-500 sm:text-sm">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-r-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 group-hover:border-red-300"
+                  placeholder="Your phone number"
+                />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Company Name Input */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+              className="group"
+            >
+              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 group-hover:border-red-300"
+                  placeholder="Your company name"
+                />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Newsletter Subscription - Full Width */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7 }}
+              className="col-span-2 flex items-center space-x-3"
+            >
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  id="subscribe"
+                  defaultChecked
+                  className="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500 transition-colors"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 transform scale-75 opacity-0 blur-sm peer-checked:opacity-100 transition-all duration-300"></div>
+              </div>
+              <label htmlFor="subscribe" className="text-sm text-gray-600">
+                Subscribe to our weekly newsletter to stay updated with our latest security insights and updates!
+              </label>
+            </motion.div>
+
+            {/* Submit Button - Full Width */}
+            <motion.button
+              type="submit"
+              className="col-span-2 relative overflow-hidden group"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 transform group-hover:scale-105 transition-transform duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <span className="relative block py-4 px-6 text-white font-semibold rounded-md shadow-lg text-lg">
+                SUBMIT
+              </span>
+              <div className="absolute inset-0 rounded-md overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-700"></div>
+              </div>
+            </motion.button>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="col-span-2 text-sm text-center text-gray-500 mt-4"
+            >
+              By clicking submit, you agree to our{' '}
+              <a href="/privacy-policy" className="text-red-600 hover:text-red-700 underline">
+                privacy policy
+              </a>
+            </motion.p>
+          </form>
+        </div>
+
+        {/* Security Notice */}
+        <div className="bg-gradient-to-r from-gray-50 to-white px-8 py-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="flex items-center justify-center space-x-4 max-w-3xl mx-auto"
+          >
+            <div className="flex-shrink-0">
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 360, 0]
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              >
+                <Shield className="h-6 w-6 text-red-600" />
+              </motion.div>
+            </div>
+            <p className="text-sm text-gray-600">
+              Your information is secure and encrypted, we&apos;ll never share your details with third parties.
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-900 mt-10 text-white overflow-hidden">
@@ -71,7 +295,10 @@ export default function ApiPentesting() {
               variants={fadeIn}
               className="flex justify-center"
             >
-              <button className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105">
+              <button 
+                onClick={() => setShowForm(true)}
+                className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105"
+              >
                 Get Started Now
               </button>
             </motion.div>
@@ -394,6 +621,11 @@ export default function ApiPentesting() {
           </motion.div>
         </div>
       </section>
+
+      {/* Form Dialog */}
+      <AnimatePresence>
+        {showForm && <FormDialog />}
+      </AnimatePresence>
     </div>
   );
 }
