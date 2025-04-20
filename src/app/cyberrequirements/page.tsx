@@ -1364,7 +1364,7 @@ export default function Home() {
                           </div>
                           <textarea
                             {...register("specialRequirements")}
-                            rows="5"
+                            rows={5}
                             className="w-full bg-gray-900/50 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
                             placeholder="Describe any specific requirements or constraints..."
                           ></textarea>
