@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Activity, CheckCircle, AlertTriangle, Database, Lock } from 'lucide-react';
 import CyberJallFAQ from '../components/FAQ';
+import { useRouter } from 'next/navigation';
 
 export default function Services() {
   const [isClient, setIsClient] = useState(false);
-  
+  const router=useRouter();
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -352,8 +353,9 @@ export default function Services() {
                     className="bg-transparent border-2 border-red-500 text-red-500 font-bold py-3 px-8 rounded-full hover:bg-red-500 hover:text-white transition duration-300"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={()=>router.push("/cyberrequirements")}
                   >
-                    Schedule Your Free Consultation Today
+                    Book your Package 
                   </motion.button>
                 </motion.div>
               </motion.div>
