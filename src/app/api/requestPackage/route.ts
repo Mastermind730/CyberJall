@@ -1,7 +1,6 @@
-import prisma from "@/lib/prismadb"
+import prisma from "@/lib/prismadb";
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
-
 
 const formSchema = z.object({
   companyName: z.string().min(1, { message: "Company name is required" }),
@@ -11,6 +10,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   services: z.array(z.string()).min(1, { message: "Select at least one service" }),
   providerPreferences: z.array(z.string()).min(1, { message: "Select at least one preference" }),
+  preferredPartners: z.array(z.string()).optional(), 
   multipleProviders: z.boolean({
     required_error: "Please select an option",
   }),
@@ -22,28 +22,47 @@ const formSchema = z.object({
     })
 });
 
-export async function POST(req:Request) {
-  
+export async function POST(req: Request) {
   try {
-    // Validate the requet data
     const body = await req.json();
     const validatedData = formSchema.parse(body);
     
     const submission = await prisma.securityAssessmentRequest.create({
-      data: validatedData
+      data: {
+        ...validatedData,
+        preferredPartners: validatedData.preferredPartners || [], 
+      }
     });
-    
 
-    return NextResponse.json({"success":true,"message":'Security assessment request submitted successfully',"submissionId":submission.id},{status:200})
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Security assessment request submitted successfully',
+        submissionId: submission.id
+      },
+      { status: 200 }
+    );
    
   } catch (error) {
     if (error instanceof z.ZodError) {
-        return NextResponse.json("Error submitting form",{status:400})
-     
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Validation error',
+          errors: error.errors
+        },
+        { status: 400 }
+      );
     }
     
     console.error('Error submitting security assessment request:', error);
-    return NextResponse.json("Error submitting form",{status:500})
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Internal server error'
+      },
+      { status: 500 }
+    );
 
   } finally {
     await prisma.$disconnect();
