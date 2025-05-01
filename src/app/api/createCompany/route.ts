@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 
-export  async function POST(req: Request) {
+export async function POST(req: Request) {
   try {
     // Parse the request body
     const data = await req.json();
@@ -9,9 +10,14 @@ export  async function POST(req: Request) {
       company_name, 
       logo, 
       overview, 
+      year_founded,
+      headquarters_city,
+      headquarters_country,
       services_offered, 
       expertise_and_certifications, 
-      case_studies, 
+      case_studies,
+      client_reviews,
+      social_links,
       website 
     } = data;
 
@@ -29,23 +35,30 @@ export  async function POST(req: Request) {
         company_name,
         logo,
         overview,
+        year_founded: parseInt(year_founded),
+        headquarters_city,
+        headquarters_country,
         services_offered,
         expertise_and_certifications,
         case_studies,
-        website
+        client_reviews,
+        social_links,
+        website,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     });
 
     return NextResponse.json(new_company, { status: 201 });
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Error creating company:", error);
     
-    // if (error.code === 'P2002') {
-    //   return NextResponse.json(
-    //     { error: "A company with this name already exists" },
-    //     { status: 409 }
-    //   );
-    // }
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { error: "A company with this name already exists" },
+        { status: 409 }
+      );
+    }
     
     return NextResponse.json(
       { error: "Internal server error" },
