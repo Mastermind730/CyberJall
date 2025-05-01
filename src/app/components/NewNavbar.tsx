@@ -227,6 +227,7 @@ const NewNavbar = () => {
               />
             </svg>
           </motion.div>
+          <Link href={"/"}>
           <motion.span 
             className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500"
             initial={{ opacity: 0 }}
@@ -239,6 +240,7 @@ const NewNavbar = () => {
           >
             CyberJall
           </motion.span>
+          </Link>
         </motion.div>
         
         {/* Desktop Menu */}
