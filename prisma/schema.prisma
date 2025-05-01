@@ -78,17 +78,28 @@ model Validated_User{
     password String
 }
 
-model Company{
-  id String @id @default(auto()) @map("_id")@db.ObjectId
-  company_name String
-  logo String
-  overview String @db.String
-  services_offered Json
+model Company {
+  id                        String   @id @default(auto()) @map("_id") @db.ObjectId
+  company_name              String
+  logo                      String
+  overview                  String
+  year_founded              Int
+  headquarters_city         String
+  headquarters_country      String
+  services_offered          Json
   expertise_and_certifications Json
-  case_studies Json
-  website String
-}
+  case_studies              Json
+  client_reviews            Json
+  social_links              Json
+  website                   String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
+  @@index([company_name])
+  @@index([year_founded])
+  @@index([headquarters_city])
+  @@index([headquarters_country])
+}
 model SecurityAssessmentRequest {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
   companyName        String
