@@ -6,6 +6,12 @@ interface ServicePartner {
     logo: string;
     website: string;
   }
+  interface Company {
+    id: string;
+    company_name: string;
+    logo?: string;
+    website: string;
+  }
 
 export async function fetchPartners(): Promise<ServicePartner[]> {
     try {
@@ -14,7 +20,7 @@ export async function fetchPartners(): Promise<ServicePartner[]> {
         throw new Error('Failed to fetch partners');
       }
       const data = await response.data;
-      return data.map((company: any) => ({
+      return data.map((company: Company) => ({
         ...company,
         // Add any additional fields or transformations here
         specialties: [], // Add if you have this data
