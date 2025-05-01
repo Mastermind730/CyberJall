@@ -6,15 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { fetchPartners } from "@/lib/partnerService";
+import Image from "next/image";
 
 interface ServicePartner {
   id: string;
-  name: string;
+  company_name: string;
   logo: string;
-  specialties: string[];
-  rating: number;
-  projectsCompleted: number;
-  description: string;
+  website: string;
 }
 
 // Zod schema for form validation
@@ -132,44 +131,7 @@ const preferenceData = [
     icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
   },
 ];
-const partnerData: ServicePartner[] = [
-  {
-    id: "securecorp",
-    name: "SecureCorp",
-    logo: "🔒",
-    specialties: ["Web Penetration Testing", "API Security Testing"],
-    rating: 4.8,
-    projectsCompleted: 245,
-    description: "Specialized in web application security with 10+ years experience"
-  },
-  {
-    id: "netdefend",
-    name: "NetDefend",
-    logo: "🛡️",
-    specialties: ["Network Penetration Testing", "Endpoint Security"],
-    rating: 4.6,
-    projectsCompleted: 178,
-    description: "Network security experts with military-grade solutions"
-  },
-  {
-    id: "cloudshield",
-    name: "CloudShield",
-    logo: "☁️",
-    specialties: ["Cloud Penetration Testing", "Compliance Audits"],
-    rating: 4.7,
-    projectsCompleted: 192,
-    description: "Cloud security specialists with multi-platform expertise"
-  },
-  {
-    id: "cybermind",
-    name: "CyberMind",
-    logo: "🧠",
-    specialties: ["Security Training", "Compliance Audits"],
-    rating: 4.9,
-    projectsCompleted: 210,
-    description: "Security education and compliance framework specialists"
-  }
-];
+
 interface svgIconProps {
   path: string;
   className?: string;
@@ -200,6 +162,24 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [submissionError, setSubmissionError] = useState<string | null>();
+  const [partners, setPartners] = useState<ServicePartner[]>([]);
+  const [loadingPartners, setLoadingPartners] = useState(true);
+
+  useEffect(() => {
+    const loadPartners = async () => {
+      setLoadingPartners(true);
+      try {
+        const fetchedPartners = await fetchPartners();
+        setPartners(fetchedPartners);
+      } catch (error) {
+        console.error("Failed to load partners:", error);
+      } finally {
+        setLoadingPartners(false);
+      }
+    };
+
+    loadPartners();
+  }, []);
 
   //   useEffect(() => {
   //     setMounted(true);
@@ -1495,86 +1475,105 @@ export default function Home() {
         <label className="block text-gray-300 mb-4 font-medium">
           Choose from our verified partners (optional)
         </label>
-        <div className="grid md:grid-cols-2 gap-4">
-          {partnerData.map((partner) => (
-            <motion.div
-              key={partner.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`relative rounded-xl p-4 cursor-pointer transition-all duration-200 border ${
+        {loadingPartners ? (
+  <div className="flex justify-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+  </div>
+) : (
+  <div className="grid md:grid-cols-2 gap-4">
+    {partners.map((partner) => (
+      <motion.div
+        key={partner.id}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className={`relative rounded-xl p-4 cursor-pointer transition-all duration-200 border ${
+          watch("preferredPartners")?.includes(partner.id)
+            ? "bg-gradient-to-br from-red-900/30 to-orange-900/20 border-orange-500/50"
+            : "bg-gray-900/30 border-gray-700"
+        }`}
+      >
+        <input
+          type="checkbox"
+          id={`partner-${partner.id}`}
+          value={partner.id}
+          {...register("preferredPartners")}
+          className="sr-only"
+        />
+        <label
+          htmlFor={`partner-${partner.id}`}
+          className="flex items-start cursor-pointer"
+        >
+          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center overflow-hidden">
+            <Image
+              src={partner.logo} 
+              alt={partner.company_name}
+              width={60}
+              height={60}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48';
+                (e.target as HTMLImageElement).className = 'w-full h-full object-contain p-2';
+              }}
+            />
+          </div>
+          <div className="ml-3 flex-1">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-white font-medium">{partner.company_name}</div>
+                <a 
+                  href={partner.website} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-orange-400 hover:underline block mt-1 truncate max-w-[160px]"
+                  title={partner.website}
+                >
+                  {partner.website.replace(/^https?:\/\/(www\.)?/, '')}
+                </a>
+              </div>
+              <div className="flex items-center bg-gray-800 px-2 py-1 rounded text-sm">
+                <svg
+                  className="w-4 h-4 text-yellow-400 mr-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                4.5
+              </div>
+            </div>
+            <p className="text-sm text-gray-300 mt-2 line-clamp-2">
+              Cybersecurity service provider specializing in various security solutions
+            </p>
+          </div>
+          <div className="absolute top-4 right-4">
+            <div
+              className={`w-5 h-5 rounded flex items-center justify-center ${
                 watch("preferredPartners")?.includes(partner.id)
-                  ? "bg-gradient-to-br from-red-900/30 to-orange-900/20 border-orange-500/50"
-                  : "bg-gray-900/30 border-gray-700"
+                  ? "bg-orange-500 text-white"
+                  : "border border-gray-600"
               }`}
             >
-              <input
-                type="checkbox"
-                id={`partner-${partner.id}`}
-                value={partner.id}
-                {...register("preferredPartners")}
-                className="sr-only"
-              />
-              <label
-                htmlFor={`partner-${partner.id}`}
-                className="flex items-start cursor-pointer"
-              >
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center text-2xl">
-                  {partner.logo}
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="text-white font-medium">{partner.name}</div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        {partner.specialties.join(", ")}
-                      </div>
-                    </div>
-                    <div className="flex items-center bg-gray-800 px-2 py-1 rounded text-sm">
-                      <svg
-                        className="w-4 h-4 text-yellow-400 mr-1"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      {partner.rating}
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-300 mt-2">
-                    {partner.description}
-                  </p>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {partner.projectsCompleted}+ projects completed
-                  </div>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <div
-                    className={`w-5 h-5 rounded flex items-center justify-center ${
-                      watch("preferredPartners")?.includes(partner.id)
-                        ? "bg-orange-500 text-white"
-                        : "border border-gray-600"
-                    }`}
-                  >
-                    {watch("preferredPartners")?.includes(partner.id) && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-              </label>
-            </motion.div>
-          ))}
-        </div>
+              {watch("preferredPartners")?.includes(partner.id) && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </div>
+          </div>
+        </label>
+      </motion.div>
+    ))}
+  </div>
+)}
       </motion.div>
 
       {/* Navigation buttons */}
@@ -1738,13 +1737,13 @@ export default function Home() {
     <p className="text-gray-400 mb-2">Preferred Partners</p>
     <div className="flex flex-wrap gap-2">
       {watch("preferredPartners")?.map((partnerId) => {
-        const partner = partnerData.find(p => p.id === partnerId);
+        const partner = partners.find(p => p.id === partnerId);
         return (
           <span
             key={partnerId}
             className="inline-flex items-center px-3 py-1 rounded-full bg-gray-800 text-sm text-white"
           >
-            {partner?.name}
+            {partner?.company_name}
           </span>
         );
       })}
