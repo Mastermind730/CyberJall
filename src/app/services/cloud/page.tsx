@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Cloud, Check, Server, Lock, Database, FileSearch, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function CloudPentesting() {
   const [isVisible, setIsVisible] = useState(false);
-
+  const router=useRouter();
   useEffect(() => {
     setIsVisible(true);
   }, []);
@@ -282,6 +283,24 @@ export default function CloudPentesting() {
                           </motion.div>
                         ))}
                       </div>
+
+                      <motion.div 
+                  variants={fadeIn}
+                  className="mt-12 text-center"
+                >
+                  <p className="text-gray-400 mb-8">
+                    Each plan offers flexible options tailored to meet the security demands of businesses of all sizes, 
+                    helping you maintain robust security throughout the year.
+                  </p>
+                  <motion.button
+                    className="bg-transparent border-2 border-red-500 text-red-500 font-bold py-3 px-8 rounded-full hover:bg-red-500 hover:text-white transition duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={()=>router.push("/cyberrequirements")}
+                  >
+                    Submit your security requirement
+                  </motion.button>
+                </motion.div>
 
       {/* How It Works Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black to-gray-900">

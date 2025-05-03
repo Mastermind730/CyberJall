@@ -355,7 +355,7 @@ export default function Services() {
                     whileTap={{ scale: 0.95 }}
                     onClick={()=>router.push("/cyberrequirements")}
                   >
-                    Book your Package 
+                    Submit your security requirement
                   </motion.button>
                 </motion.div>
               </motion.div>

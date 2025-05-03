@@ -4,10 +4,59 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, CheckCircle, Code, Server, Database, AlertTriangle, Key, FileSearch, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+
+ const plans = [
+    {
+      title: "Prime Security Assessment",
+      duration: "4 Month Plan",
+      features: [
+        "One-time Cloud Security Audit (Infrastructure & Configurations)",
+        "IAM & Access Control Review (Permissions & Least Privilege Analysis)",
+        "Cloud Storage Security & Data Exposure Testing",
+        "Misconfiguration & Compliance Gap Analysis",
+        "Security Recommendations Report"
+      ],
+      icon: <Shield className="h-12 w-12" />,
+      popular: false
+    },
+    {
+      title: "Advanced Protection",
+      duration: "8 Month Plan",
+      features: [
+        "Bi-annual Cloud Security Testing (2 rounds)",
+        "Identity & Privilege Escalation Testing",
+        "Container & Kubernetes Security Assessment (If applicable)",
+        "Cloud Network Security Testing (Traffic monitoring & segmentation analysis)",
+        "Encryption & Key Management Testing"
+      ],
+      icon: <Lock className="h-12 w-12" />,
+      popular: true
+    },
+    {
+      title: "Enterprise Shield",
+      duration: "12 Month Plan",
+      features: [
+        "Quarterly Cloud Security Testing (4 rounds)",
+        "Serverless Security Assessment (If applicable)",
+        "Threat Modeling & Attack Simulations",
+        "Cloud API Gateway Security Testing",
+        "Zero Trust Architecture Review & Implementation Support",
+        "Continuous Threat Monitoring & Incident Response Recommendations"
+      ],
+      icon: <Database className="h-12 w-12" />,
+      popular: false
+    }
+  ];
+  
+
 
 export default function ApiPentesting() {
   const [isVisible, setIsVisible] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  const router=useRouter();
 
   useEffect(() => {
     setIsVisible(true);
@@ -295,12 +344,7 @@ export default function ApiPentesting() {
               variants={fadeIn}
               className="flex justify-center"
             >
-              <button 
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105"
-              >
-                Get Started Now
-              </button>
+               
             </motion.div>
           </motion.div>
         </div>
@@ -440,6 +484,79 @@ export default function ApiPentesting() {
           </div>
         </div>
       </section>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {plans.map((plan, index) => (
+                          <motion.div
+                            key={index}
+                            variants={fadeIn}
+                            className={`bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden transition-all duration-300 ${
+                              plan.popular ? 'border-2 border-red-500 relative' : 'border border-gray-800'
+                            }`}
+                          >
+                            {plan.popular && (
+                              <div className="absolute top-0 right-0">
+                                <div className="bg-red-500 text-white px-4 py-1 text-sm font-bold">
+                                  MOST POPULAR
+                                </div>
+                              </div>
+                            )}
+                            <div className="p-8">
+                              <div className="mb-6 text-center">
+                                <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                                  plan.popular ? 'bg-gradient-to-br from-red-600 to-orange-500' : 'bg-gray-800'
+                                }`}>
+                                  {plan.icon}
+                                </div>
+                                <h3 className="text-xl font-bold mb-1">{plan.title}</h3>
+                                <p className="text-gray-400 text-sm">{plan.duration}</p>
+                              </div>
+                              
+                              <ul className="space-y-3 mb-8">
+                                {plan.features.map((feature, i) => (
+                                  <li key={i} className="flex items-start">
+                                    <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                                    <span className="text-gray-300">{feature}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.98 }}
+                                className={`w-full py-3 px-4 rounded-lg font-semibold transition ${
+                                  plan.popular 
+                                    ? 'bg-gradient-to-r from-red-600 to-orange-500 text-white' 
+                                    : 'bg-gray-800 text-white border border-gray-700 hover:border-red-500'
+                                }`}
+                              >
+                                Get Started
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        ))}
+
+
+                      </div>
+
+                       <motion.div 
+                                        variants={fadeIn}
+                                        className="mt-12 text-center"
+                                      >
+                                        <p className="text-gray-400 mb-8">
+                                          Each plan offers flexible options tailored to meet the security demands of businesses of all sizes, 
+                                          helping you maintain robust security throughout the year.
+                                        </p>
+                                        <motion.button
+                                          className="bg-transparent border-2 border-red-500 text-red-500 font-bold py-3 px-8 rounded-full hover:bg-red-500 hover:text-white transition duration-300"
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                          onClick={()=>router.push("/cyberrequirements")}
+                                        >
+                                          Submit your security requirement
+                                        </motion.button>
+                                      </motion.div>
+                      
+
 
       {/* How It Works Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black to-gray-900">
