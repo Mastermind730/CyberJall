@@ -199,10 +199,10 @@ export default function Partners() {
                       </h3>
                     </div>
 
-                    <div className="mt-6 flex justify-center gap-3 z-20">
+                    <div className="mt-6 flex justify-center gap-3 z-40">
                       <Link
                         href={`/company/${partner.id}`}
-                        className="inline-flex items-center px-4 z-40 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-700 to-red-500 rounded-full hover:from-red-800 hover:to-red-600 transition-colors duration-300 shadow-lg"
+                        className="inline-flex items-center px-4 z-50 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-700 to-red-500 rounded-full hover:from-red-800 hover:to-red-600 transition-colors duration-300 shadow-lg"
                       >
                         View Company
                         <svg
