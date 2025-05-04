@@ -2,7 +2,7 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import axios from 'axios';
 import Image from 'next/image';
 import { Calendar, MapPin, Users } from 'lucide-react';
@@ -510,7 +510,37 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
             </div>
           </AnimatedSection>
         )}
+
+        {/* Client Reviews Section */}
+<AnimatedSection title="Client Testimonials" icon={Users} delay={1.1}>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    {company.client_reviews?.map((review, index) => (
+      <motion.div
+        key={index}
+        className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 * index }}
+        whileHover={{ scale: 1.02 }}
+      >
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-lg font-semibold">{review.clientName}</h3>
+            <p className="text-gray-400 text-sm">{review.position}, {review.company}</p>
+          </div>
+          <div className="flex items-center bg-red-900 bg-opacity-30 px-2 py-1 rounded">
+            <Star className="text-yellow-400 mr-1" size={16} fill="currentColor" />
+            <span>{review.rating}/5</span>
+          </div>
+        </div>
+        <p className="text-gray-300 italic">{review.review}</p>
+      </motion.div>
+    ))}
+  </div>
+</AnimatedSection>
       </main>
+
+      
 
       
       {/* Contact Section */}
