@@ -178,8 +178,8 @@ export default function Partners() {
                       <div className="flex justify-center mb-4 h-32 items-center">
                         {partner.logo && partner.logo !== "" ? (
                           <Image
-                            width={60}
-                            height={60}
+                            width={250}
+                            height={250}
                             src={partner.logo}
                             alt={`${partner.company_name} logo`}
                             className="max-h-24 max-w-full object-contain"
