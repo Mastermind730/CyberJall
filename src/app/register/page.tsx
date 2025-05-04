@@ -155,7 +155,7 @@ const Page = () => {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Get Started with Bug Bounty Platform
+            Get Started with CyberJall InfoTech 
           </motion.h1>
           <motion.p
             className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto"
