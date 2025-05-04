@@ -151,7 +151,10 @@ interface FormattedExpertise {
 interface FormattedCaseStudy {
   title: string;
   client?: string;
-  description: string;
+  challenge?: string;
+  solution?: string;
+  result?: string;
+  description?: string; // For backward compatibility
 }
 
 // For Next.js App Router
@@ -241,25 +244,21 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
   
   // Process case studies to handle both formats
   const formattedCaseStudies: FormattedCaseStudy[] = company.case_studies?.map(study => {
+    // Handle both simple and detailed formats
     if ('description' in study) {
       return {
         title: study.title,
-        client: 'Client',
-        description: study.description + (study.results ? ` Results: ${study.results}` : "")
+        client:  '',
+        description: study.description,
+        ...(study.results && { result: study.results })
       };
     } else {
-      // Handle the detailed format
-      const detailedStudy = study as CaseStudyDetailed;
-      const description = [
-        detailedStudy.challenge ? `Challenge: ${detailedStudy.challenge}` : '',
-        detailedStudy.solution ? `Solution: ${detailedStudy.solution}` : '',
-        detailedStudy.result ? `Results: ${detailedStudy.result}` : ''
-      ].filter(Boolean).join('. ');
-      
       return {
-        title: detailedStudy.title,
-        client: detailedStudy.client || 'Client',
-        description
+        title: study.title,
+        client: study.client || 'Client',
+        challenge: study.challenge,
+        solution: study.solution,
+        result: study.result
       };
     }
   }) || [];
@@ -484,33 +483,100 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
           </AnimatedSection>
         )}
         
-        {/* Case Studies Section */}
-        {formattedCaseStudies.length > 0 && (
-          <AnimatedSection title="Case Studies" icon={FileText} delay={0.7}>
-            <div className="mt-6 space-y-6">
-              {formattedCaseStudies.map((study, index) => (
-                <motion.div
-                  key={index}
-                  className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-lg p-6 border-l-4 border-red-800"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
-                >
-                  <div className="flex flex-wrap justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold text-white">{study.title}</h3>
-                    {study.client && (
-                      <span className="text-sm font-medium bg-red-900 bg-opacity-30 text-red-400 px-3 py-1 rounded-full">
-                        {study.client}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-gray-300">{study.description}</p>
-                </motion.div>
-              ))}
+       {/* Case Studies Section */}
+{formattedCaseStudies.length > 0 && (
+  <AnimatedSection title="Case Studies" icon={FileText} delay={0.7}>
+    <div className="mt-8 space-y-8">
+      {formattedCaseStudies.map((study, index) => (
+        <motion.div
+          key={index}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 shadow-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 * index }}
+          whileHover={{ y: -5 }}
+        >
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-red-600 to-red-900" />
+          <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdHRlcm4gaWQ9InBhdHRlcm4iIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0iY3VycmVudENvbG9yIi8+PC9wYXR0ZXJuPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiIGNsYXNzPSJ0ZXh0LXJlZC-500LzMwIi8+PC9zdmc+')]" />
+          
+          <div className="relative z-10 p-8">
+            {/* Header with client info */}
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-bold text-white">{study.title}</h3>
+                {study.client && (
+                  <p className="text-gray-400 mt-1">{study.client}</p>
+                )}
+              </div>
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-red-900 to-red-700 flex items-center justify-center">
+                <span className="text-white font-bold">
+                  {study.client?.split(' ').map(w => w[0]).join('').substring(0, 2) || 'CS'}
+                </span>
+              </div>
             </div>
-          </AnimatedSection>
-        )}
 
+            {/* For simple format with description */}
+            {study.description && (
+              <div className="prose prose-invert max-w-none">
+                <p className="text-gray-300">{study.description}</p>
+              </div>
+            )}
+
+            {/* For detailed format */}
+            {!study.description && (
+              <div className="space-y-6">
+                {study.challenge && (
+                  <div className="bg-zinc-800/50 rounded-lg p-5 border-l-4 border-red-600">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold text-red-400 mb-3">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      The Challenge
+                    </h4>
+                    <p className="text-gray-300">{study.challenge}</p>
+                  </div>
+                )}
+
+                {study.solution && (
+                  <div className="bg-zinc-800/50 rounded-lg p-5 border-l-4 border-blue-500">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold text-blue-400 mb-3">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      Our Solution
+                    </h4>
+                    <p className="text-gray-300">{study.solution}</p>
+                  </div>
+                )}
+
+                {(study.result || study.results) && (
+                  <div className="bg-zinc-800/50 rounded-lg p-5 border-l-4 border-green-500">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold text-green-400 mb-3">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                      </svg>
+                      The Results
+                    </h4>
+                    <p className="text-gray-300">{study.result || study.results}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs font-medium">
+                        Security Improved
+                      </span>
+                      <span className="px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs font-medium">
+                        Compliance Achieved
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </AnimatedSection>
+)}
         {/* Client Reviews Section */}
 <AnimatedSection title="Client Testimonials" icon={Users} delay={1.1}>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
