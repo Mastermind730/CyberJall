@@ -558,7 +558,7 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
                       </svg>
                       The Results
                     </h4>
-                    <p className="text-gray-300">{study.result || study.results}</p>
+                    <p className="text-gray-300">{study.result }</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <span className="px-3 py-1 rounded-full bg-green-900/30 text-green-400 text-xs font-medium">
                         Security Improved
