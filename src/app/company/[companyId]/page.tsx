@@ -550,7 +550,7 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
                   </div>
                 )}
 
-                {(study.result || study.results) && (
+                {(study.result ) && (
                   <div className="bg-zinc-800/50 rounded-lg p-5 border-l-4 border-green-500">
                     <h4 className="flex items-center gap-2 text-sm font-semibold text-green-400 mb-3">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
