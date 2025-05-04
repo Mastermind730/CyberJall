@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
 import Image from 'next/image';
-import { Calendar, MapPin, Star, Users } from 'lucide-react';
+import { Calendar, MapPin, Users } from 'lucide-react';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }: { name: string }) => {
