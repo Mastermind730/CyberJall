@@ -475,7 +475,6 @@ export default function CompanyProfile() {
               </motion.div>
               
               {/* Services Offered (JSON Structure) */}
-         {/* Services Offered (JSON Structure) */}
 <motion.div
   initial={{ x: -20, opacity: 0 }}
   animate={{ x: 0, opacity: 1 }}

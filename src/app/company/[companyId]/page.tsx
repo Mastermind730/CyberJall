@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
 import Image from 'next/image';
+import { Calendar, MapPin, Star, Users } from 'lucide-react';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }: { name: string }) => {
@@ -85,10 +86,10 @@ const AnimatedSection = ({ title, icon, children, delay = 0 }: AnimatedSectionPr
   );
 };
 
-// Define types for all possible data structures
 interface ServiceObject {
   name: string;
   description: string;
+  image?: string; 
 }
 
 interface ExpertiseObject {
@@ -117,15 +118,30 @@ interface Company {
   overview: string;
   logo?: string;
   website?: string;
+  year_founded?: number;
+  headquarters_city?: string;
+  headquarters_country?: string;
   services_offered: Array<string | ServiceObject>;
   expertise_and_certifications?: Array<string | ExpertiseObject>;
   case_studies?: Array<CaseStudySimple | CaseStudyDetailed>;
+  client_reviews?: Array<{
+    clientName: string;
+    position: string;
+    company: string;
+    review: string;
+    rating: number;
+  }>;
+  social_links?: Array<{
+    platform: string;
+    url: string;
+  }>;
 }
 
 // Helper type for display
 interface FormattedService {
   title: string;
   description: string;
+  image?: string;
 }
 
 interface FormattedExpertise {
@@ -198,19 +214,21 @@ export default function CompanyDetails(props: { params: Promise<Params> }) {
   if (!company) return null;
   
   // Process services data to handle both formats
-  const formattedServices: FormattedService[] = company.services_offered.map(service => {
-    if (typeof service === 'string') {
-      return {
-        title: service,
-        description: `Specialized ${service} solutions tailored to meet your business requirements.`
-      };
-    } else {
-      return {
-        title: service.name,
-        description: service.description || `Specialized service tailored to meet your business requirements.`
-      };
-    }
-  });
+const formattedServices: FormattedService[] = company.services_offered.map(service => {
+  if (typeof service === 'string') {
+    return {
+      title: service,
+      description: `Specialized ${service} solutions tailored to meet your business requirements.`,
+      image: undefined // No image for string format
+    };
+  } else {
+    return {
+      title: service.name,
+      description: service.description || `Specialized service tailored to meet your business requirements.`,
+      image: service.image // Include the image from the object
+    };
+  }
+});
   
   // Process expertise data to handle both formats
   const formattedExpertise: FormattedExpertise[] = company.expertise_and_certifications?.map(expertise => {
@@ -333,26 +351,117 @@ export default function CompanyDetails(props: { params: Promise<Params> }) {
       
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
+
+      <AnimatedSection title="Company Details" icon={MapPin} delay={0.9}>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <motion.div
+      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      <div className="flex items-center mb-3">
+        <Calendar className="text-red-500 mr-3" size={20} />
+        <h3 className="text-lg font-semibold">Year Founded</h3>
+      </div>
+      <p className="text-gray-300 pl-9">2015</p>
+    </motion.div>
+
+    <motion.div
+      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <div className="flex items-center mb-3">
+        <MapPin className="text-red-500 mr-3" size={20} />
+        <h3 className="text-lg font-semibold">Headquarters</h3>
+      </div>
+      <p className="text-gray-300 pl-9">San Francisco, United States</p>
+    </motion.div>
+  </div>
+</AnimatedSection>
+
+{/* Social Links Section */}
+<AnimatedSection title="Connect With Us" icon={Users} delay={1.3}>
+  <div className="flex flex-wrap gap-4 mt-6">
+    {company.social_links?.map((social, index) => (
+      <motion.a
+        key={index}
+        href={social.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center bg-zinc-800 hover:bg-zinc-700 px-4 py-3 rounded-lg transition-colors"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, delay: 0.05 * index }}
+        whileHover={{ scale: 1.05 }}
+      >
+        <div className="w-8 h-8 mr-3 flex items-center justify-center bg-red-900 rounded-full">
+          {social.platform === 'linkedin' && (
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          )}
+          {social.platform === 'twitter' && (
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+            </svg>
+          )}
+          {social.platform === 'facebook' && (
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/>
+            </svg>
+          )}
+          {social.platform === 'instagram' && (
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+            </svg>
+          )}
+        </div>
+        <span className="capitalize">{social.platform}</span>
+      </motion.a>
+    ))}
+  </div>
+</AnimatedSection>
+
+
+
+
         {/* Services Section */}
-        {formattedServices.length > 0 && (
-          <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              {formattedServices.map((service, index) => (
-                <motion.div
-                  key={index}
-                  className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                >
-                  <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
-                  <p className="text-gray-300">{service.description}</p>
-                </motion.div>
-              ))}
+{formattedServices.length > 0 && (
+  <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      {formattedServices.map((service, index) => (
+        <motion.div
+          key={index}
+          className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 * index }}
+          whileHover={{ y: -5, transition: { duration: 0.2 } }}
+        >
+          {/* Service Image */}
+          {service.image && (
+            <div className="relative h-40 mb-4 rounded-md overflow-hidden">
+              <Image
+                src={service.image}
+                alt={service.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
             </div>
-          </AnimatedSection>
-        )}
+          )}
+          
+          <h3 className="text-xl font-bold mb-3 text-red-500">{service.title}</h3>
+          <p className="text-gray-300">{service.description}</p>
+        </motion.div>
+      ))}
+    </div>
+  </AnimatedSection>
+)}
         
         {/* Expertise Section */}
         {formattedExpertise.length > 0 && (
@@ -402,6 +511,7 @@ export default function CompanyDetails(props: { params: Promise<Params> }) {
           </AnimatedSection>
         )}
       </main>
+
       
       {/* Contact Section */}
       <section className="py-16 bg-gradient-to-r from-red-900 to-black">
