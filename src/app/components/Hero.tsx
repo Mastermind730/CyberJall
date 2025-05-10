@@ -125,9 +125,7 @@ export const Hero: FC = () => {
                   Discover More
                 </button>
                 
-                <button className="text-white border border-white/30 backdrop-blur-sm bg-white/10 px-8 py-3 rounded-full text-lg font-medium hover:bg-white/20 transition-all duration-300">
-                  Learn How It Works
-                </button>
+               
               </div>
             </div>
           </div>

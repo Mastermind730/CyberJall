@@ -3,9 +3,9 @@ import { Hero } from './components/Hero';
 import { AboutUs } from './components/sections/AboutUs';
 import { SmartestChoice } from './components/sections/SmartestChoice';
 import { WhatWeOffer } from './components/sections/WhatWeOffer';
-import { Scope } from './components/sections/Scope';
-import { HowItWorks } from './components/sections/HowItWorks';
-import { GetStarted } from './components/sections/GetStarted';
+// import { Scope } from './components/sections/Scope';
+// import { HowItWorks } from './components/sections/HowItWorks';
+// import { GetStarted } from './components/sections/GetStarted';
 import { SecurityFeatures } from './components/sections/SecurityFeatures';
 import { HowWeWork } from './components/sections/HowWeWork';
 import { PlatformFeatures } from './components/sections/PlatformFeatures';
@@ -17,9 +17,9 @@ const Home: NextPage = () => {
       <AboutUs />
       <SmartestChoice />
       <WhatWeOffer />
-      <Scope />
-      <HowItWorks />
-      <GetStarted />
+      {/* <Scope /> */}
+      {/* <HowItWorks /> */}
+      {/* <GetStarted /> */}
       <SecurityFeatures />
       <HowWeWork />
       <PlatformFeatures />
