@@ -40,9 +40,13 @@ export const AboutUs: FC = () => {
               we&apos;re a community-driven ecosystem passionate about making the digital world safer for everyone.
             </p>
             <p className="mt-8 text-xl leading-8 text-gray-300 max-w-4xl mx-auto font-light">
-              At CyberJall, we believe that security is not a destination; it&apos;s a journey. That&apos;s why we&apos;ve built 
-              a platform that fosters collaboration between security companies and organizations, empowering them 
-              to identify and resolve vulnerabilities before they can be exploited.
+            At CyberJall, we are redefining how businesses access and manage cybersecurity services. Our mission is to bridge the gap between businesses and top-tier cybersecurity providers by offering a centralized, transparent, and flexible marketplace.
+We understand that cyber threats are constantly evolving, and businesses need reliable, customizable, and collaborative security solutions. That&apos;s why CyberJall empowers companies to explore, compare, and bundle multiple service providers in a single subscription package, ensuring they get the protection they need on their terms.
+
+
+
+
+
             </p>
           </div>
 

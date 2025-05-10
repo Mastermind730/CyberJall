@@ -4,11 +4,15 @@
 import { useState, useEffect, SetStateAction } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, AlertTriangle, Search, Code, Database, FileText, CheckCircle, ArrowRight, Lock, Zap, Eye, Terminal, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [activeFaq, setActiveFaq] = useState<number| null>();
+
+
+  const router = useRouter();
 
   useEffect(() => {
     setIsVisible(true);
@@ -474,9 +478,29 @@ export default function Home() {
                               </motion.button>
                             </div>
                           </motion.div>
+                          
                         ))}
+
+
+                          
                       </div>
-                      
+                      <motion.div 
+                                          variants={fadeIn}
+                                          className="mt-12  text-center"
+                                        >
+                                          <p className="text-gray-400 mb-8">
+                                            Each plan offers flexible options tailored to meet the security demands of businesses of all sizes, 
+                                            helping you maintain robust security throughout the year.
+                                          </p>
+                                          <motion.button
+                                            className="bg-transparent border-2 border-red-500 text-red-500 font-bold py-3 px-8 rounded-full hover:bg-red-500 hover:text-white transition duration-300"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={()=>router.push("/cyberrequirements")}
+                                          >
+                                            Submit your security requirement
+                                          </motion.button>
+                                        </motion.div>
 
       {/* How It Works */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
