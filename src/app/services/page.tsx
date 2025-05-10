@@ -35,7 +35,7 @@ export default function Services() {
     {
       title: "Basic Security Assessment",
       price: "$1,499",
-      duration: "3 Month Plan",
+      duration: "4 Month Plan",
       features: [
         "Short-term, intensive assessment",
         "Fast-track security enhancement",
@@ -49,7 +49,7 @@ export default function Services() {
     {
       title: "Advanced Protection",
       price: "$2,999",
-      duration: "6 Month Plan",
+      duration: "8 Month Plan",
       features: [
         "Mid-term solution with periodic assessments",
         "Balanced, proactive coverage",
@@ -314,9 +314,9 @@ export default function Services() {
                           <h3 className="text-xl font-bold mb-1">{plan.title}</h3>
                           <p className="text-gray-400 text-sm">{plan.duration}</p>
                         </div>
-                        <div className="text-center mb-6">
+                        {/* <div className="text-center mb-6">
                           <p className="text-4xl font-bold">{plan.price}</p>
-                        </div>
+                        </div> */}
                         <ul className="space-y-3 mb-8">
                           {plan.features.map((feature, i) => (
                             <li key={i} className="flex items-start">
