@@ -13,6 +13,10 @@ export async function POST(req: Request) {
       year_founded,
       headquarters_city,
       headquarters_country,
+      industries_served,
+      target_business_size,
+      geographic_coverage,
+      team_size,
       services_offered, 
       expertise_and_certifications, 
       case_studies,
@@ -29,6 +33,20 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!industries_served || industries_served.length === 0) {
+      return NextResponse.json(
+        { error: "At least one industry must be selected" },
+        { status: 400 }
+      );
+    }
+
+    if (!team_size) {
+      return NextResponse.json(
+        { error: "Team size is required" },
+        { status: 400 }
+      );
+    }
+
     // Create the new company record
     const new_company = await prisma.company.create({
       data: {
@@ -38,14 +56,17 @@ export async function POST(req: Request) {
         year_founded: parseInt(year_founded),
         headquarters_city,
         headquarters_country,
+        industries_served,
+        target_business_size,
+        geographic_coverage,
+        team_size,
         services_offered,
         expertise_and_certifications,
         case_studies,
         client_reviews,
         social_links,
-        website,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        website
+        // createdAt and updatedAt are automatically handled by Prisma
       }
     });
 
@@ -61,8 +82,27 @@ export async function POST(req: Request) {
     }
     
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error.message },
       { status: 500 }
     );
   }
 }
+
+// export async function GET() {
+//   try {
+//     const companies = await prisma.company.findMany({
+//       orderBy: {
+//         createdAt: 'desc'
+//       },
+//       take: 100
+//     });
+
+//     return NextResponse.json(companies, { status: 200 });
+//   } catch (error: any) {
+//     console.error("Error fetching companies:", error);
+//     return NextResponse.json(
+//       { error: "Internal server error", details: error.message },
+//       { status: 500 }
+//     );
+//   }
+// }

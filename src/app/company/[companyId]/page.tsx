@@ -121,6 +121,10 @@ interface Company {
   year_founded?: number;
   headquarters_city?: string;
   headquarters_country?: string;
+  industries_served: string[];
+  target_business_size: string[];
+  geographic_coverage: string[];
+  team_size?: string;
   services_offered: Array<string | ServiceObject>;
   expertise_and_certifications?: Array<string | ExpertiseObject>;
   case_studies?: Array<CaseStudySimple | CaseStudyDetailed>;
@@ -135,6 +139,8 @@ interface Company {
     platform: string;
     url: string;
   }>;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // Helper type for display
@@ -378,6 +384,308 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
       </div>
       <p className="text-gray-300 pl-9">San Francisco, United States</p>
     </motion.div>
+  </div>
+</AnimatedSection>
+
+{/* Company Details Section */}
+<AnimatedSection title="Company Details" icon={MapPin} delay={0.9}>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+    {/* Year Founded */}
+    <motion.div
+      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 relative overflow-hidden"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      <div className="absolute -right-10 -top-10 opacity-10">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <path d="M60 10L110 60L60 110L10 60L60 10Z" stroke="url(#yearGradient)" strokeWidth="8" strokeLinejoin="round"/>
+          <defs>
+            <linearGradient id="yearGradient" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F97316"/>
+              <stop offset="1" stopColor="#EF4444"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div className="flex items-center mb-3">
+        <Calendar className="text-red-500 mr-3" size={20} />
+        <h3 className="text-lg font-semibold">Year Founded</h3>
+      </div>
+      <p className="text-gray-300 pl-9">{company.year_founded || 'Not specified'}</p>
+    </motion.div>
+
+    {/* Headquarters */}
+    <motion.div
+      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 relative overflow-hidden"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <div className="absolute -left-10 -bottom-10 opacity-10">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <path d="M60 10C80 30 90 30 110 10C90 60 90 80 110 100C90 120 80 120 60 140C40 120 30 120 10 100C30 80 30 60 10 30C30 10 40 10 60 10Z" stroke="url(#hqGradient)" strokeWidth="8" strokeLinejoin="round"/>
+          <defs>
+            <linearGradient id="hqGradient" x1="60" y1="0" x2="60" y2="140" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F97316"/>
+              <stop offset="1" stopColor="#EF4444"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div className="flex items-center mb-3">
+        <MapPin className="text-red-500 mr-3" size={20} />
+        <h3 className="text-lg font-semibold">Headquarters</h3>
+      </div>
+      <p className="text-gray-300 pl-9">
+        {company.headquarters_city || 'Not specified'}
+        {company.headquarters_city && company.headquarters_country && ', '}
+        {company.headquarters_country}
+      </p>
+    </motion.div>
+
+    {/* Team Size */}
+    <motion.div
+      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 relative overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+    >
+      <div className="absolute -right-10 -bottom-10 opacity-10">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="50" stroke="url(#teamGradient)" strokeWidth="8"/>
+          <defs>
+            <linearGradient id="teamGradient" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F97316"/>
+              <stop offset="1" stopColor="#EF4444"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div className="flex items-center mb-3">
+        <Users className="text-red-500 mr-3" size={20} />
+        <h3 className="text-lg font-semibold">Team Size</h3>
+      </div>
+      <p className="text-gray-300 pl-9">{company.team_size || 'Not specified'}</p>
+    </motion.div>
+
+    {/* Industries Served */}
+    <motion.div
+      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 relative overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.4 }}
+    >
+      <div className="absolute -left-10 -top-10 opacity-10">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+          <rect x="10" y="10" width="100" height="100" rx="15" stroke="url(#industriesGradient)" strokeWidth="8"/>
+          <defs>
+            <linearGradient id="industriesGradient" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#F97316"/>
+              <stop offset="1" stopColor="#EF4444"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div className="flex items-center mb-3">
+        <svg className="text-red-500 mr-3" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        <h3 className="text-lg font-semibold">Industries Served</h3>
+      </div>
+      <div className="flex flex-wrap gap-2 pl-9">
+        {company.industries_served?.length > 0 ? (
+          company.industries_served.map((industry, index) => (
+            <motion.span
+              key={index}
+              className="inline-block bg-red-900/30 text-red-400 px-3 py-1 rounded-full text-sm"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.05 * index }}
+            >
+              {industry}
+            </motion.span>
+          ))
+        ) : (
+          <span className="text-gray-400">Not specified</span>
+        )}
+      </div>
+    </motion.div>
+  </div>
+</AnimatedSection>
+
+{/* Target Business Size Section */}
+<AnimatedSection title="Target Clients" icon={Users} delay={1.0}>
+  <div className="mt-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {company.target_business_size?.length > 0 ? (
+        company.target_business_size.map((size, index) => (
+          <motion.div
+            key={index}
+            className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700 relative overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 * index }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <div className="absolute inset-0 opacity-10">
+              <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,0 L100,0 L100,100 Q50,80 0,100 Z" fill="url(#targetGradient)"/>
+                <defs>
+                  <linearGradient id="targetGradient" x1="50" y1="0" x2="50" y2="100" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#F97316" stopOpacity="0.3"/>
+                    <stop offset="1" stopColor="#EF4444" stopOpacity="0.1"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div className="flex items-center">
+              <div className="bg-red-900/50 p-3 rounded-lg mr-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {size === 'Startup' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>}
+                  {size === 'Small Medium Businesses' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>}
+                  {size === 'Enterprises' && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>}
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold">{size}</h3>
+            </div>
+            <p className="mt-3 text-gray-300 pl-14">
+              {size === 'Startup' && 'Tailored solutions for innovative startups and early-stage companies'}
+              {size === 'Small Medium Businesses' && 'Customized services for growing small and medium businesses'}
+              {size === 'Enterprises' && 'Enterprise-grade solutions for large organizations'}
+            </p>
+          </motion.div>
+        ))
+      ) : (
+        <div className="col-span-3 text-center py-8 text-gray-400">
+          No target business sizes specified
+        </div>
+      )}
+    </div>
+  </div>
+</AnimatedSection>
+
+{/* Geographic Coverage Section */}
+<AnimatedSection title="Global Reach" icon={Globe} delay={1.1}>
+  <div className="mt-6">
+    <div className="relative h-64 md:h-96 rounded-xl overflow-hidden border border-zinc-700">
+      {/* World map background with animated highlights */}
+      <div className="absolute inset-0 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/1200px-World_map_-_low_resolution.svg.png')] bg-cover bg-center opacity-20" />
+      
+      {/* Animated coverage indicators */}
+      {company.geographic_coverage?.map((region, index) => {
+        const positions = {
+          'India': { left: '72%', top: '55%' },
+          'APAC': { left: '80%', top: '45%' },
+          'Global': { left: '50%', top: '50%', scale: 2.5 },
+          'Remote Only': { left: '50%', top: '50%' }
+        };
+        
+        const position = positions[region as keyof typeof positions] || { left: '50%', top: '50%' };
+        
+        return (
+          <motion.div
+            key={index}
+            className="absolute w-8 h-8 bg-red-500 rounded-full shadow-lg"
+            style={{
+              left: position.left,
+              top: position.top,
+              
+              transform: 'translate(-50%, -50%)',
+              scale: 1
+            }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.7 }}
+            transition={{ 
+              type: 'spring',
+              stiffness: 100,
+              damping: 10,
+              delay: 0.2 * index
+            }}
+            whileHover={{ 
+              scale: 1.2,
+              opacity: 1,
+              transition: { duration: 0.2 }
+            }}
+          >
+            <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30"></div>
+            <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              {region === 'Global' ? '🌍' : region === 'APAC' ? '🌏' : region === 'India' ? '🇮🇳' : '💻'}
+            </div>
+          </motion.div>
+        );
+      })}
+      
+      {/* Legend */}
+      <div className="absolute bottom-4 left-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg p-4 border border-zinc-700">
+        <h4 className="text-sm font-semibold mb-2 text-white">Geographic Coverage</h4>
+        <div className="flex flex-wrap gap-3">
+          {company.geographic_coverage?.length > 0 ? (
+            company.geographic_coverage.map((region, index) => (
+              <motion.div
+                key={index}
+                className="flex items-center"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 * index }}
+              >
+                <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                <span className="text-sm text-gray-300">{region}</span>
+              </motion.div>
+            ))
+          ) : (
+            <span className="text-sm text-gray-400">No geographic coverage specified</span>
+          )}
+        </div>
+      </div>
+    </div>
+    
+    {/* Coverage description */}
+    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <motion.div
+        className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          Service Coverage
+        </h3>
+        <p className="text-gray-300">
+          {company.geographic_coverage?.includes('Global') 
+            ? 'Provides services worldwide with global support infrastructure'
+            : company.geographic_coverage?.includes('APAC')
+            ? 'Specializes in the Asia-Pacific region with local expertise'
+            : company.geographic_coverage?.includes('India')
+            ? 'Focuses primarily on the Indian market with deep local knowledge'
+            : company.geographic_coverage?.includes('Remote Only')
+            ? 'Offers fully remote services with digital delivery'
+            : 'Geographic service coverage not specified'}
+        </p>
+      </motion.div>
+      
+      <motion.div
+        className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <h3 className="text-lg font-semibold mb-3 flex items-center">
+          <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Availability
+        </h3>
+        <p className="text-gray-300">
+          {company.geographic_coverage?.includes('Remote Only')
+            ? 'Available 24/7 through digital channels with remote support'
+            : 'Typically operates during standard business hours with on-call support for critical issues'}
+        </p>
+      </motion.div>
+    </div>
   </div>
 </AnimatedSection>
 

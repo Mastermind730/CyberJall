@@ -16,6 +16,7 @@ interface ServiceOffered {
 interface ExpertiseCertification {
   type: string;
   name: string;
+  logo:string;
 }
 
 interface CaseStudy {
@@ -52,6 +53,10 @@ interface CompanyFormData {
   social_links: SocialLink[];
   website: string;
   logo: string;
+  industries_served: string[];
+  target_business_size: string[];
+  geographic_coverage: string[];
+  team_size: string;
 }
 
 // Define type for submission status
@@ -83,12 +88,16 @@ export default function CompanyProfile() {
       services_offered: [{ name: '', description: '', image: '' }],
       expertise_and_certifications: [{ type: '', name: '' }],
       case_studies: [{ title: '', client: '', challenge: '', solution: '', result: '' }],
+      industries_served: [],
+  target_business_size: [],
+  geographic_coverage: [],
+  team_size: '',
       client_reviews: [
         { clientName: '', position: '', company: '', review: '', rating: 0 }
       ],
       social_links: [
         { platform: 'linkedin', url: '' },
-        { platform: 'twitter', url: '' },
+        { platform: 'x', url: '' },
         { platform: 'facebook', url: '' },
         { platform: 'instagram', url: '' }
       ],
@@ -400,6 +409,228 @@ export default function CompanyProfile() {
                   )}
                 </div>
               </motion.div>
+        {/* Industries Served - Enhanced Multi-select with Checkboxes */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.9 }}
+  className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-lg relative overflow-hidden"
+>
+  <div className="absolute -right-10 -top-10 opacity-20">
+    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M75 25L125 25L175 75V125L125 175H75L25 125V75L75 25Z" stroke="url(#paint0_linear)" strokeWidth="10" strokeLinejoin="round"/>
+      <defs>
+        <linearGradient id="paint0_linear" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F97316"/>
+          <stop offset="1" stopColor="#EF4444"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  
+  <div className="relative z-10">
+    <div className="flex items-center mb-6">
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg mr-4">
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+      </div>
+      <h3 className="text-xl font-bold text-white">Industries Served</h3>
+    </div>
+    
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+      {[
+        'Finance & Banking', 
+        'Healthcare & Life Sciences',
+        'E-commerce & Retail',
+        'Telecommunications',
+        'Agriculture & Agritech',
+        'Hospitality & Travel',
+        'Aerospace & Defense',
+        'Government & Public Sector',
+        'Education & EdTech',
+        'Transportation & Logistics',
+        'Real Estate & Construction',
+        'Other'
+      ].map((industry) => (
+        <label key={industry} className="flex items-center space-x-2 group">
+          <input
+            type="checkbox"
+            value={industry}
+            {...register("industries_served")}
+            className="hidden"
+          />
+          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+            watch("industries_served")?.includes(industry)
+              ? 'bg-orange-500 border-orange-500'
+              : 'bg-gray-800 border-gray-600 group-hover:border-orange-400'
+          }`}>
+            {watch("industries_served")?.includes(industry) && (
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            )}
+          </div>
+          <span className="text-gray-200 group-hover:text-white transition-colors">{industry}</span>
+        </label>
+      ))}
+    </div>
+    {errors.industries_served && (
+      <p className="mt-3 text-sm text-red-400 flex items-center">
+        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {errors.industries_served.message}
+      </p>
+    )}
+  </div>
+</motion.div>
+
+{/* Target Business Size - Fixed Checkboxes */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 1.0 }}
+  className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-lg"
+>
+  <div className="flex items-center mb-6">
+    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg mr-4">
+      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+    </div>
+    <h3 className="text-xl font-bold text-white">Target Business Size</h3>
+  </div>
+  
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    {['Startup', 'Small Medium Businesses', 'Enterprises'].map((size) => (
+      <label key={size} className="flex items-center space-x-2 group">
+        <input
+          type="checkbox"
+          value={size}
+          {...register("target_business_size")}
+          className="hidden"
+        />
+        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+          watch("target_business_size")?.includes(size)
+            ? 'bg-orange-500 border-orange-500'
+            : 'bg-gray-800 border-gray-600 group-hover:border-orange-400'
+        }`}>
+          {watch("target_business_size")?.includes(size) && (
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          )}
+        </div>
+        <span className="text-gray-200 group-hover:text-white transition-colors">{size}</span>
+      </label>
+    ))}
+  </div>
+</motion.div>
+
+{/* Geographic Coverage - Fixed Checkboxes */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 1.1 }}
+  className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-lg"
+>
+  <div className="flex items-center mb-6">
+    <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg mr-4">
+      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h3 className="text-xl font-bold text-white">Geographic Coverage</h3>
+  </div>
+  
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+    {['India', 'APAC', 'Global', 'Remote Only'].map((region) => (
+      <label key={region} className="flex items-center space-x-2 group">
+        <input
+          type="checkbox"
+          value={region}
+          {...register("geographic_coverage")}
+          className="hidden"
+        />
+        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+          watch("geographic_coverage")?.includes(region)
+            ? 'bg-orange-500 border-orange-500'
+            : 'bg-gray-800 border-gray-600 group-hover:border-orange-400'
+        }`}>
+          {watch("geographic_coverage")?.includes(region) && (
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          )}
+        </div>
+        <span className="text-gray-200 group-hover:text-white transition-colors">{region}</span>
+      </label>
+    ))}
+  </div>
+</motion.div>
+{/* Team Size - Elegant Select */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 1.2 }}
+  className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-lg relative overflow-hidden"
+>
+  <div className="absolute -left-10 -top-10 opacity-20">
+    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="25" y="25" width="150" height="150" rx="15" stroke="url(#paint3_linear)" strokeWidth="10"/>
+      <defs>
+        <linearGradient id="paint3_linear" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F97316"/>
+          <stop offset="1" stopColor="#EF4444"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  
+  <div className="relative z-10">
+    <div className="flex items-center mb-6">
+      <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg mr-4">
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <h3 className="text-xl font-bold text-white">Team Size</h3>
+    </div>
+    
+    <div className="relative">
+      <select
+        {...register("team_size", {
+          required: "Please select your team size"
+        })}
+        className="w-full px-4 py-3 rounded-lg bg-gray-900/70 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all appearance-none text-white"
+      >
+        <option value="">Select team size</option>
+        <option value="1-10" className="bg-gray-800 text-white">1-10</option>
+        <option value="11-50" className="bg-gray-800 text-white">11-50</option>
+        <option value="51-100" className="bg-gray-800 text-white">51-100</option>
+        <option value="100+" className="bg-gray-800 text-white">100+</option>
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </div>
+    </div>
+    {errors.team_size && (
+      <p className="mt-2 text-sm text-red-400 flex items-center">
+        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {errors.team_size.message}
+      </p>
+    )}
+  </div>
+</motion.div>
+
+
+
+
               
               {/* Company Overview */}
               <motion.div
@@ -583,72 +814,152 @@ export default function CompanyProfile() {
 </motion.div>
               {/* Expertise & Certifications (JSON Structure) */}
               <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 1.2 }}
-                className="space-y-4"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 1.3 }}
+  className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 shadow-lg relative overflow-hidden"
+>
+  <div className="absolute -right-10 -top-10 opacity-20">
+    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 50H150V150H50V50Z" stroke="url(#paint4_linear)" strokeWidth="10" strokeLinejoin="round"/>
+      <path d="M75 75H125V125H75V75Z" stroke="url(#paint5_linear)" strokeWidth="10" strokeLinejoin="round"/>
+      <defs>
+        <linearGradient id="paint4_linear" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F97316"/>
+          <stop offset="1" stopColor="#EF4444"/>
+        </linearGradient>
+        <linearGradient id="paint5_linear" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F97316"/>
+          <stop offset="1" stopColor="#EF4444"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  
+  <div className="relative z-10">
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg mr-4">
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-white">Expertise & Certifications</h3>
+      </div>
+      <button
+        type="button"
+        onClick={() => appendCert({ type: '', name: '', logo: '' })}
+        className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg text-white text-sm hover:from-orange-600 hover:to-red-600 transition-all flex items-center"
+      >
+        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        Add Certification
+      </button>
+    </div>
+    
+    {certFields.map((field, index) => (
+      <div key={field.id} className="mb-6 last:mb-0 p-5 bg-gray-900/50 rounded-lg border border-gray-700">
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-lg font-semibold text-orange-400">Certification #{index + 1}</h4>
+          {index > 0 && (
+            <button
+              type="button"
+              onClick={() => removeCert(index)}
+              className="text-red-400 hover:text-red-300 p-1 rounded-full hover:bg-red-900/30 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
+            <select
+              {...register(`expertise_and_certifications.${index}.type`, { required: "Type required" })}
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white"
+            >
+              <option value="">Select type</option>
+              <option value="certification" className="bg-gray-800">Certification</option>
+              <option value="partnership" className="bg-gray-800">Partnership</option>
+              <option value="expertise" className="bg-gray-800">Expertise</option>
+              <option value="achievement" className="bg-gray-800">Achievement</option>
+            </select>
+            {errors.expertise_and_certifications?.[index]?.type && (
+              <p className="mt-1 text-sm text-red-400">{errors.expertise_and_certifications[index]?.message}</p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Name/Description</label>
+            <input
+              {...register(`expertise_and_certifications.${index}.name`, { required: "Name required" })}
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white"
+              placeholder="e.g., CISSP, ISO 27001"
+            />
+            {errors.expertise_and_certifications?.[index]?.name && (
+              <p className="mt-1 text-sm text-red-400">{errors.expertise_and_certifications[index]?.name?.message}</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-300 mb-2">Certification Logo</label>
+          <div className="flex items-center space-x-4">
+            <div className="flex-1">
+              <CldUploadButton 
+                uploadPreset="Certification_Logo"
+                onSuccess={(result) => {
+                  if (result && typeof result.info !== 'string') {
+                    const info = result.info as { secure_url: string };
+                    if (info?.secure_url) {
+                      setValue(`expertise_and_certifications.${index}.logo`, info.secure_url);
+                    }
+                  }
+                }}
+                options={{
+                  multiple: false,
+                  resourceType: "image",
+                  maxFileSize: 5000000,
+                }}
               >
-                <div className="flex justify-between items-center">
-                  <label className="block text-orange-400 font-medium">Expertise & Certifications</label>
-                  <button
-                    type="button"
-                    onClick={() => appendCert({ type: '', name: '' })}
-                    className="px-3 py-1 bg-orange-600 rounded-lg text-white text-sm hover:bg-orange-700 transition-colors"
-                  >
-                    + Add Certification
-                  </button>
+                <div className="w-full p-8 border-2 border-dashed border-gray-700 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors text-center cursor-pointer">
+                  <svg className="w-10 h-10 mx-auto text-orange-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <p className="text-gray-300">Click to upload logo</p>
+                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, SVG up to 5MB</p>
                 </div>
-                
-                {certFields.map((field, index) => (
-                  <div key={field.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <h4 className="text-orange-400 font-medium">Certification #{index + 1}</h4>
-                      {index > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => removeCert(index)}
-                          className="text-red-400 hover:text-red-300"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-1">Type</label>
-                      <select
-                        {...register(`expertise_and_certifications.${index}.type`, { required: "Type required" })}
-                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      >
-                        <option value="">Select type</option>
-                        <option value="certification">Certification</option>
-                        <option value="partnership">Partnership</option>
-                        <option value="expertise">Expertise</option>
-                        <option value="achievement">Achievement</option>
-                      </select>
-                      {errors.expertise_and_certifications?.[index] && (
-  <p className="mt-1 text-red-500 text-sm">
-    {errors.expertise_and_certifications[index]?.message}
-  </p>
-)}
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm text-gray-300 mb-1">Name/Description</label>
-                      <input
-                        {...register(`expertise_and_certifications.${index}.name`, { required: "Name required" })}
-                        className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        placeholder="e.g., CISSP, ISO 27001, etc."
-                      />
-                      {errors.expertise_and_certifications?.[index]?.name && (
-                        <p className="mt-1 text-red-500 text-sm">{errors.expertise_and_certifications[index]?.name?.message}</p>
-                      )}
-                    </div>
-                    </div>
-                ))}
-              </motion.div>
+              </CldUploadButton>
+            </div>
+            {watch(`expertise_and_certifications.${index}.logo`) && (
+              <div className="relative w-20 h-20 bg-gray-800 rounded-md overflow-hidden border border-gray-700 flex-shrink-0">
+                <Image
+                  src={watch(`expertise_and_certifications.${index}.logo`)}
+                  alt={`Certification ${index + 1} logo`}
+                  fill
+                  className="object-contain p-2"
+                />
+                <button
+                  type="button"
+                  onClick={() => setValue(`expertise_and_certifications.${index}.logo`, '')}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2 hover:bg-red-600 transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</motion.div>
               
               {/* Case Studies (JSON Structure) */}
               <motion.div

@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import Head from "next/head";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+
 // Define Partner interface
 interface Partner {
   id: string;
@@ -16,6 +16,7 @@ export default function Partners() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -53,12 +54,12 @@ export default function Partners() {
 
   const getRandomColor = (id: string) => {
     const colors = [
-      "from-red-600 to-red-800",
-      "from-orange-500 to-red-600",
-      "from-red-700 to-black",
-      "from-orange-400 to-orange-600",
-      "from-red-500 to-black",
-      "from-black to-red-900",
+      "from-red-600 via-red-700 to-red-800",
+      "from-orange-400 via-orange-500 to-red-600",
+      "from-red-700 via-red-800 to-black",
+      "from-orange-400 via-orange-500 to-orange-600",
+      "from-red-500 via-red-700 to-black",
+      "from-black via-red-800 to-red-900",
     ];
 
     // Use the id's last character to select a color
@@ -67,236 +68,389 @@ export default function Partners() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <Head>
-        <title>Our Partners | Your Company Name</title>
-        <meta
-          name="description"
-          content="Our trusted partners and collaborators"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div className="min-h-screen bg-black relative">
+    
 
-      <div className="relative overflow-hidden">
-        {/* Background Vector Elements */}
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 opacity-20">
-          <svg width="404" height="404" fill="none" viewBox="0 0 404 404">
-            <defs>
-              <pattern
-                id="pattern-circles"
-                x="0"
-                y="0"
-                width="20"
-                height="20"
-                patternUnits="userSpaceOnUse"
-              >
-                <circle
-                  cx="10"
-                  cy="10"
-                  r="2"
-                  className="text-red-800"
-                  fill="currentColor"
-                />
-              </pattern>
-            </defs>
-            <rect width="404" height="404" fill="url(#pattern-circles)" />
-          </svg>
+      {/* Background Gradient Mesh */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-0 w-full h-1/3 bg-gradient-to-b from-red-900/20 to-transparent"></div>
+        <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-red-900/20 to-transparent"></div>
+        <div className="absolute left-0 h-full w-1/3 bg-gradient-to-r from-orange-800/10 to-transparent"></div>
+        <div className="absolute right-0 h-full w-1/3 bg-gradient-to-l from-red-900/10 to-transparent"></div>
+      </div>
+
+      {/* Animated background elements */}
+      <div className="fixed inset-0 z-0 overflow-hidden opacity-40">
+        {/* Dynamic grid pattern */}
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 5% 15%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 85% 45%, #9a3412aa 0.5%, transparent 5%), radial-gradient(circle at 35% 75%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 65% 85%, #9a341222 0.5%, transparent 5%)" }}></div>
+        
+        {/* Floating particles */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={`particle-${i}`}
+              className={`absolute rounded-full bg-gradient-to-br ${
+                i % 2 === 0 ? "from-red-600/30 to-red-800/10" : "from-orange-500/20 to-orange-700/10"
+              }`}
+              style={{
+                width: `${Math.floor(Math.random() * 10) + 3}px`,
+                height: `${Math.floor(Math.random() * 10) + 3}px`,
+                left: `${Math.floor(Math.random() * 100)}%`,
+                top: `${Math.floor(Math.random() * 100)}%`,
+              }}
+              animate={{
+                y: [0, Math.random() * 50 - 25],
+                x: [0, Math.random() * 50 - 25],
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{
+                duration: Math.floor(Math.random() * 15) + 15,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
+          ))}
         </div>
+      </div>
 
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 opacity-20">
-          <svg width="404" height="404" fill="none" viewBox="0 0 404 404">
-            <defs>
-              <pattern
-                id="pattern-squares"
-                x="0"
-                y="0"
-                width="30"
-                height="30"
-                patternUnits="userSpaceOnUse"
-              >
-                <rect
-                  x="10"
-                  y="10"
-                  width="10"
-                  height="10"
-                  className="text-orange-500"
-                  fill="currentColor"
-                />
-              </pattern>
-            </defs>
-            <rect width="404" height="404" fill="url(#pattern-squares)" />
-          </svg>
-        </div>
-
-        <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-20"
+        >
+          <motion.h1 
+            className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl mb-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl mb-4">
-              Our <span className="text-red-600">Partners</span>
-            </h1>
-            <p className="max-w-xl mx-auto text-xl text-gray-400">
-              We&apos;re proud to collaborate with these amazing organizations
-              to deliver excellence.
-            </p>
+            Our <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">Partners</span>
+          </motion.h1>
+          
+          <motion.p 
+            className="max-w-2xl mx-auto text-xl text-gray-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            We&apos;re proud to collaborate with these amazing organizations
+            to deliver excellence in everything we do.
+          </motion.p>
 
-            {/* Decorative line */}
-            <div className="mt-8 flex justify-center">
-              <div className="h-1 w-32 bg-gradient-to-r from-red-600 via-orange-500 to-red-700 rounded-full"></div>
-            </div>
+          {/* Decorative line with enhanced animation */}
+          <motion.div 
+            className="mt-8 flex justify-center"
+            initial={{ width: 0 }}
+            animate={{ width: "auto" }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <motion.div 
+              className="h-1 w-48 bg-gradient-to-r from-red-700 via-orange-500 to-red-600 rounded-full"
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{ 
+                duration: 5, 
+                repeat: Infinity,
+                ease: "linear" 
+              }}
+              style={{
+                backgroundSize: "200% 200%",
+              }}
+            />
           </motion.div>
+        </motion.div>
 
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-600"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center text-red-500 p-8 bg-red-900 bg-opacity-20 rounded-lg border border-red-800">
-              <p>{error}</p>
-            </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <motion.div 
+              className="relative w-20 h-20"
+              animate={{ rotate: 360 }}
+              transition={{ 
+                duration: 2, 
+                repeat: Infinity,
+                ease: "linear" 
+              }}
+            >
+              <div className="absolute inset-0 rounded-full border-4 border-t-red-600 border-r-orange-500 border-b-red-700 border-l-orange-600"></div>
+              <div className="absolute inset-2 rounded-full border-4 border-t-orange-500 border-r-red-700 border-b-orange-600 border-l-red-600"></div>
+            </motion.div>
+          </div>
+        ) : error ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center text-red-500 p-8 bg-gradient-to-br from-red-900/30 to-black rounded-xl border border-red-800/50 shadow-lg shadow-red-900/20"
+          >
+            <p>{error}</p>
+          </motion.div>
+        ) : (
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+          >
+            {partners.map((partner) => (
+            <motion.div
+  key={partner.id}
+  variants={{
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0 }
+  }}
+  transition={{ duration: 0.6, ease: "easeOut" }}
+  onHoverStart={() => setHoveredCard(partner.id)}
+  onHoverEnd={() => setHoveredCard(null)}
+  className="relative group"
+>
+  {/* Ambient glow effect */}
+  <div 
+    className="absolute -inset-0.5 bg-gradient-to-r from-red-500/60 via-orange-400/60 to-amber-500/60 rounded-2xl opacity-0 group-hover:opacity-80 transition-all duration-500 ease-out"
+    style={{
+      filter: "blur(18px)",
+      transform: "translateZ(0)",
+    }}
+  />
+  
+  <motion.div
+    whileHover={{ y: -12, scale: 1.02 }}
+    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    className="relative h-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 rounded-xl overflow-hidden border border-gray-800/50 group-hover:border-red-500/70 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-red-500/20"
+  >
+    {/* Subtle texture overlay */}
+    <div className="absolute inset-0 opacity-10 bg-[url('/noise-texture.png')] mix-blend-overlay pointer-events-none" />
+    
+    {/* Top accent line */}
+    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out" />
+    
+    {/* Card content container */}
+    <div className="p-8 h-full flex flex-col justify-between relative z-10">
+      <div>
+        {/* Company logo area with enhanced presentation */}
+        <div className="flex justify-center mb-6 h-36 items-center relative">
+          {partner.logo && partner.logo !== "" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative"
+            >
+              <Image
+                width={250}
+                height={250}
+                src={partner.logo}
+                alt={`${partner.company_name} logo`}
+                className="max-h-28 max-w-full object-contain filter drop-shadow-lg"
+              />
+              
+              {/* Enhanced logo glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 to-amber-500/20 filter blur-2xl opacity-0 group-hover:opacity-80 transition-opacity duration-700 -z-10 scale-110" />
+            </motion.div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {partners.map((partner, index) => (
-                <motion.div
-                  key={partner.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{
-                    y: -5,
-                    boxShadow:
-                      "0 10px 25px -5px rgba(239, 68, 68, 0.2), 0 10px 10px -5px rgba(239, 68, 68, 0.1)",
-                    borderColor: "#ef4444",
-                  }}
-                  className="bg-gray-900 rounded-xl overflow-hidden shadow-lg border border-gray-800 hover:border-red-500 transition-all duration-300"
-                >
-                  <div className="p-6 h-full flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-center mb-4 h-32 items-center">
-                        {partner.logo && partner.logo !== "" ? (
-                          <Image
-                            width={250}
-                            height={250}
-                            src={partner.logo}
-                            alt={`${partner.company_name} logo`}
-                            className="max-h-24 max-w-full object-contain"
-                          />
-                        ) : (
-                          <div
-                            className={`w-24 h-24 rounded-full bg-gradient-to-br ${getRandomColor(
-                              partner.id
-                            )} flex items-center justify-center text-white text-2xl font-bold shadow-lg`}
-                          >
-                            {getInitials(partner.company_name)}
-                          </div>
-                        )}
-                      </div>
-                      <h3 className="text-xl font-semibold text-white text-center mt-2">
-                        {partner.company_name}
-                      </h3>
-                    </div>
-
-                    <div className="mt-6 flex justify-center gap-3 z-40">
-                      <Link
-                        href={`/company/${partner.id}`}
-                        className="inline-flex items-center px-4 z-50 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-700 to-red-500 rounded-full hover:from-red-800 hover:to-red-600 transition-colors duration-300 shadow-lg"
-                      >
-                        View Company
-                        <svg
-                          className="ml-2 h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                      </Link>
-                      
-                      <Link
-                        href={partner.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-500 rounded-full hover:from-red-700 hover:to-orange-600 transition-colors duration-300 shadow-lg"
-                      >
-                        Visit Website
-                        <svg
-                          className="ml-2 h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <motion.div
+              whileHover={{ rotate: [0, -3, 3, -3, 0] }}
+              transition={{ duration: 0.5 }}
+              className="w-28 h-28 rounded-full bg-gradient-to-br from-red-600 via-red-500 to-orange-500 flex items-center justify-center text-white text-3xl font-bold shadow-xl relative z-10 border border-red-400/20"
+            >
+              {getInitials(partner.company_name)}
+              
+              {/* Multiple animated rings */}
+              <motion.div
+                className="absolute inset-0 rounded-full border border-red-400/40"
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.7, 0.2, 0.7],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              <motion.div
+                className="absolute inset-0 rounded-full border border-orange-400/30"
+                animate={{
+                  scale: [1, 1.25, 1],
+                  opacity: [0.5, 0.1, 0.5],
+                }}
+                transition={{
+                  duration: 3,
+                  delay: 0.3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </motion.div>
           )}
+        </div>
+        
+        {/* Company name with sophisticated underline animation */}
+        <motion.h3 className="text-2xl font-bold text-center mt-2 mb-1">
+          <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-red-200 group-hover:via-white group-hover:to-amber-100 transition-all duration-500">
+            {partner.company_name}
+          </span>
+          <div className="relative h-0.5 w-16 mx-auto mt-2 overflow-hidden">
+            <motion.span
+              className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500 to-red-500/0"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: hoveredCard === partner.id ? 1 : 0 }}
+              transition={{ duration: 0.4 }}
+            />
+          </div>
+        </motion.h3>
+      </div>
 
-          {/* Floating animated elements */}
-          <div className="absolute top-1/4 left-5 animate-pulse">
-            <svg
-              width="40"
-              height="40"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="rgba(239, 68, 68, 0.3)"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-          </div>
-          <div className="absolute bottom-1/4 right-5 animate-bounce">
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="rgba(249, 115, 22, 0.3)"
-              strokeWidth="2"
-            >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-          </div>
-          <div className="absolute top-1/2 right-1/4 animate-spin-slow">
-            <svg
-              width="35"
-              height="35"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="rgba(239, 68, 68, 0.2)"
-              strokeWidth="2"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            </svg>
-          </div>
+      {/* Action buttons with enhanced styling */}
+      <div className="mt-8 flex justify-center gap-4">
+        <motion.div 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="relative group/btn"
+        >
+          <Link
+            href={`/company/${partner.id}`}
+            className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-red-700 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-red-500/25 relative overflow-hidden"
+          >
+            {/* Button spotlight effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
+            
+            <span className="relative z-20 flex items-center">
+              View Details
+              <svg
+                className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            </span>
+          </Link>
+        </motion.div>
+        
+        <motion.div 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="relative group/btn"
+        >
+          <Link
+            href={partner.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-orange-600 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-orange-500/25 relative overflow-hidden"
+          >
+            {/* Button spotlight effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
+            
+            <span className="relative z-20 flex items-center">
+              Visit Website
+              <svg
+                className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </span>
+          </Link>
+        </motion.div>
+      </div>
+    </div>
+  </motion.div>
+</motion.div>
+            ))}
+          </motion.div>
+        )}
+      </div>
 
-          {/* Flame-like decorative element */}
-          <div className="absolute bottom-0 w-full left-0 h-32 bg-gradient-to-t from-red-900 to-transparent opacity-10"></div>
-        </main>
+      {/* Decorative elements that don't interfere with buttons */}
+      <div className="fixed top-0 right-0 w-1/3 h-1/3 pointer-events-none">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-10">
+          <defs>
+            <linearGradient id="redGradient" gradientTransform="rotate(45)">
+              <stop offset="0%" stopColor="#ef4444" />
+              <stop offset="100%" stopColor="#991b1b" />
+            </linearGradient>
+          </defs>
+          <motion.path
+            fill="url(#redGradient)"
+            d="M41.9,-73.3C56.1,-66.4,70.3,-58.4,78.9,-46.1C87.4,-33.8,90.3,-16.9,88.2,-1.2C86.1,14.5,79,29,70.6,42.8C62.2,56.5,52.5,69.5,39.6,76.2C26.8,82.8,10.9,83.2,-3.5,79.5C-17.8,75.7,-30.6,67.9,-42.6,59.5C-54.6,51,-65.8,41.9,-73.1,29.9C-80.3,18,-83.5,3.1,-80.8,-10.6C-78,-24.4,-69.3,-37,-58.9,-45.2C-48.5,-53.5,-36.5,-57.4,-25.1,-65.7C-13.6,-74,-6.8,-86.7,3.4,-92.5C13.6,-98.3,27.7,-80.1,41.9,-73.3Z"
+            animate={{
+              d: [
+                "M41.9,-73.3C56.1,-66.4,70.3,-58.4,78.9,-46.1C87.4,-33.8,90.3,-16.9,88.2,-1.2C86.1,14.5,79,29,70.6,42.8C62.2,56.5,52.5,69.5,39.6,76.2C26.8,82.8,10.9,83.2,-3.5,79.5C-17.8,75.7,-30.6,67.9,-42.6,59.5C-54.6,51,-65.8,41.9,-73.1,29.9C-80.3,18,-83.5,3.1,-80.8,-10.6C-78,-24.4,-69.3,-37,-58.9,-45.2C-48.5,-53.5,-36.5,-57.4,-25.1,-65.7C-13.6,-74,-6.8,-86.7,3.4,-92.5C13.6,-98.3,27.7,-80.1,41.9,-73.3Z",
+                "M34.5,-59.9C45.5,-54.9,55.9,-47.5,62.7,-37.2C69.5,-26.9,72.7,-13.5,73.6,0.5C74.5,14.5,73.1,29.1,65.9,39.2C58.7,49.3,45.8,55,33.2,60.5C20.5,66.1,8.1,71.5,-3.8,69.9C-15.8,68.3,-27.3,59.8,-37.8,50.6C-48.3,41.4,-57.8,31.4,-61.7,19.6C-65.7,7.8,-64.1,-5.9,-60,-17.7C-55.9,-29.6,-49.3,-39.6,-40.1,-45.5C-30.9,-51.3,-19.1,-53,-7.2,-61.1C4.7,-69.2,18.5,-83.7,29.2,-80.9C39.9,-78.1,47.6,-58.2,34.5,-59.9Z",
+                "M31.8,-54.9C42.2,-52.2,52.2,-45.6,58.6,-36.2C65,-26.8,67.8,-14.4,68.6,-1.5C69.3,11.5,67.9,22.9,61.6,31.6C55.2,40.2,43.9,46,32.9,54C21.9,62.1,11,72.3,-0.7,73.3C-12.3,74.4,-24.6,66.2,-35.8,57.7C-47,49.1,-57.2,40.1,-62.7,28.9C-68.1,17.6,-68.9,4,-66.7,-9C-64.5,-22,-59.4,-34.4,-50.7,-41.7C-42,-49.1,-29.8,-51.3,-18.9,-53.1C-8,-55,-4,-56.5,3.2,-62C10.5,-67.5,21,-70.9,31.8,-54.9Z",
+                "M41.9,-73.3C56.1,-66.4,70.3,-58.4,78.9,-46.1C87.4,-33.8,90.3,-16.9,88.2,-1.2C86.1,14.5,79,29,70.6,42.8C62.2,56.5,52.5,69.5,39.6,76.2C26.8,82.8,10.9,83.2,-3.5,79.5C-17.8,75.7,-30.6,67.9,-42.6,59.5C-54.6,51,-65.8,41.9,-73.1,29.9C-80.3,18,-83.5,3.1,-80.8,-10.6C-78,-24.4,-69.3,-37,-58.9,-45.2C-48.5,-53.5,-36.5,-57.4,-25.1,-65.7C-13.6,-74,-6.8,-86.7,3.4,-92.5C13.6,-98.3,27.7,-80.1,41.9,-73.3Z"
+              ],
+            }}
+            transition={{
+              repeat: Infinity,
+              repeatType: "mirror",
+              duration: 20,
+              ease: "easeInOut",
+            }}
+            className="blur-md"
+          />
+        </svg>
+      </div>
+
+      <div className="fixed bottom-0 left-0 w-1/3 h-1/3 pointer-events-none">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-10">
+          <defs>
+            <linearGradient id="orangeGradient" gradientTransform="rotate(45)">
+              <stop offset="0%" stopColor="#f97316" />
+              <stop offset="100%" stopColor="#ea580c" />
+            </linearGradient>
+          </defs>
+          <motion.path
+            fill="url(#orangeGradient)"
+            d="M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
+            animate={{
+              d: [
+                "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z",
+                "M38.5,-65.8C49.8,-59.9,58.5,-48.5,65.4,-35.9C72.3,-23.3,77.5,-9.5,77.2,4.2C76.9,17.9,71.1,31.4,62.7,43.2C54.3,55,43.3,65,30.4,71.1C17.6,77.3,2.8,79.5,-12.3,77.7C-27.5,75.9,-42.9,70.1,-53.9,59.9C-64.8,49.7,-71.2,35.2,-74.5,20C-77.8,4.8,-78,-11,-73.1,-25.1C-68.3,-39.2,-58.4,-51.5,-46,-57.9C-33.6,-64.3,-18.5,-64.8,-3.4,-60.2C11.7,-55.6,27.2,-71.8,38.5,-65.8Z",
+                "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
+              ],
+            }}
+            transition={{
+              repeat: Infinity,
+              repeatType: "mirror",
+              duration: 25,
+              ease: "easeInOut",
+            }}
+            className="blur-md"
+          />
+        </svg>
       </div>
     </div>
   );

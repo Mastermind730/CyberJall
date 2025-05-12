@@ -86,6 +86,10 @@ model Company {
   year_founded              Int
   headquarters_city         String
   headquarters_country      String
+  industries_served         String[]
+  target_business_size      String[]
+  geographic_coverage       String[]
+  team_size                 String
   services_offered          Json
   expertise_and_certifications Json
   case_studies              Json
@@ -99,7 +103,13 @@ model Company {
   @@index([year_founded])
   @@index([headquarters_city])
   @@index([headquarters_country])
+  @@index([industries_served])
+  @@index([team_size])
 }
+
+
+
+
 model SecurityAssessmentRequest {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
   companyName        String
