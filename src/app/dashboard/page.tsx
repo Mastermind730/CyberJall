@@ -170,36 +170,7 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* User Info Section */}
-          {user && (
-            <motion.div className="mb-8" variants={itemVariants}>
-              <h3 className="text-lg font-semibold text-orange-500 mb-4">
-                User Information
-              </h3>
-              <div className="bg-gray-800 rounded-xl p-6 border border-orange-600 border-opacity-20 shadow-lg">
-                {user.company_name && (
-                  <p className="text-gray-300 mb-2">
-                    <span className="font-semibold">Company:</span> {user.company_name}
-                  </p>
-                )}
-                {user.contact && (
-                  <p className="text-gray-300 mb-2">
-                    <span className="font-semibold">Contact:</span> {user.contact}
-                  </p>
-                )}
-                {user.work_email && (
-                  <p className="text-gray-300 mb-2">
-                    <span className="font-semibold">Email:</span> {user.work_email}
-                  </p>
-                )}
-                {user.message && (
-                  <p className="text-gray-300">
-                    <span className="font-semibold">Message:</span> {user.message}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          )}
+         
 
           {/* Rewards Section */}
           <motion.div className="mb-8" variants={itemVariants}>
@@ -238,7 +209,7 @@ export default function Dashboard() {
             <div className="mt-6">
               {activeTab === "Tasks" && (
                 <div className="space-y-4">
-                  {tasksData.map((task) => (
+                  {/* {tasksData.map((task) => (
                     <div
                       key={task.id}
                       className="bg-gray-800 rounded-xl p-4 border border-orange-600 border-opacity-20 shadow-lg"
@@ -248,13 +219,14 @@ export default function Dashboard() {
                       </h4>
                       <p className="text-gray-300">Status: {task.status}</p>
                     </div>
-                  ))}
+                  ))} */}
+                  No current tasks
                 </div>
               )}
 
               {activeTab === "Activity" && (
                 <div className="space-y-4">
-                  {activityData.map((activity) => (
+                  {/* {activityData.map((activity) => (
                     <div
                       key={activity.id}
                       className="bg-gray-800 rounded-xl p-4 border border-orange-600 border-opacity-20 shadow-lg"
@@ -264,13 +236,14 @@ export default function Dashboard() {
                         {activity.timestamp}
                       </p>
                     </div>
-                  ))}
+                  ))} */}
+                  No current Activities
                 </div>
               )}
 
               {activeTab === "Announcements" && (
                 <div className="space-y-4">
-                  {announcementsData.map((announcement) => (
+                  {/* {announcementsData.map((announcement) => (
                     <div
                       key={announcement.id}
                       className="bg-gray-800 rounded-xl p-4 border border-orange-600 border-opacity-20 shadow-lg"
@@ -285,7 +258,8 @@ export default function Dashboard() {
                         {announcement.date}
                       </p>
                     </div>
-                  ))}
+                  ))} */}
+                  No current announcements
                 </div>
               )}
             </div>
