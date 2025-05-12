@@ -52,20 +52,20 @@ export default function Partners() {
       .substring(0, 2);
   };
 
-  const getRandomColor = (id: string) => {
-    const colors = [
-      "from-red-600 via-red-700 to-red-800",
-      "from-orange-400 via-orange-500 to-red-600",
-      "from-red-700 via-red-800 to-black",
-      "from-orange-400 via-orange-500 to-orange-600",
-      "from-red-500 via-red-700 to-black",
-      "from-black via-red-800 to-red-900",
-    ];
+  // const getRandomColor = (id: string) => {
+  //   const colors = [
+  //     "from-red-600 via-red-700 to-red-800",
+  //     "from-orange-400 via-orange-500 to-red-600",
+  //     "from-red-700 via-red-800 to-black",
+  //     "from-orange-400 via-orange-500 to-orange-600",
+  //     "from-red-500 via-red-700 to-black",
+  //     "from-black via-red-800 to-red-900",
+  //   ];
 
-    // Use the id's last character to select a color
-    const colorIndex = parseInt(id.charAt(id.length - 1), 16) % colors.length;
-    return colors[colorIndex];
-  };
+  //   // Use the id's last character to select a color
+  //   const colorIndex = parseInt(id.charAt(id.length - 1), 16) % colors.length;
+  //   return colors[colorIndex];
+  // };
 
   return (
     <div className="min-h-screen bg-black relative">
