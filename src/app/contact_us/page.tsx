@@ -16,7 +16,6 @@ const ContactPage = () => {
 
   const recaptchaRef = React.useRef<ReCAPTCHA>(null);
 
-
   const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
@@ -44,19 +43,18 @@ const ContactPage = () => {
     if (token) {
         try {
             await verifyCaptcha(token);
-            
         } catch (error) {
             console.error('Error verifying captcha:', error);
         }
     }
-};
+  };
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-red-950 overflow-hidden relative">
+    <section className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-violet-950 overflow-hidden relative">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
@@ -66,28 +64,59 @@ const ContactPage = () => {
             rotate: 360
           }}
           transition={{ 
-            duration: 10, 
+            duration: 20, 
             repeat: Infinity, 
             repeatType: "reverse",
-            ease: "easeInOut"
+            ease: "linear"
           }}
-          className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-gradient-to-r from-red-900/30 to-black/30 blur-3xl rotate-45"
+          className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-gradient-to-r from-blue-400/10 via-violet-400/10 to-purple-400/10 blur-3xl"
         />
         <motion.div
           initial={{ opacity: 0, x: -100, y: -100 }}
           animate={{ 
             opacity: isLoaded ? 0.1 : 0, 
-            x: isLoaded ? 100 : -100,
-            y: isLoaded ? 100 : -100
+            x: isLoaded ? [0, 100, 0, -100, 0] : -100,
+            y: isLoaded ? [0, 100, 0, -100, 0] : -100
           }}
           transition={{ 
-            duration: 15, 
+            duration: 25, 
             repeat: Infinity, 
-            repeatType: "mirror",
             ease: "easeInOut"
           }}
-          className="absolute inset-0 bg-gradient-to-br from-red-900/20 to-black/20 blur-2xl"
+          className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-violet-400/10 to-purple-400/10 blur-2xl"
         />
+        {/* Floating orb elements */}
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ 
+              opacity: 0,
+              x: Math.random() * 100 - 50,
+              y: Math.random() * 100 - 50
+            }}
+            animate={{ 
+              opacity: isLoaded ? 0.3 : 0,
+              x: [0, Math.random() * 200 - 100],
+              y: [0, Math.random() * 200 - 100]
+            }}
+            transition={{
+              duration: 15 + Math.random() * 20,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut"
+            }}
+            className={`absolute rounded-full w-${Math.floor(Math.random() * 20) + 10} h-${Math.floor(Math.random() * 20) + 10} ${
+              i % 3 === 0 ? 'bg-blue-400/20' : 
+              i % 2 === 0 ? 'bg-violet-400/20' : 'bg-purple-400/20'
+            } blur-xl`}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${Math.random() * 200 + 100}px`,
+              height: `${Math.random() * 200 + 100}px`
+            }}
+          />
+        ))}
       </div>
 
       <div className="container px-6 py-12 mx-auto relative z-10">
@@ -105,27 +134,27 @@ const ContactPage = () => {
               type: "spring", 
               stiffness: 200 
             }}
-            className="inline-flex items-center justify-center px-4 py-1.5 mb-4 rounded-full bg-red-900/20 backdrop-blur-sm"
+            className="inline-flex items-center justify-center px-4 py-1.5 mb-4 rounded-full bg-gradient-to-r from-blue-500/20 via-violet-500/20 to-purple-500/20 backdrop-blur-sm"
           >
-            <span className="text-sm font-medium text-red-300">Connect With Us</span>
+            <span className="text-sm font-medium text-blue-200">Connect With Us</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 20, letterSpacing: -0.1 }}
-            animate={{ opacity: 1, y: 0, letterSpacing: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className="text-3xl font-bold text-white md:text-4xl lg:text-5xl tracking-tight"
           >
-            Let&apos;s Ignite a Conversation
+            Let&apos;s Start a Conversation
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-4 max-w-2xl mx-auto text-neutral-400"
+            className="mt-4 max-w-2xl mx-auto text-neutral-300"
           >
-            Reach out and let&apos;s create something extraordinary together.
+            Reach out and let&apos;s explore possibilities together.
           </motion.p>
         </motion.div>
 
@@ -146,9 +175,9 @@ const ContactPage = () => {
                   ),
                   title: 'Email',
                   text: 'Direct line to our team',
-                  contact: 'chetantest2226@gmail.com',
+                  contact: 'cyberjall@gmail.com',
                   delay: 0.1,
-                  gradient: 'from-red-600 to-black'
+                  gradient: 'from-blue-500 to-violet-600'
                 },
                 {
                   icon: (
@@ -158,9 +187,9 @@ const ContactPage = () => {
                   ),
                   title: 'Phone',
                   text: 'Mon-Fri, 8am-5pm',
-                  contact: '+917709869493',
+                  contact: '+91 77098 69493',
                   delay: 0.2,
-                  gradient: 'from-black to-red-700'
+                  gradient: 'from-violet-600 to-purple-600'
                 },
                 {
                   icon: (
@@ -173,7 +202,7 @@ const ContactPage = () => {
                   text: 'Visit our innovation hub',
                   contact: 'Pune, Maharashtra',
                   delay: 0.3,
-                  gradient: 'from-red-800 to-black'
+                  gradient: 'from-purple-600 to-blue-500'
                 },
                 {
                   icon: (
@@ -185,7 +214,7 @@ const ContactPage = () => {
                   text: 'Real-time support',
                   contact: 'Start Conversation',
                   delay: 0.4,
-                  gradient: 'from-black to-red-900'
+                  gradient: 'from-blue-400 to-purple-500'
                 }
               ].map((item, index) => (
                 <motion.div
@@ -193,23 +222,29 @@ const ContactPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.6 + item.delay }}
-                  className="p-6 rounded-2xl bg-neutral-900/60 backdrop-blur-sm shadow-2xl border border-red-900/30 group hover:border-red-600/50 transition-all duration-300"
+                  className="p-6 rounded-2xl bg-gray-900/60 backdrop-blur-sm shadow-2xl border border-violet-500/20 group hover:border-blue-400/50 transition-all duration-300"
                 >
                   <div className="relative">
                     <motion.span
                       whileHover={{ scale: 1.1, rotate: 10 }}
-                      className="inline-flex items-center justify-center p-3 text-red-400 rounded-full bg-red-900/20"
+                      className={`inline-flex items-center justify-center p-3 rounded-full ${
+                        index % 3 === 0 ? 'bg-blue-500/20 text-blue-300' : 
+                        index % 2 === 0 ? 'bg-violet-500/20 text-violet-300' : 'bg-purple-500/20 text-purple-300'
+                      }`}
                     >
                       {item.icon}
                     </motion.span>
                     <div 
-                      className={`absolute inset-0 bg-gradient-to-r ${item.gradient} rounded-full blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300`}
+                      className={`absolute inset-0 bg-gradient-to-r ${item.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
                     />
                   </div>
 
                   <h2 className="mt-4 text-base font-semibold text-white">{item.title}</h2>
-                  <p className="mt-2 text-sm text-neutral-400">{item.text}</p>
-                  <p className="mt-2 text-sm font-medium text-red-300">{item.contact}</p>
+                  <p className="mt-2 text-sm text-neutral-300">{item.text}</p>
+                  <p className={`mt-2 text-sm font-medium ${
+                    index % 3 === 0 ? 'text-blue-300' : 
+                    index % 2 === 0 ? 'text-violet-300' : 'text-purple-300'
+                  }`}>{item.contact}</p>
                 </motion.div>
               ))}
             </div>
@@ -222,7 +257,7 @@ const ContactPage = () => {
             className="lg:col-span-3"
           >
             <motion.div
-              className="p-8 rounded-3xl bg-neutral-900/80 backdrop-blur-sm shadow-2xl border border-red-900/30"
+              className="p-8 rounded-3xl bg-gray-900/80 backdrop-blur-sm shadow-2xl border border-violet-500/20"
               initial={{ y: 50, scale: 0.9 }}
               animate={{ y: 0, scale: 1 }}
               transition={{ 
@@ -242,7 +277,7 @@ const ContactPage = () => {
                         value={fullName}
                         type="text"
                         placeholder="Your Full Name"
-                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
                         required
                       />
                     </motion.div>
@@ -256,7 +291,7 @@ const ContactPage = () => {
                         value={companyName}
                         type="text"
                         placeholder="Your Company Name"
-                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-gray-800 border border-gray-700 rounded-lg focus:border-violet-400 focus:ring-violet-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
                         required
                       />
                     </motion.div>
@@ -270,7 +305,7 @@ const ContactPage = () => {
                         value={workEmail}
                         type="email"
                         placeholder="you@company.com"
-                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        className="block w-full px-5 py-3 text-white placeholder-neutral-500 bg-gray-800 border border-gray-700 rounded-lg focus:border-purple-400 focus:ring-purple-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
                         required
                       />
                     </motion.div>
@@ -282,7 +317,7 @@ const ContactPage = () => {
                       <select
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setInquiryType(e?.target?.value) }}
                         value={inquiryType}
-                        className="block w-full px-5 py-3 text-white bg-neutral-800 border border-neutral-700 rounded-lg focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
+                        className="block w-full px-5 py-3 text-white bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40 transition-all duration-300"
                         required
                       >
                         <option value="business">I am a Business – Want to know more / Service Request</option>
@@ -298,7 +333,7 @@ const ContactPage = () => {
                       <textarea
                         onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setMessage(e?.target?.value) }}
                         value={message}
-                        className="block w-full h-32 px-5 py-3 text-white placeholder-neutral-500 bg-neutral-800 border border-neutral-700 rounded-lg md:h-48 focus:border-red-600 focus:ring-red-600 focus:outline-none focus:ring focus:ring-opacity-40 resize-none transition-all duration-300"
+                        className="block w-full h-32 px-5 py-3 text-white placeholder-neutral-500 bg-gray-800 border border-gray-700 rounded-lg md:h-48 focus:border-violet-400 focus:ring-violet-400 focus:outline-none focus:ring focus:ring-opacity-40 resize-none transition-all duration-300"
                         placeholder="Share your vision with us..."
                         rows={4}
                       ></textarea>
@@ -310,12 +345,10 @@ const ContactPage = () => {
                       <span className="mr-2">Captcha</span>
                       <span className="text-neutral-500">(Security purpose – anti spam protection)</span>
                       <ReCAPTCHA
-                    
-                    sitekey={"process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!"}
-                    ref={recaptchaRef}
-                    onChange={handleCaptchaSubmission}
-                />
-               
+                        sitekey={"process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!"}
+                        ref={recaptchaRef}
+                        onChange={handleCaptchaSubmission}
+                      />
                     </div>
                   </div>
 
@@ -324,12 +357,12 @@ const ContactPage = () => {
                     whileTap={{ scale: 0.98 }}
                     className="relative group"
                   >
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-black rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:duration-200"></div>
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 via-violet-400 to-purple-400 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:duration-200 animate-tilt"></div>
                     <button 
                       type="submit"
-                      className="relative w-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-red-700 to-black rounded-lg hover:from-red-600 hover:to-neutral-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 hover:text-neutral-200"
+                      className="relative w-full px-8 py-4 text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-500/80 via-violet-500/80 to-purple-500/80 rounded-lg hover:from-blue-500 hover:via-violet-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 hover:text-white"
                     >
-                      Ignite Communication
+                      Send Message
                     </button>
                   </motion.div>
                 </div>
