@@ -54,69 +54,52 @@ const ContactPage = () => {
   }, []);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-violet-950 overflow-hidden relative">
+    <section className="min-h-screen bg-gradient-to-l from-blue-400  to-purple-800 overflow-hidden relative">
+      {/* Cosmic Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
-          animate={{ 
-            opacity: isLoaded ? 0.2 : 0, 
-            scale: isLoaded ? 1.2 : 0.8,
-            rotate: 360
-          }}
-          transition={{ 
-            duration: 20, 
-            repeat: Infinity, 
-            repeatType: "reverse",
-            ease: "linear"
-          }}
-          className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-gradient-to-r from-blue-400/10 via-violet-400/10 to-purple-400/10 blur-3xl"
-        />
-        <motion.div
-          initial={{ opacity: 0, x: -100, y: -100 }}
-          animate={{ 
-            opacity: isLoaded ? 0.1 : 0, 
-            x: isLoaded ? [0, 100, 0, -100, 0] : -100,
-            y: isLoaded ? [0, 100, 0, -100, 0] : -100
-          }}
-          transition={{ 
-            duration: 25, 
-            repeat: Infinity, 
-            ease: "easeInOut"
-          }}
-          className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-violet-400/10 to-purple-400/10 blur-2xl"
-        />
-        {/* Floating orb elements */}
-        {[...Array(5)].map((_, i) => (
-          <motion.div
+        {/* Stars */}
+        {[...Array(200)].map((_, i) => (
+          <div
             key={i}
-            initial={{ 
-              opacity: 0,
-              x: Math.random() * 100 - 50,
-              y: Math.random() * 100 - 50
-            }}
-            animate={{ 
-              opacity: isLoaded ? 0.3 : 0,
-              x: [0, Math.random() * 200 - 100],
-              y: [0, Math.random() * 200 - 100]
-            }}
-            transition={{
-              duration: 15 + Math.random() * 20,
-              repeat: Infinity,
-              repeatType: "reverse",
-              ease: "easeInOut"
-            }}
-            className={`absolute rounded-full w-${Math.floor(Math.random() * 20) + 10} h-${Math.floor(Math.random() * 20) + 10} ${
-              i % 3 === 0 ? 'bg-blue-400/20' : 
-              i % 2 === 0 ? 'bg-violet-400/20' : 'bg-purple-400/20'
-            } blur-xl`}
+            className="absolute rounded-full bg-white"
             style={{
+              width: `${Math.random() * 3}px`,
+              height: `${Math.random() * 3}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 200 + 100}px`,
-              height: `${Math.random() * 200 + 100}px`
+              opacity: Math.random() * 0.8 + 0.2,
+              animation: `twinkle ${Math.random() * 5 + 3}s infinite alternate`
             }}
           />
         ))}
+
+        {/* Large Nebula Elements */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoaded ? 0.3 : 0 }}
+          transition={{ duration: 2 }}
+          className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-purple-900/30 blur-[100px]"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoaded ? 0.4 : 0 }}
+          transition={{ duration: 2, delay: 0.5 }}
+          className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-blue-900/20 blur-[120px]"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoaded ? 0.3 : 0 }}
+          transition={{ duration: 2, delay: 1 }}
+          className="absolute top-1/3 right-1/3 w-80 h-80 rounded-full bg-violet-900/25 blur-[90px]"
+        />
+
+        {/* Animated Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoaded ? 0.03 : 0 }}
+          transition={{ duration: 1.5 }}
+          className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48cGF0aCBkPSJNMCAwaDQwdjQwSDB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTAgMjBoNDBNMjAgMHY0MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4xIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"
+        />
       </div>
 
       <div className="container px-6 py-12 mx-auto relative z-10">
@@ -134,7 +117,7 @@ const ContactPage = () => {
               type: "spring", 
               stiffness: 200 
             }}
-            className="inline-flex items-center justify-center px-4 py-1.5 mb-4 rounded-full bg-gradient-to-r from-blue-500/20 via-violet-500/20 to-purple-500/20 backdrop-blur-sm"
+            className="inline-flex items-center justify-center px-4 py-1.5 mb-4 rounded-full bg-gradient-to-r from-blue-500/20 to-violet-500/20 backdrop-blur-sm"
           >
             <span className="text-sm font-medium text-blue-200">Connect With Us</span>
           </motion.div>
@@ -145,7 +128,7 @@ const ContactPage = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="text-3xl font-bold text-white md:text-4xl lg:text-5xl tracking-tight"
           >
-            Let&apos;s Start a Conversation
+            Let&apos; Start a Conversation
           </motion.h1>
 
           <motion.p
@@ -175,7 +158,7 @@ const ContactPage = () => {
                   ),
                   title: 'Email',
                   text: 'Direct line to our team',
-                  contact: 'cyberjall@gmail.com',
+                  contact: 'hello@example.com',
                   delay: 0.1,
                   gradient: 'from-blue-500 to-violet-600'
                 },
@@ -187,7 +170,7 @@ const ContactPage = () => {
                   ),
                   title: 'Phone',
                   text: 'Mon-Fri, 8am-5pm',
-                  contact: '+91 77098 69493',
+                  contact: '+1 (555) 123-4567',
                   delay: 0.2,
                   gradient: 'from-violet-600 to-purple-600'
                 },
@@ -200,7 +183,7 @@ const ContactPage = () => {
                   ),
                   title: 'Headquarters',
                   text: 'Visit our innovation hub',
-                  contact: 'Pune, Maharashtra',
+                  contact: 'San Francisco, CA',
                   delay: 0.3,
                   gradient: 'from-purple-600 to-blue-500'
                 },
@@ -222,7 +205,7 @@ const ContactPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.6 + item.delay }}
-                  className="p-6 rounded-2xl bg-gray-900/60 backdrop-blur-sm shadow-2xl border border-violet-500/20 group hover:border-blue-400/50 transition-all duration-300"
+                  className="p-6 rounded-2xl bg-gray-900/60 backdrop-blur-sm shadow-xl border border-gray-800 group hover:border-blue-400/50 transition-all duration-300"
                 >
                   <div className="relative">
                     <motion.span
@@ -257,7 +240,7 @@ const ContactPage = () => {
             className="lg:col-span-3"
           >
             <motion.div
-              className="p-8 rounded-3xl bg-gray-900/80 backdrop-blur-sm shadow-2xl border border-violet-500/20"
+              className="p-8 rounded-3xl bg-gray-900/80 backdrop-blur-sm shadow-xl border border-gray-800"
               initial={{ y: 50, scale: 0.9 }}
               animate={{ y: 0, scale: 1 }}
               transition={{ 
@@ -371,6 +354,13 @@ const ContactPage = () => {
           </motion.div>
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes twinkle {
+          0% { opacity: 0.2; }
+          100% { opacity: ${Math.random() * 0.7 + 0.3}; }
+        }
+      `}</style>
     </section>
   );
 };
