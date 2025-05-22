@@ -54,7 +54,7 @@ const ContactPage = () => {
   }, []);
 
   return (
-    <section className="min-h-screen bg-gradient-to-l from-blue-400  to-purple-800 overflow-hidden relative">
+    <section className="min-h-screen bg-gradient-to-bl from-red-900 via-gray-800 to-black overflow-hidden relative">
       {/* Cosmic Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Stars */}

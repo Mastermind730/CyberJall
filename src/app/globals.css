@@ -2,3 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}

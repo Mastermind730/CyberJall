@@ -291,7 +291,7 @@ export default function ApiPentesting() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 mt-10 text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-bl from-red-900 via-gray-800 to-black mt-10 text-white overflow-hidden">
       {/* Hero Section */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 overflow-hidden">
@@ -351,7 +351,7 @@ export default function ApiPentesting() {
       </section>
 
       {/* Why You Need Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-900 to-black">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-radial from-red-900 via-gray-800 to-black">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -420,7 +420,7 @@ export default function ApiPentesting() {
       </section>
 
       {/* Our Expertise Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-black">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-radial from-red-900 via-gray-800 to-black">
         <div className="absolute inset-0">
           <svg className="absolute w-full h-full opacity-5" viewBox="0 0 800 800">
             <path d="M0,100 L800,100 M0,200 L800,200 M0,300 L800,300 M0,400 L800,400 M0,500 L800,500 M0,600 L800,600 M0,700 L800,700" stroke="url(#apiGradient)" strokeWidth="2" />
@@ -485,7 +485,7 @@ export default function ApiPentesting() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid bg-gradient-radial from-red-900 via-gray-800 to-black grid-cols-1 md:grid-cols-3 gap-8">
                         {plans.map((plan, index) => (
                           <motion.div
                             key={index}
@@ -559,7 +559,7 @@ export default function ApiPentesting() {
 
 
       {/* How It Works Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-black to-gray-900">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-radial from-red-900 via-gray-800 to-black">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -569,7 +569,7 @@ export default function ApiPentesting() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">How It Works</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto mb-8"></div>
+            <div className="w-24 h-1 bg-gradient-radial from-red-900 via-gray-800 to-black mx-auto mb-8"></div>
           </motion.div>
 
           <div className="relative">

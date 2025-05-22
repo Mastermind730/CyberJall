@@ -110,7 +110,7 @@ export default function Services() {
         <>
           <div className="relative overflow-hidden">
             <div className="absolute inset-0 z-0">
-              <div className="absolute inset-0 bg-gradient-to-br from-black via-black to-orange-900 opacity-90"></div>
+<div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-90"></div>
               <div className="absolute top-0 left-0 w-full h-full">
                 {[...Array(20)].map((_, i) => (
                   <motion.div
@@ -144,7 +144,7 @@ export default function Services() {
                 className="text-center max-w-4xl mx-auto"
               >
                 <motion.h1 
-                  className="text-5xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500"
+                  className="text-5xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-400 to-red-600"
                   animate={{ 
                     backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] 
                   }}
@@ -161,7 +161,7 @@ export default function Services() {
                   Protect your digital assets from cyber threats with expert security testing
                 </motion.p>
                 <motion.button
-                  className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:shadow-lg hover:shadow-red-500/30 transition duration-300"
+                  className="bg-gradient-to-r from-red-700 to-orange-900 text-white font-bold py-3 px-8 rounded-full hover:shadow-lg hover:shadow-red-900/50 transition duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -222,7 +222,7 @@ export default function Services() {
                     <motion.div
                       key={index}
                       variants={fadeIn}
-                      className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-xl border border-gray-800 hover:border-red-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/10"
+                      className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-xl border border-gray-800 hover:border-red-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-red-900/30"
                     >
                       <div className="mb-6">
                         {service.icon}
@@ -254,7 +254,7 @@ export default function Services() {
                       className="flex gap-6 items-start"
                     >
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-700 to-orange-900 flex items-center justify-center">
                           {step.icon}
                         </div>
                         {index < howItWorks.length - 1 && (
@@ -294,7 +294,7 @@ export default function Services() {
                       key={index}
                       variants={fadeIn}
                       className={`bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden transition-all duration-300 ${
-                        plan.popular ? 'border-2 border-red-500 relative' : 'border border-gray-800'
+                        plan.popular ? 'border-2 border-red-600 relative' : 'border border-gray-800'
                       }`}
                     >
                       {plan.popular && (
@@ -330,7 +330,7 @@ export default function Services() {
                           whileTap={{ scale: 0.98 }}
                           className={`w-full py-3 px-4 rounded-lg font-semibold transition ${
                             plan.popular 
-                              ? 'bg-gradient-to-r from-red-600 to-orange-500 text-white' 
+                              ? 'bg-gradient-to-r from-red-700 to-orange-900 text-white' 
                               : 'bg-gray-800 text-white border border-gray-700 hover:border-red-500'
                           }`}
                         >
@@ -368,9 +368,9 @@ export default function Services() {
                 className="absolute inset-0"
                 animate={{ 
                   background: [
-                    'radial-gradient(circle at 20% 50%, rgba(255, 69, 0, 0.15) 0%, rgba(0, 0, 0, 0) 50%)',
-                    'radial-gradient(circle at 80% 50%, rgba(255, 69, 0, 0.15) 0%, rgba(0, 0, 0, 0) 50%)',
-                    'radial-gradient(circle at 20% 50%, rgba(255, 69, 0, 0.15) 0%, rgba(0, 0, 0, 0) 50%)'
+                    'radial-gradient(circle at 20% 50%, rgba(220, 38, 38, 0.25) 0%, rgba(0, 0, 0, 0) 50%)',
+                    'radial-gradient(circle at 80% 50%, rgba(220, 38, 38, 0.25) 0%, rgba(0, 0, 0, 0) 50%)',
+                    'radial-gradient(circle at 20% 50%, rgba(220, 38, 38, 0.25) 0%, rgba(0, 0, 0, 0) 50%)'
                   ] 
                 }}
                 transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
