@@ -63,7 +63,6 @@ export const PlatformFeatures: React.FC = () => {
           {/* Center Logo */}
           <div className="flex justify-center mb-16">
             <div className="relative w-32 h-32 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-lg">
-              <div className="text-white font-bold text-5xl">b</div>
             </div>
           </div>
 
@@ -76,20 +75,7 @@ export const PlatformFeatures: React.FC = () => {
               </h3>
             </div>
 
-            {/* Hexagon Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {features.map((feature) => (
-                <div key={feature.id} className="relative">
-                  {/* Hexagon Shape with clip-path */}
-                  <div className="aspect-w-1 aspect-h-1">
-                    <div className="bg-gray-800 border border-red-500/20 rounded-lg shadow-md p-6 h-full transform transition-all duration-300 hover:scale-105 hover:border-red-500/40 hover:bg-gray-800/80">
-                      <h3 className="text-lg font-semibold text-white mb-3">{feature.title}</h3>
-                      <p className="text-sm text-gray-400">{feature.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+           
           </div>
         </div>
 
