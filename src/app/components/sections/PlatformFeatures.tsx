@@ -61,10 +61,7 @@ export const PlatformFeatures: React.FC = () => {
         {/* Honeycomb Layout */}
         <div className="max-w-6xl mx-auto relative">
           {/* Center Logo */}
-          <div className="flex justify-center mb-16">
-            <div className="relative w-32 h-32 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center shadow-lg">
-            </div>
-          </div>
+          
 
           {/* Honeycomb Structure */}
           <div className="relative">
