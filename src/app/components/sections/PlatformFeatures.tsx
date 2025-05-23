@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 
 export const PlatformFeatures: React.FC = () => {
@@ -60,10 +61,8 @@ export const PlatformFeatures: React.FC = () => {
 
         {/* Honeycomb Layout */}
         <div className="max-w-6xl mx-auto relative">
-          {/* Center Logo */}
           
 
-          {/* Honeycomb Structure */}
           <div className="relative">
             {/* Main Title */}
             <div className="text-center mb-12">
