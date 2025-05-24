@@ -43,6 +43,10 @@ export default function Services() {
         "Focused reporting with remediation recommendations",
         "Critical vulnerability identification and fixes"
       ],
+      includes: [
+        "Free Membership of CyberJall Insights",
+        "1 Month Add on Service by CyberJall"
+      ],
       icon: <Shield className="h-12 w-12" />,
       popular: false
     },
@@ -59,6 +63,10 @@ export default function Services() {
         "Remediation follow-up",
         "Regular threat updates"
       ],
+      includes: [
+        "You will get one Cyber-Security Consultant for particular time",
+        "Free Membership of CyberJall Insights"
+      ],
       icon: <Lock className="h-12 w-12" />,
       popular: true
     },
@@ -74,6 +82,10 @@ export default function Services() {
         "Continuous monitoring",
         "Priority response support",
         "Complete security management"
+      ],
+      includes: [
+        "You will get one more additional Cyber-Security Partner by CyberJall",
+        "Free Membership of CyberJall Insights"
       ],
       icon: <Database className="h-12 w-12" />,
       popular: false
@@ -288,7 +300,7 @@ export default function Services() {
                   <motion.div variants={fadeIn} className="w-24 h-1 bg-gradient-to-r from-red-600 to-orange-500 mx-auto mt-6"></motion.div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {plans.map((plan, index) => (
                     <motion.div
                       key={index}
@@ -314,10 +326,7 @@ export default function Services() {
                           <h3 className="text-xl font-bold mb-1">{plan.title}</h3>
                           <p className="text-gray-400 text-sm">{plan.duration}</p>
                         </div>
-                        {/* <div className="text-center mb-6">
-                          <p className="text-4xl font-bold">{plan.price}</p>
-                        </div> */}
-                        <ul className="space-y-3 mb-8">
+                        <ul className="space-y-3 mb-6">
                           {plan.features.map((feature, i) => (
                             <li key={i} className="flex items-start">
                               <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -325,6 +334,17 @@ export default function Services() {
                             </li>
                           ))}
                         </ul>
+                        <div className="bg-gray-800/50 p-4 rounded-lg mb-6">
+                          <h4 className="text-orange-400 font-semibold mb-2">Includes:</h4>
+                          <ul className="space-y-2">
+                            {plan.includes.map((item, i) => (
+                              <li key={i} className="flex items-start">
+                                <span className="text-red-400 mr-2">•</span>
+                                <span className="text-gray-300 text-sm">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                         <motion.button
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.98 }}
