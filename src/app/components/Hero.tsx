@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
 import type { FC } from 'react';
 
@@ -6,6 +7,7 @@ interface Slide {
   title: string;
   description: string;
   color: string;
+  image:string;
 }
 
 export const Hero: FC = () => {
@@ -26,17 +28,22 @@ export const Hero: FC = () => {
     {
       title: 'Find & Customize Trusted Cybersecurity Services in One Place',
       description: 'A marketplace where businesses can explore, compare, and bundle cybersecurity services effortlessly.',
-      color: 'from-purple-600 to-blue-600'
+      color: 'from-purple-600 to-blue-600',
+      image:"/image (1).png"
     },
     {
       title: 'Cybersecurity, Reimagined – A Smarter Way to Protect Your Business',
       description: 'Simplifying cybersecurity services with a marketplace that offers flexibility, transparency, and trusted expertise',
-      color: 'from-red-600 to-pink-600'
+      color: 'from-red-600 to-pink-600',
+       image:"/image (2).png"
+
     },
     {
       title: 'Your Cybersecurity, Your Way – Build, Bundle & Protect with Experts',
       description: 'Customize cybersecurity services from multiple trusted providers and manage them effortlessly through one unified platform.',
-      color: 'from-green-600 to-teal-600'
+      color: 'from-green-600 to-teal-600',
+      image:"/image (3).png"
+
     }
   ], []);
 
@@ -70,6 +77,16 @@ export const Hero: FC = () => {
     <div className="relative w-full overflow-hidden bg-gray-900 min-h-screen">
       <div className="pt-16">
         <div className="relative h-screen max-w-7xl mx-auto overflow-hidden flex items-center justify-center">
+          <div className="absolute inset-0">
+            <Image
+              src={slides[currentSlide].image} 
+              alt="Cybersecurity background"
+              width={900}
+              height={600}
+              className="w-full h-full object-cover bg-opacity-100"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-900/90" />
+          </div>
           {/* SVG Background Pattern */}
           <div className="absolute inset-0 opacity-30">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
