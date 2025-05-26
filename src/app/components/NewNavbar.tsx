@@ -64,6 +64,15 @@ const NewNavbar = () => {
         }
       ]
     },
+    { 
+      name: "Products", 
+      link: "/products", 
+      type: "dropdown", 
+      items: [
+        { name: "Bug Bounty Platform", link: "/products/bug_bounty" },
+      ]
+    },
+    { name: "CyberJall Insights", link: "/cyberjall_insights", type: "link" },
     { name: "Contact Us", link: "/contact_us", type: "link" },
     { name: "Log in", link: "/login", type: "link" }
   ];

@@ -158,7 +158,7 @@ const ContactPage = () => {
                   ),
                   title: 'Email',
                   text: 'Direct line to our team',
-                  contact: 'hello@example.com',
+                  contact: 'cyberjall@gmail.com',
                   delay: 0.1,
                   gradient: 'from-blue-500 to-violet-600'
                 },
@@ -170,7 +170,7 @@ const ContactPage = () => {
                   ),
                   title: 'Phone',
                   text: 'Mon-Fri, 8am-5pm',
-                  contact: '+1 (555) 123-4567',
+                  contact: '+91 77098 69493',
                   delay: 0.2,
                   gradient: 'from-violet-600 to-purple-600'
                 },
@@ -183,7 +183,7 @@ const ContactPage = () => {
                   ),
                   title: 'Headquarters',
                   text: 'Visit our innovation hub',
-                  contact: 'San Francisco, CA',
+                  contact: 'Pune , Maharashtra',
                   delay: 0.3,
                   gradient: 'from-purple-600 to-blue-500'
                 },
