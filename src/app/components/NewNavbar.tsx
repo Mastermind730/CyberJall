@@ -166,7 +166,9 @@ const NewNavbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-80 backdrop-blur-md border-b border-red-600">
+    <nav className="fixed top-0 left-0 right-0 z-50 
+             bg-gradient-to-r from-red-900/20 via-black/30 to-orange-600/20 
+             backdrop-blur-lg border-b border-orange-500/10">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo Section */}
         <motion.div 

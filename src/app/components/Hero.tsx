@@ -88,7 +88,7 @@ export const Hero: FC = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-900/90" />
           </div>
           {/* SVG Background Pattern */}
-          <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 opacity-20">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
               <defs>
                 <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
