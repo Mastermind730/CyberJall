@@ -384,7 +384,7 @@ export default function CyberJallInsights() {
               <p className="text-2xl text-gray-300 mb-8 leading-relaxed">
                 Cyber threats are growing. So is your intelligence.
                 <br />
-                <span className="text-orange-400 font-semibold">You're not just reacting — you're anticipating, learning, and leading.</span>
+                <span className="text-orange-400 font-semibold">You&apos;re not just reacting — you&apos;re anticipating, learning, and leading.</span>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
