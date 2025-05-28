@@ -7,7 +7,8 @@ interface Slide {
   title: string;
   description: string;
   color: string;
-  image:string;
+  image: string;
+  textColor: string;
 }
 
 export const Hero: FC = () => {
@@ -15,35 +16,27 @@ export const Hero: FC = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-  // Fixed positions for particles to avoid hydration mismatch
-  const particlePositions = useMemo(() => Array.from({ length: 20 }).map((_, i) => ({
-    size: 5 + (i % 5),
-    left: (i * 5) % 100,
-    top: (i * 7) % 100,
-    duration: 10 + (i % 10),
-    delay: i % 20
-  })), []);
-
   const slides = useMemo<Slide[]>(() => [
     {
       title: 'Find & Customize Trusted Cybersecurity Services in One Place',
       description: 'A marketplace where businesses can explore, compare, and bundle cybersecurity services effortlessly.',
       color: 'from-purple-600 to-blue-600',
-      image:"/image (1).png"
+      image: "/image (1).png",
+      textColor: 'from-white to-orange-400'
     },
     {
       title: 'Cybersecurity, Reimagined – A Smarter Way to Protect Your Business',
       description: 'Simplifying cybersecurity services with a marketplace that offers flexibility, transparency, and trusted expertise',
       color: 'from-red-600 to-pink-600',
-       image:"/image (2).png"
-
+      image: "/image (2).png",
+      textColor: 'from-white to-green-400'
     },
     {
       title: 'Your Cybersecurity, Your Way – Build, Bundle & Protect with Experts',
       description: 'Customize cybersecurity services from multiple trusted providers and manage them effortlessly through one unified platform.',
       color: 'from-green-600 to-teal-600',
-      image:"/image (3).png"
-
+      image: "/image (3).png",
+      textColor: 'from-white to-orange-500'
     }
   ], []);
 
@@ -65,7 +58,7 @@ export const Hero: FC = () => {
     return () => clearInterval(timer);
   }, [slides.length, isClient]);
 
-  const handleDotClick = (index:number) => {
+  const handleDotClick = (index: number) => {
     setIsAnimating(true);
     setTimeout(() => {
       setCurrentSlide(index);
@@ -76,79 +69,56 @@ export const Hero: FC = () => {
   return (
     <div className="relative w-full overflow-hidden bg-gray-900 min-h-screen">
       <div className="pt-16">
-        <div className="relative h-screen max-w-7xl mx-auto overflow-hidden flex items-center justify-center">
-          <div className="absolute inset-0">
+        <div className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+          {/* Full Width Background Image - No Blur */}
+          <div className="absolute inset-0 w-full h-full">
             <Image
               src={slides[currentSlide].image} 
               alt="Cybersecurity background"
-              width={900}
-              height={600}
-              className="w-full h-full object-cover bg-opacity-100"
+              fill
+              className="object-cover"
+              priority
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-900/90" />
+            {/* Subtle overlay for text readability */}
+            <div className="absolute inset-0 bg-black/40" />
           </div>
-          {/* SVG Background Pattern */}
-          <div className="absolute inset-0 opacity-20">
+
+          {/* SVG Background Pattern - Subtle */}
+          <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
               <defs>
                 <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
                   <path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
                 </pattern>
-                <radialGradient id="radialGradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                </radialGradient>
               </defs>
               <rect width="100" height="100" fill="url(#grid)" />
-              <circle cx="50" cy="50" r="50" fill="url(#radialGradient)" />
             </svg>
           </div>
 
-          {/* Animated SVG Elements - Only rendered client-side */}
-          {isClient && (
-            <div className="absolute inset-0 overflow-hidden">
-              {particlePositions.map((particle, i) => (
-                <div 
-                  key={i}
-                  className="absolute rounded-full bg-white opacity-10"
-                  style={{
-                    width: `${particle.size}px`,
-                    height: `${particle.size}px`,
-                    left: `${particle.left}%`,
-                    top: `${particle.top}%`,
-                    animation: `float ${particle.duration}s linear infinite`,
-                    animationDelay: `${particle.delay}s`
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
           {/* Slide Content */}
-          <div className="relative z-10 px-6 max-w-4xl">
+          <div className="relative z-10 px-6 max-w-6xl mx-auto">
             <div className={`transition-all duration-500 ${isClient && isAnimating ? 'opacity-0 translate-y-10' : 'opacity-100 translate-y-0'}`}>
               <div className={`h-2 w-20 mb-8 rounded-full bg-gradient-to-r ${slides[currentSlide].color}`} />
               
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              {/* Colorful Gradient Text */}
+              <h1 className={`text-4xl md:text-6xl font-bold mb-6 leading-tight bg-gradient-to-r ${slides[currentSlide].textColor} bg-clip-text text-transparent`}>
                 {slides[currentSlide].title}
               </h1>
               
-              <p className="text-xl md:text-2xl text-gray-300 mb-10 max-w-3xl">
+              <p className="text-xl md:text-2xl text-gray-200 mb-10 max-w-4xl leading-relaxed">
                 {slides[currentSlide].description}
               </p>
               
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <button className={`bg-gradient-to-r ${slides[currentSlide].color} text-white px-8 py-3 rounded-full text-lg font-medium hover:shadow-lg hover:shadow-current/30 transition-all duration-300 transform hover:-translate-y-1`}>
+                <button className={`bg-gradient-to-r ${slides[currentSlide].color} text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:shadow-current/30 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105`}>
                   Discover More
                 </button>
-                
-               
               </div>
             </div>
           </div>
 
-          {/* Decorative Vector Graphics */}
-          <div className="absolute bottom-0 right-0 w-1/2 h-1/2 opacity-20 pointer-events-none">
+          {/* Decorative Vector Graphics - Simplified */}
+          <div className="absolute bottom-0 right-0 w-1/3 h-1/3 opacity-15 pointer-events-none">
             <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
               <path 
                 fill={`url(#gradient-${currentSlide})`} 
@@ -172,33 +142,6 @@ export const Hero: FC = () => {
             </svg>
           </div>
 
-          {/* Connection Lines - Cybersecurity Visual Metaphor */}
-          <div className="absolute inset-0 pointer-events-none">
-            <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path 
-                d="M10,30 Q50,10 90,40" 
-                stroke="rgba(255,255,255,0.1)" 
-                strokeWidth="0.2" 
-                fill="none"
-                className="animate-pulse"
-              />
-              <path 
-                d="M20,80 Q40,60 80,70" 
-                stroke="rgba(255,255,255,0.1)" 
-                strokeWidth="0.2" 
-                fill="none"
-                className="animate-pulse"
-              />
-              <path 
-                d="M30,20 Q60,50 70,20" 
-                stroke="rgba(255,255,255,0.1)" 
-                strokeWidth="0.2" 
-                fill="none" 
-                className="animate-pulse"
-              />
-            </svg>
-          </div>
-
           {/* Navigation Dots */}
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
             {slides.map((_, index) => (
@@ -218,15 +161,8 @@ export const Hero: FC = () => {
         </div>
       </div>
 
-      {/* Animation classes using Tailwind instead of JSX styles */}
+      {/* Animation classes */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          25% { transform: translateY(-20px) translateX(10px); }
-          50% { transform: translateY(-10px) translateX(-15px); }
-          75% { transform: translateY(-30px) translateX(5px); }
-        }
-        
         @keyframes progress {
           0% { width: 0; }
           100% { width: 100%; }
