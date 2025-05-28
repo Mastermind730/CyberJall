@@ -1,158 +1,476 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 
-export const PlatformFeatures: React.FC = () => {
+export const PlatformFeatures = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [hoveredHex, setHoveredHex] = useState<number|null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e:MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   const features = [
     {
       id: 1,
       title: 'Multiple solutions on a single platform',
-      description: 'Access all your cybersecurity needs in one centralized location.'
+      description: 'Access all your cybersecurity needs in one centralized location.',
+      icon: '🔗'
     },
     {
       id: 2,
       title: 'Platform-powered, best-in-class triage',
-      description: 'Efficiently prioritize and manage vulnerabilities with our advanced triage system.'
+      description: 'Efficiently prioritize and manage vulnerabilities with our advanced triage system.',
+      icon: '🎯'
     },
     {
       id: 3,
       title: 'The right security researchers at the right time',
-      description: 'Connect with specialized security experts when you need them most.'
+      description: 'Connect with specialized security experts when you need them most.',
+      icon: '👥'
     },
     {
       id: 4,
       title: 'Automated, orchestrated workflows',
-      description: 'Streamline your security processes with intelligent automation.'
+      description: 'Streamline your security processes with intelligent automation.',
+      icon: '⚡'
     },
     {
       id: 5,
       title: 'Rich reporting and recommendations',
-      description: 'Gain valuable insights with comprehensive vulnerability reports and actionable recommendations.'
+      description: 'Gain valuable insights with comprehensive vulnerability reports.',
+      icon: '📊'
     },
     {
       id: 6,
       title: 'Real-time integration with your SDLC',
-      description: 'Seamlessly incorporate security into your development lifecycle.'
+      description: 'Seamlessly incorporate security into your development lifecycle.',
+      icon: '🔄'
     }
   ];
 
   return (
-    <section className="py-24 bg-gray-900 relative overflow-hidden">
-      {/* Binary Pattern Background */}
-      <div className="absolute inset-0 opacity-5">
-        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <pattern id="binary-pattern" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-            <text x="0" y="5" fill="currentColor" fontSize="3">01</text>
-            <text x="5" y="10" fill="currentColor" fontSize="3">10</text>
-          </pattern>
-          <rect width="100" height="100" fill="url(#binary-pattern)" />
+    <section className="min-h-screen bg-black relative overflow-hidden">
+      {/* Animated Background Layers */}
+      <div className="absolute inset-0">
+        {/* Gradient Orbs */}
+        <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-orange-500/20 to-red-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-red-500/5 to-transparent rounded-full animate-spin-slow"></div>
+        
+        {/* Dynamic Grid Pattern */}
+        <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 1200 800">
+          <defs>
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="url(#gridGradient)" strokeWidth="0.5"/>
+            </pattern>
+            <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3"/>
+              <stop offset="100%" stopColor="#f97316" stopOpacity="0.1"/>
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)"/>
         </svg>
+
+        {/* Floating Particles */}
+        {Array.from({ length: 50 }, (_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-gradient-to-r from-red-400 to-orange-400 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }}
+          />
+        ))}
+
+        {/* Binary Rain Effect */}
+        <div className="absolute inset-0 opacity-5">
+          {Array.from({ length: 20 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute text-green-400 text-xs font-mono animate-binary-rain"
+              style={{
+                left: `${i * 5}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${8 + Math.random() * 4}s`
+              }}
+            >
+              {Array.from({ length: 50 }, () => Math.random() > 0.5 ? '1' : '0').join('')}
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+      {/* Mouse Follower Gradient */}
+      <div 
+        className="fixed w-96 h-96 pointer-events-none z-10 opacity-20"
+        style={{
+          background: 'radial-gradient(circle, rgba(239,68,68,0.3) 0%, rgba(249,115,22,0.2) 50%, transparent 70%)',
+          left: mousePosition.x - 192,
+          top: mousePosition.y - 192,
+          transition: 'all 0.3s ease-out'
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative z-20 py-24">
+        {/* Header with Animated Elements */}
         <div className="max-w-4xl mx-auto text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold text-red-500 mb-6">
-            CyberJall Platform
-          </h2>
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-8">
-            Experience uninterrupted, preemptive security with our platform.
-          </h3>
-        </div>
-
-        {/* Honeycomb Layout */}
-        <div className="max-w-6xl mx-auto relative">
-          
-
           <div className="relative">
-            {/* Main Title */}
-            <div className="text-center mb-12">
-              <h3 className="text-2xl md:text-3xl font-bold text-white">
-                The CyberJall Security Knowledge Platform
-              </h3>
+            <h2 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400 uppercase tracking-[0.3em] mb-6 animate-fade-in-up">
+              CYBERJALL PLATFORM
+            </h2>
+            
+            {/* Animated Lines */}
+            <div className="flex justify-center mb-8">
+              <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse"></div>
             </div>
-
-           
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight animate-fade-in-up delay-200">
+              Our platform delivers{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-500 to-red-600 animate-gradient-x">
+                continuous
+              </span>
+              ,<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-orange-600 animate-gradient-x">
+                proactive security
+              </span>
+            </h1>
+            
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-400">
+              We&apos;ve all seen it: Siloed solutions often lead to surprise attacks. Only CyberJall offers a 
+              <span className="text-orange-400 font-semibold"> multi-solution SaaS platform</span> that continuously 
+              delivers high-impact insights about vulnerabilities directly into your security and dev processes.
+            </p>
           </div>
         </div>
 
-        {/* Feature Points */}
-        <div className="mt-20 max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+        {/* Enhanced Hexagonal Layout */}
+        <div className="max-w-7xl mx-auto relative">
+          {/* Animated Connection Lines */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 1000 600">
+            <defs>
+              <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ef4444" stopOpacity="0.6"/>
+                <stop offset="50%" stopColor="#f97316" stopOpacity="0.8"/>
+                <stop offset="100%" stopColor="#ef4444" stopOpacity="0.6"/>
+              </linearGradient>
+            </defs>
+            {/* Connection lines between hexagons */}
+            <g className="animate-pulse">
+              <line x1="250" y1="150" x2="500" y2="300" stroke="url(#connectionGradient)" strokeWidth="2" strokeDasharray="5,5"/>
+              <line x1="750" y1="150" x2="500" y2="300" stroke="url(#connectionGradient)" strokeWidth="2" strokeDasharray="5,5"/>
+              <line x1="150" y1="300" x2="500" y2="300" stroke="url(#connectionGradient)" strokeWidth="2" strokeDasharray="5,5"/>
+              <line x1="850" y1="300" x2="500" y2="300" stroke="url(#connectionGradient)" strokeWidth="2" strokeDasharray="5,5"/>
+              <line x1="250" y1="450" x2="500" y2="300" stroke="url(#connectionGradient)" strokeWidth="2" strokeDasharray="5,5"/>
+              <line x1="750" y1="450" x2="500" y2="300" stroke="url(#connectionGradient)" strokeWidth="2" strokeDasharray="5,5"/>
+            </g>
+          </svg>
+
+          {/* Hexagonal Feature Layout */}
+          <div className="relative flex flex-col items-center">
+            {/* Top Row */}
+            <div className="flex justify-center mb-12 space-x-16">
+              {[features[1], features[2]].map((feature, index) => (
+                <div 
+                  key={feature.id}
+                  className="hexagon-container animate-float-in"
+                  style={{ animationDelay: `${index * 200}ms` }}
+                  onMouseEnter={() => setHoveredHex(feature.id)}
+                  onMouseLeave={() => setHoveredHex(null)}
+                >
+                  <div className={`hexagon group cursor-pointer transition-all duration-500 ${
+                    hoveredHex === feature.id ? 'scale-110' : ''
+                  }`}>
+                    <div className="hexagon-bg bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm"></div>
+                    <div className="hexagon-border border-gradient"></div>
+                    <div className="hexagon-glow"></div>
+                    <div className="hexagon-content">
+                      <div className="text-center">
+                        <div className="text-2xl mb-3 animate-bounce">{feature.icon}</div>
+                        <h3 className="text-sm font-semibold text-white leading-tight group-hover:text-orange-300 transition-colors duration-300">
+                          {feature.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-white font-medium">Leading group of cyber security companies work for your company.</p>
+              ))}
+            </div>
+
+            {/* Middle Row with Center Logo */}
+            <div className="flex justify-center items-center mb-12 space-x-20">
+              <div 
+                className="hexagon-container animate-float-in"
+                style={{ animationDelay: '400ms' }}
+                onMouseEnter={() => setHoveredHex(features[0].id)}
+                onMouseLeave={() => setHoveredHex(null)}
+              >
+                <div className={`hexagon group cursor-pointer transition-all duration-500 ${
+                  hoveredHex === features[0].id ? 'scale-110' : ''
+                }`}>
+                  <div className="hexagon-bg bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm"></div>
+                  <div className="hexagon-border border-gradient"></div>
+                  <div className="hexagon-glow"></div>
+                  <div className="hexagon-content">
+                    <div className="text-center">
+                      <div className="text-2xl mb-3 animate-bounce">{features[0].icon}</div>
+                      <h3 className="text-sm font-semibold text-white leading-tight group-hover:text-orange-300 transition-colors duration-300">
+                        {features[0].title}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Center Logo - Enhanced */}
+              <div className="center-hexagon animate-float-in" style={{ animationDelay: '600ms' }}>
+                <div className="hexagon-large group cursor-pointer">
+                  <div className="hexagon-bg-large bg-gradient-to-br from-red-600 via-orange-500 to-red-700 animate-gradient-xy"></div>
+                  <div className="hexagon-border-large border-gradient-center"></div>
+                  <div className="hexagon-glow-large"></div>
+                  <div className="hexagon-content-large">
+                    <div className="text-center">
+                      {/* Animated Logo */}
+                      <div className="relative mb-4">
+                        <div className="w-16 h-16 mx-auto bg-white rounded-xl flex items-center justify-center shadow-2xl animate-pulse">
+                          <svg className="w-10 h-10 text-red-600" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 9.83 9 11 5.16-1.17 9-5.45 9-11V7L12 2z"/>
+                          </svg>
+                        </div>
+                        <div className="absolute -inset-4 bg-gradient-to-r from-red-400 to-orange-400 rounded-full opacity-20 animate-ping"></div>
+                      </div>
+                      <h3 className="text-white font-bold text-sm mb-1 animate-pulse">The CyberJall Security</h3>
+                      <h3 className="text-white font-bold text-sm animate-pulse">Knowledge Platform</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div 
+                className="hexagon-container animate-float-in"
+                style={{ animationDelay: '800ms' }}
+                onMouseEnter={() => setHoveredHex(features[3].id)}
+                onMouseLeave={() => setHoveredHex(null)}
+              >
+                <div className={`hexagon group cursor-pointer transition-all duration-500 ${
+                  hoveredHex === features[3].id ? 'scale-110' : ''
+                }`}>
+                  <div className="hexagon-bg bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm"></div>
+                  <div className="hexagon-border border-gradient"></div>
+                  <div className="hexagon-glow"></div>
+                  <div className="hexagon-content">
+                    <div className="text-center">
+                      <div className="text-2xl mb-3 animate-bounce">{features[3].icon}</div>
+                      <h3 className="text-sm font-semibold text-white leading-tight group-hover:text-orange-300 transition-colors duration-300">
+                        {features[3].title}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                  </svg>
+            {/* Bottom Row */}
+            <div className="flex justify-center space-x-16">
+              {[features[4], features[5]].map((feature, index) => (
+                <div 
+                  key={feature.id}
+                  className="hexagon-container animate-float-in"
+                  style={{ animationDelay: `${1000 + index * 200}ms` }}
+                  onMouseEnter={() => setHoveredHex(feature.id)}
+                  onMouseLeave={() => setHoveredHex(null)}
+                >
+                  <div className={`hexagon group cursor-pointer transition-all duration-500 ${
+                    hoveredHex === feature.id ? 'scale-110' : ''
+                  }`}>
+                    <div className="hexagon-bg bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm"></div>
+                    <div className="hexagon-border border-gradient"></div>
+                    <div className="hexagon-glow"></div>
+                    <div className="hexagon-content">
+                      <div className="text-center">
+                        <div className="text-2xl mb-3 animate-bounce">{feature.icon}</div>
+                        <h3 className="text-sm font-semibold text-white leading-tight group-hover:text-orange-300 transition-colors duration-300">
+                          {feature.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-white font-medium">Multiple solutions on single platform.</p>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                  </svg>
-                </div>
-                <p className="text-white font-medium">Collaborative services with industry partnership.</p>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="text-white font-medium">Affordable pricing with quality of services.</p>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <p className="text-white font-medium">Professional Team & Industry Awareness with global community.</p>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <p className="text-white font-medium">This is the best platform for SMB&apos;s & Big Enterprises to run their bug bounty program.</p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* CTA Button */}
-        <div className="mt-16 text-center">
-          <a href="#" className="inline-block px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-xl">
-            Explore the platform
-          </a>
+        {/* Enhanced CTA Button */}
+        <div className="mt-20 text-center animate-fade-in-up" style={{ animationDelay: '1400ms' }}>
+          <button className="group relative px-12 py-4 bg-gradient-to-r from-orange-500 via-red-600 to-orange-500 text-white font-bold rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl animate-gradient-x">
+            <span className="relative z-10">Explore the platform</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-orange-500 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          </button>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes gradient-xy {
+          0%, 100% { background-position: 0% 0%; }
+          25% { background-position: 100% 0%; }
+          50% { background-position: 100% 100%; }
+          75% { background-position: 0% 100%; }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes float-in {
+          0% { 
+            opacity: 0; 
+            transform: translateY(50px) scale(0.8); 
+          }
+          100% { 
+            opacity: 1; 
+            transform: translateY(0px) scale(1); 
+          }
+        }
+        
+        @keyframes fade-in-up {
+          0% { 
+            opacity: 0; 
+            transform: translateY(30px); 
+          }
+          100% { 
+            opacity: 1; 
+            transform: translateY(0px); 
+          }
+        }
+        
+        @keyframes binary-rain {
+          0% { transform: translateY(-100vh); }
+          100% { transform: translateY(100vh); }
+        }
+        
+        @keyframes spin-slow {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .animate-gradient-x { 
+          background-size: 200% 200%; 
+          animation: gradient-x 3s ease infinite; 
+        }
+        
+        .animate-gradient-xy { 
+          background-size: 200% 200%; 
+          animation: gradient-xy 4s ease infinite; 
+        }
+        
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-float-in { animation: float-in 0.8s ease-out forwards; opacity: 0; }
+        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; opacity: 0; }
+        .animate-binary-rain { animation: binary-rain linear infinite; }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+        .hexagon-container {
+          width: 200px;
+          height: 173px;
+          position: relative;
+        }
+
+        .center-hexagon {
+          width: 280px;
+          height: 242px;
+          position: relative;
+        }
+
+        .hexagon, .hexagon-large {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .hexagon-bg, .hexagon-bg-large {
+          position: absolute;
+          inset: 0;
+          clip-path: inherit;
+        }
+
+        .hexagon-border, .hexagon-border-large {
+          position: absolute;
+          inset: 0;
+          clip-path: inherit;
+          padding: 2px;
+        }
+
+        .border-gradient::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          padding: 2px;
+          background: linear-gradient(45deg, #ef4444, #f97316, #ef4444);
+          clip-path: inherit;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: exclude;
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+        }
+
+        .border-gradient-center::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          padding: 3px;
+          background: linear-gradient(45deg, #fbbf24, #fff, #fbbf24);
+          clip-path: inherit;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: exclude;
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+        }
+
+        .hexagon-glow, .hexagon-glow-large {
+          position: absolute;
+          inset: -20px;
+          background: radial-gradient(circle, rgba(239,68,68,0.4) 0%, transparent 70%);
+          clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .hexagon:hover .hexagon-glow,
+        .hexagon-large:hover .hexagon-glow-large {
+          opacity: 1;
+        }
+
+        .hexagon-content, .hexagon-content-large {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 30px;
+          z-index: 10;
+        }
+
+        .bg-gradient-radial {
+          background: radial-gradient(var(--tw-gradient-stops));
+        }
+      `}</style>
     </section>
   );
-}; 
+};
+
+export default PlatformFeatures;
