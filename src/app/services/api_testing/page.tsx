@@ -4,9 +4,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, CheckCircle, Code, Server, Database, AlertTriangle, Key, FileSearch } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function ApiPentesting() {
   const [isVisible, setIsVisible] = useState(false);
+  const router=useRouter();
      const plans = [
     {
       title: "Basic Security Assessment",
