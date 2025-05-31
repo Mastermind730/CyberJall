@@ -9,6 +9,7 @@ import { WhatWeOffer } from './components/sections/WhatWeOffer';
 import { SecurityFeatures } from './components/sections/SecurityFeatures';
 import { HowWeWork } from './components/sections/HowWeWork';
 import { PlatformFeatures } from './components/sections/PlatformFeatures';
+import ClientLogoShowcase from './components/ClientCarousel';
 
 const Home: NextPage = () => {
   return (
@@ -23,6 +24,7 @@ const Home: NextPage = () => {
       <SecurityFeatures />
       <HowWeWork />
       <PlatformFeatures />
+      <ClientLogoShowcase/>
     </main>
   );
 };

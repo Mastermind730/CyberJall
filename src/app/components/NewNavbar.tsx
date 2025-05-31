@@ -49,6 +49,7 @@ const NewNavbar = () => {
         { name: "Network Pen Testing", link: "/services/network" },
         { name: "Cloud Pen Testing", link: "/services/cloud" },
         { name: "Mobile App Pen Testing", link: "/services/mobile_pentesting" },
+        { name: "Compliance", link: "/services/compliance" },
         {name:"API Testing",link:"/services/api_testing"},
         { 
           name: "VAPT Services", 
