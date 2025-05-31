@@ -374,7 +374,7 @@ const CompliancePage = () => {
               Why Compliance Matters
             </h2>
             <p className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Compliance is more than a checkbox — it's the{" "}
+              Compliance is more than a checkbox — it&apos;s the{" "}
               <span className="text-orange-400 font-semibold">
                 foundation of trust, resilience, and business growth.
               </span>
