@@ -787,7 +787,7 @@ const CompliancePage = () => {
             </h2>
             
             <p className="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-              Join thousands of companies who've turned compliance from a burden into a 
+              Join thousands of companies who&apos;ve turned compliance from a burden into a 
               <span className="text-orange-400 font-bold"> business advantage</span>
             </p>
             
