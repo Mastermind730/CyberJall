@@ -254,7 +254,6 @@ const EntityShowcase: React.FC = () => {
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ 
                     opacity: 1, 
-                    y: 0,
                     x: hoveredId === entity.id ? parallax.x : 0,
                     y: hoveredId === entity.id ? parallax.y : 0,
                     scale: hoveredId === entity.id ? 1.05 : 1
