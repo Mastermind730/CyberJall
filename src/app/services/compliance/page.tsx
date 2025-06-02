@@ -16,6 +16,10 @@ import {
   Award,
   Cpu,
   Database,
+  TrendingUp,
+  Users,
+  Building,
+  Sparkles,
 } from "lucide-react";
 
 interface ComplianceService {
@@ -63,11 +67,18 @@ const CompliancePage = () => {
   const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState<VisibilityState>({});
   const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [activeIndustry, setActiveIndustry] = useState<number>(0);
+  const [selectedService, setSelectedService] = useState<string>("iso27001");
   
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     const handleScroll = () => setScrollY(window.scrollY);
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -97,7 +108,16 @@ const CompliancePage = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       observer.disconnect();
     };
-  }, []);
+  }, [isMounted]);
+
+  // Auto-rotate industries
+  useEffect(() => {
+    if (!isMounted) return;
+    const interval = setInterval(() => {
+      setActiveIndustry((prev) => (prev + 1) % industries.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isMounted]);
 
   const complianceServices: ComplianceService[] = [
     {
@@ -256,7 +276,11 @@ const CompliancePage = () => {
   };
 
   if (!isMounted) {
-    return null;
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -276,10 +300,7 @@ const CompliancePage = () => {
 
       {/* Mega Animated Background */}
       <div className="fixed inset-0 z-0">
-        {/* Base gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-red-950/30 to-orange-950/30"></div>
-
-        {/* Moving gradient orbs */}
         <div
           className="absolute inset-0 opacity-40"
           style={{
@@ -303,8 +324,7 @@ const CompliancePage = () => {
           }}
         />
 
-        {/* Floating particles */}
-        {[...Array(100)].map((_, i) => (
+        {[...Array(50)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full animate-pulse"
@@ -324,7 +344,6 @@ const CompliancePage = () => {
           />
         ))}
 
-        {/* Grid pattern overlay */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -344,7 +363,46 @@ const CompliancePage = () => {
         ref={addToRefs}
         className="relative z-10 min-h-screen flex items-center justify-center px-4"
       >
-        {/* ... hero section content ... */}
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="mb-12">
+            <h1
+              className="text-8xl md:text-9xl font-black mb-8 leading-none"
+              style={{
+                background: "linear-gradient(45deg, #ef4444, #f97316, #dc2626)",
+                backgroundSize: "200% 200%",
+                animation: "gradient-shift 3s ease infinite",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              COMPLIANCE
+            </h1>
+            <p className="text-3xl md:text-4xl text-gray-300 mb-8 max-w-4xl mx-auto">
+              Transform Regulatory Requirements into 
+              <span className="text-orange-400 font-bold"> Competitive Advantages</span>
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              {["ISO 27001", "SOC 2", "GDPR", "HIPAA"].map((cert, index) => (
+                <div
+                  key={cert}
+                  className="px-6 py-3 bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-500/30 rounded-full backdrop-blur-lg transform hover:scale-110 transition-all duration-300"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <span className="text-white font-semibold">{cert}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <button
+            className="group px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xl font-bold transform hover:scale-110 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/50"
+            onMouseEnter={() => setActiveCard("cta")}
+            onMouseLeave={() => setActiveCard(null)}
+          >
+            Start Your Compliance Journey
+            <ArrowRight className="inline-block ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+          </button>
+        </div>
       </section>
 
       {/* Why Compliance Matters */}
@@ -438,17 +496,33 @@ const CompliancePage = () => {
               ))}
             </div>
 
-            {/* Right side - Visual element */}
             <div
               className={`relative transition-all duration-1000 ${
                 isVisible["why-compliance"]
                   ? "translate-x-0 opacity-100"
                   : "translate-x-20 opacity-0"
               }`}
-              style={{ animationDelay: "0.6s" }}
             >
-              <div className="relative w-full h-[600px] rounded-3xl bg-gradient-to-br from-red-600/20 via-orange-600/20 to-red-600/20 border border-red-500/40 backdrop-blur-lg overflow-hidden">
-                {/* ... visual element content ... */}
+              <div className="relative w-full h-[600px] rounded-3xl bg-gradient-to-br from-red-600/20 via-orange-600/20 to-red-600/20 border border-red-500/40 backdrop-blur-lg overflow-hidden flex items-center justify-center">
+                <div className="text-center">
+                  <TrendingUp className="w-32 h-32 text-orange-400 mx-auto mb-8 animate-bounce" />
+                  <h3 className="text-4xl font-bold text-white mb-4">Business Growth</h3>
+                  <p className="text-xl text-gray-300 max-w-md">
+                    Compliance drives revenue, reduces risk, and opens new market opportunities
+                  </p>
+                </div>
+                {[...Array(20)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 bg-orange-500 rounded-full animate-ping"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      animationDelay: `${Math.random() * 3}s`,
+                      animationDuration: `${2 + Math.random() * 2}s`,
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -461,7 +535,93 @@ const CompliancePage = () => {
         ref={addToRefs}
         className="relative z-10 py-32 px-4"
       >
-        {/* ... services section content ... */}
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2
+              className="text-6xl md:text-7xl font-black mb-8"
+              style={{
+                background: "linear-gradient(45deg, #ef4444, #f97316, #dc2626)",
+                backgroundSize: "200% 200%",
+                animation: "gradient-shift 3s ease infinite",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Our Services
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8">
+            {complianceServices.map((service, index) => (
+              <div
+                key={service.id}
+                className={`group relative p-8 rounded-3xl border backdrop-blur-lg transition-all duration-700 hover:scale-105 cursor-pointer ${
+                  selectedService === service.id
+                    ? "bg-gradient-to-br from-red-900/60 to-orange-900/60 border-red-400/80 scale-105"
+                    : "bg-gradient-to-br from-red-900/20 to-orange-900/20 border-red-500/30 hover:border-red-400/60"
+                } ${
+                  isVisible["services"]
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-20 opacity-0"
+                }`}
+                style={{
+                  animationDelay: `${index * 0.1}s`,
+                  boxShadow: selectedService === service.id 
+                    ? "0 25px 80px rgba(239, 68, 68, 0.3)"
+                    : "0 20px 60px rgba(239, 68, 68, 0.1)",
+                }}
+                onClick={() => setSelectedService(service.id)}
+                onMouseEnter={() => setActiveCard(service.id)}
+                onMouseLeave={() => setActiveCard(null)}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className={`p-4 rounded-2xl bg-gradient-to-r ${service.gradient}/20`}>
+                    {service.icon}
+                  </div>
+                  {selectedService === service.id && (
+                    <Sparkles className="w-8 h-8 text-orange-400 animate-pulse" />
+                  )}
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-orange-400 transition-colors">
+                  {service.title}
+                </h3>
+                
+                <p className="text-orange-400 font-medium mb-4">
+                  {service.subtitle}
+                </p>
+                
+                <p className="text-gray-300 mb-6 text-sm leading-relaxed">
+                  {service.description}
+                </p>
+                
+                <div className="space-y-3 mb-6">
+                  {service.benefits.map((benefit, benefitIndex) => (
+                    <div
+                      key={benefitIndex}
+                      className="flex items-center gap-3 text-sm text-gray-300 group-hover:translate-x-2 transition-transform duration-300"
+                      style={{ transitionDelay: `${benefitIndex * 0.1}s` }}
+                    >
+                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      <span>{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {service.features.map((feature, featureIndex) => (
+                    <span
+                      key={featureIndex}
+                      className="px-3 py-1 bg-red-600/20 text-red-300 text-xs rounded-full border border-red-500/30"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Industries */}
@@ -470,7 +630,74 @@ const CompliancePage = () => {
         ref={addToRefs}
         className="relative z-10 py-32 px-4"
       >
-        {/* ... industries section content ... */}
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2
+              className="text-6xl md:text-7xl font-black mb-8"
+              style={{
+                background: "linear-gradient(45deg, #ef4444, #f97316, #dc2626)",
+                backgroundSize: "200% 200%",
+                animation: "gradient-shift 3s ease infinite",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Industries We Serve
+            </h2>
+            <p className="text-2xl text-gray-300 max-w-4xl mx-auto">
+              Specialized compliance solutions for every sector
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {industries.map((industry, index) => (
+              <div
+                key={index}
+                className={`group relative p-6 rounded-2xl border backdrop-blur-lg transition-all duration-500 cursor-pointer ${
+                  activeIndustry === index
+                    ? "bg-gradient-to-br from-orange-900/60 to-red-900/60 border-orange-400/80 scale-110"
+                    : "bg-gradient-to-br from-gray-900/40 to-gray-800/40 border-gray-600/30 hover:border-orange-400/60 hover:scale-105"
+                } ${
+                  isVisible["industries"]
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-20 opacity-0"
+                }`}
+                style={{
+                  animationDelay: `${index * 0.1}s`,
+                  boxShadow: activeIndustry === index 
+                    ? "0 25px 80px rgba(251, 146, 60, 0.3)"
+                    : "0 10px 40px rgba(0, 0, 0, 0.3)",
+                }}
+                onClick={() => setActiveIndustry(index)}
+                onMouseEnter={() => setActiveIndustry(index)}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl ${
+                    activeIndustry === index 
+                      ? "bg-orange-500/20 text-orange-400" 
+                      : "bg-gray-700/50 text-gray-400 group-hover:bg-orange-500/20 group-hover:text-orange-400"
+                  } transition-all duration-300`}>
+                    {industry.icon}
+                  </div>
+                  <h3 className={`font-bold ${
+                    activeIndustry === index 
+                      ? "text-white" 
+                      : "text-gray-300 group-hover:text-white"
+                  } transition-colors duration-300`}>
+                    {industry.name}
+                  </h3>
+                </div>
+                
+                {activeIndustry === index && (
+                  <div className="mt-4 flex items-center gap-2 text-orange-400">
+                    <Building className="w-4 h-4" />
+                    <span className="text-sm font-medium">Active Sector</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Why Choose Us */}
@@ -479,12 +706,148 @@ const CompliancePage = () => {
         ref={addToRefs}
         className="relative z-10 py-32 px-4"
       >
-        {/* ... why choose section content ... */}
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2
+              className="text-6xl md:text-7xl font-black mb-8"
+              style={{
+                background: "linear-gradient(45deg, #ef4444, #f97316, #dc2626)",
+                backgroundSize: "200% 200%",
+                animation: "gradient-shift 3s ease infinite",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Why Choose Us
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+            {whyChooseFeatures.map((feature, index) => (
+              <div
+                key={index}
+                className={`group text-center p-8 rounded-3xl border backdrop-blur-lg transition-all duration-700 hover:scale-110 ${
+                  isVisible["why-choose"]
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-20 opacity-0"
+                } bg-gradient-to-br from-red-900/20 to-orange-900/20 border-red-500/30 hover:border-red-400/60 hover:bg-gradient-to-br hover:from-red-900/40 hover:to-orange-900/40`}
+                style={{
+                  animationDelay: `${index * 0.1}s`,
+                  boxShadow: "0 20px 60px rgba(239, 68, 68, 0.1)",
+                }}
+                onMouseEnter={() => setActiveCard(`feature-${index}`)}
+                onMouseLeave={() => setActiveCard(null)}
+              >
+                <div className="mb-6 flex justify-center">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-red-600/20 to-orange-600/20 group-hover:from-red-600/40 group-hover:to-orange-600/40 transition-all duration-300">
+                    <div className="text-red-400 group-hover:text-orange-400 group-hover:scale-110 transition-all duration-300">
+                      {feature.icon}
+                    </div>
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-bold mb-4 text-white group-hover:text-orange-400 transition-colors">
+                  {feature.title}
+                </h3>
+                
+                <p className="text-gray-300 group-hover:text-white transition-colors">
+                  {feature.desc}
+                </p>
+                
+                <div className="mt-6 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <ArrowRight className="w-6 h-6 text-orange-400 animate-bounce" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* CTA Section */}
       <section id="cta" ref={addToRefs} className="relative z-10 py-32 px-4">
-        {/* ... cta section content ... */}
+        <div className="max-w-4xl mx-auto text-center">
+          <div
+            className={`transition-all duration-1000 ${
+              isVisible["cta"]
+                ? "translate-y-0 opacity-100"
+                : "translate-y-20 opacity-0"
+            }`}
+          >
+            <h2
+              className="text-6xl md:text-7xl font-black mb-8"
+              style={{
+                background: "linear-gradient(45deg, #ef4444, #f97316, #dc2626)",
+                backgroundSize: "200% 200%",
+                animation: "gradient-shift 3s ease infinite",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Ready to Transform?
+            </h2>
+            
+            <p className="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
+              Join thousands of companies who've turned compliance from a burden into a 
+              <span className="text-orange-400 font-bold"> business advantage</span>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+              <button
+                className="group px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xl font-bold transform hover:scale-110 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/50"
+                onMouseEnter={() => setActiveCard("primary-cta")}
+                onMouseLeave={() => setActiveCard(null)}
+              >
+                Get Started Today
+                <ArrowRight className="inline-block ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              </button>
+              
+              <button
+                className="group px-12 py-6 border-2 border-orange-500 text-orange-400 rounded-full text-xl font-bold hover:bg-orange-500 hover:text-black transition-all duration-300"
+                onMouseEnter={() => setActiveCard("secondary-cta")}
+                onMouseLeave={() => setActiveCard(null)}
+              >
+                Schedule Consultation
+                <Users className="inline-block ml-3 w-6 h-6 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="text-4xl font-black text-orange-400 mb-2">500+</div>
+                <div className="text-gray-400">Companies Certified</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-black text-red-400 mb-2">99.7%</div>
+                <div className="text-gray-400">Success Rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-black text-orange-400 mb-2">24/7</div>
+                <div className="text-gray-400">Expert Support</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Floating elements around CTA */}
+        <div className="absolute inset-0 pointer-events-none">
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-bounce"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+              }}
+            >
+              {i % 4 === 0 && <Shield className="w-8 h-8 text-red-400/30" />}
+              {i % 4 === 1 && <Lock className="w-8 h-8 text-orange-400/30" />}
+              {i % 4 === 2 && <Globe className="w-8 h-8 text-red-400/30" />}
+              {i % 4 === 3 && <Heart className="w-8 h-8 text-orange-400/30" />}
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Global Styles */}
@@ -522,6 +885,19 @@ const CompliancePage = () => {
           to {
             transform: rotate(360deg);
           }
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+          }
+        }
+
+        .animate-pulse-glow {
+          animation: pulse-glow 2s ease-in-out infinite;
         }
       `}</style>
     </div>

@@ -9,12 +9,14 @@ import { WhatWeOffer } from './components/sections/WhatWeOffer';
 import { SecurityFeatures } from './components/sections/SecurityFeatures';
 import { HowWeWork } from './components/sections/HowWeWork';
 import { PlatformFeatures } from './components/sections/PlatformFeatures';
-import ClientLogoShowcase from './components/ClientCarousel';
+// import ClientLogoShowcase from './components/ClientCarousel';
+import EntityShowcase from './components/ClientCarousel';
 
 const Home: NextPage = () => {
   return (
     <main className="min-h-screen bg-gray-900">
       <Hero />
+      <EntityShowcase/>
       <AboutUs />
       <SmartestChoice />
       <WhatWeOffer />
@@ -24,7 +26,6 @@ const Home: NextPage = () => {
       <SecurityFeatures />
       <HowWeWork />
       <PlatformFeatures />
-      <ClientLogoShowcase/>
     </main>
   );
 };
