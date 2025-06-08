@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -14,7 +15,7 @@ const ContactPage = () => {
   const [inquiryType, setInquiryType] = useState("business");
   const [message, setMessage] = useState("");
 
-  const recaptchaRef = React.useRef<ReCAPTCHA>(null);
+  // const recaptchaRef = React.useRef<ReCAPTCHA>(null);
 
   const sendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,15 +40,15 @@ const ContactPage = () => {
     }
   }
 
-  const handleCaptchaSubmission = async (token: string | null) => {
-    if (token) {
-        try {
-            await verifyCaptcha(token);
-        } catch (error) {
-            console.error('Error verifying captcha:', error);
-        }
-    }
-  };
+  // const handleCaptchaSubmission = async (token: string | null) => {
+  //   if (token) {
+  //       try {
+  //           await verifyCaptcha(token);
+  //       } catch (error) {
+  //           console.error('Error verifying captcha:', error);
+  //       }
+  //   }
+  // };
 
   useEffect(() => {
     setIsLoaded(true);
@@ -323,7 +324,7 @@ const ContactPage = () => {
                     </motion.div>
                   </div>
 
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <div className="text-sm text-neutral-400">
                       <span className="mr-2">Captcha</span>
                       <span className="text-neutral-500">(Security purpose – anti spam protection)</span>
@@ -333,7 +334,7 @@ const ContactPage = () => {
                         onChange={handleCaptchaSubmission}
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   <motion.div
                     whileHover={{ scale: 1.02 }}

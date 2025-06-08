@@ -110,6 +110,12 @@ interface CaseStudyDetailed {
   solution?: string;
   result?: string;
 }
+interface Product {
+  name: string;
+  description: string;
+  image: string;
+  link?: string; // Optional product link
+}
 
 // Define Company interface with flexible types
 interface Company {
@@ -119,6 +125,7 @@ interface Company {
   logo?: string;
   website?: string;
   year_founded?: number;
+  products: Product[]
   headquarters_city?: string;
   headquarters_country?: string;
   industries_served: string[];
@@ -565,129 +572,8 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
   </div>
 </AnimatedSection>
 
-{/* Geographic Coverage Section */}
-<AnimatedSection title="Global Reach" icon={Globe} delay={1.1}>
-  <div className="mt-6">
-    <div className="relative h-64 md:h-96 rounded-xl overflow-hidden border border-zinc-700">
-      {/* World map background with animated highlights */}
-      <div className="absolute inset-0 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/1200px-World_map_-_low_resolution.svg.png')] bg-cover bg-center opacity-20" />
-      
-      {/* Animated coverage indicators */}
-      {company.geographic_coverage?.map((region, index) => {
-        const positions = {
-          'India': { left: '72%', top: '55%' },
-          'APAC': { left: '80%', top: '45%' },
-          'Global': { left: '50%', top: '50%', scale: 2.5 },
-          'Remote Only': { left: '50%', top: '50%' }
-        };
-        
-        const position = positions[region as keyof typeof positions] || { left: '50%', top: '50%' };
-        
-        return (
-          <motion.div
-            key={index}
-            className="absolute w-8 h-8 bg-red-500 rounded-full shadow-lg"
-            style={{
-              left: position.left,
-              top: position.top,
-              
-              transform: 'translate(-50%, -50%)',
-              scale: 1
-            }}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.7 }}
-            transition={{ 
-              type: 'spring',
-              stiffness: 100,
-              damping: 10,
-              delay: 0.2 * index
-            }}
-            whileHover={{ 
-              scale: 1.2,
-              opacity: 1,
-              transition: { duration: 0.2 }
-            }}
-          >
-            <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30"></div>
-            <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
-              {region === 'Global' ? '🌍' : region === 'APAC' ? '🌏' : region === 'India' ? '🇮🇳' : '💻'}
-            </div>
-          </motion.div>
-        );
-      })}
-      
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 right-4 bg-zinc-900/80 backdrop-blur-sm rounded-lg p-4 border border-zinc-700">
-        <h4 className="text-sm font-semibold mb-2 text-white">Geographic Coverage</h4>
-        <div className="flex flex-wrap gap-3">
-          {company.geographic_coverage?.length > 0 ? (
-            company.geographic_coverage.map((region, index) => (
-              <motion.div
-                key={index}
-                className="flex items-center"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 * index }}
-              >
-                <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                <span className="text-sm text-gray-300">{region}</span>
-              </motion.div>
-            ))
-          ) : (
-            <span className="text-sm text-gray-400">No geographic coverage specified</span>
-          )}
-        </div>
-      </div>
-    </div>
-    
-    {/* Coverage description */}
-    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <motion.div
-        className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <h3 className="text-lg font-semibold mb-3 flex items-center">
-          <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-          Service Coverage
-        </h3>
-        <p className="text-gray-300">
-          {company.geographic_coverage?.includes('Global') 
-            ? 'Provides services worldwide with global support infrastructure'
-            : company.geographic_coverage?.includes('APAC')
-            ? 'Specializes in the Asia-Pacific region with local expertise'
-            : company.geographic_coverage?.includes('India')
-            ? 'Focuses primarily on the Indian market with deep local knowledge'
-            : company.geographic_coverage?.includes('Remote Only')
-            ? 'Offers fully remote services with digital delivery'
-            : 'Geographic service coverage not specified'}
-        </p>
-      </motion.div>
-      
-      <motion.div
-        className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
-        <h3 className="text-lg font-semibold mb-3 flex items-center">
-          <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          Availability
-        </h3>
-        <p className="text-gray-300">
-          {company.geographic_coverage?.includes('Remote Only')
-            ? 'Available 24/7 through digital channels with remote support'
-            : 'Typically operates during standard business hours with on-call support for critical issues'}
-        </p>
-      </motion.div>
-    </div>
-  </div>
-</AnimatedSection>
+
+
 
 {/* Social Links Section */}
 <AnimatedSection title="Connect With Us" icon={Users} delay={1.3}>
@@ -766,6 +652,131 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
           <p className="text-gray-300">{service.description}</p>
         </motion.div>
       ))}
+    </div>
+  </AnimatedSection>
+)}
+
+{/* Products Section */}
+{company.products && company.products.length > 0 && (
+  <AnimatedSection title="Our Products" icon={Shield} delay={0.9}>
+    <div className="mt-8">
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.1
+            }
+          }
+        }}
+      >
+        {company.products.map((product, index) => (
+          <motion.div
+            key={index}
+            className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 shadow-2xl h-full"
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: {
+                y: 0,
+                opacity: 1,
+                transition: {
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 10
+                }
+              }
+            }}
+            whileHover={{
+              y: -10,
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1)"
+            }}
+          >
+            {/* Product Image */}
+            <div className="relative h-48 overflow-hidden">
+              {product.image ? (
+                <>
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-red-900 to-red-800 flex items-center justify-center">
+                  <span className="text-4xl font-bold text-white opacity-30">
+                    {product.name.split(' ').map(w => w[0]).join('')}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Floating product badge */}
+            <motion.div 
+              className="absolute -top-3 -right-3 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1, transition: { delay: 0.2 + index * 0.05 } }}
+              whileHover={{ rotate: 10 }}
+            >
+              Product
+            </motion.div>
+
+            {/* Product Content */}
+            <div className="p-6 relative z-10">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="text-xl font-bold text-white">{product.name}</h3>
+                {product.link && (
+                  <a 
+                    href={product.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                )}
+              </div>
+              
+              <p className="text-gray-300 mb-4">{product.description}</p>
+              
+              {/* Interactive elements */}
+              <motion.div 
+                className="flex justify-between items-center pt-4 border-t border-zinc-700"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { delay: 0.3 } }}
+              >
+                <button className="text-sm bg-red-900 hover:bg-red-800 px-4 py-2 rounded-full transition-colors">
+                  Learn More
+                </button>
+                <div className="flex space-x-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      size={16} 
+                      className={i < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-500"} 
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Animated background elements */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-red-600 rounded-full filter blur-3xl opacity-20"></div>
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-orange-600 rounded-full filter blur-3xl opacity-20"></div>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
   </AnimatedSection>
 )}

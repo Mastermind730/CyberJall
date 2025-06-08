@@ -8,11 +8,11 @@ export async function POST(request: Request) {
 
     try {
         const formData = await request.json();
-        const name = formData.name;
-        const email = formData.email;
+        const name = formData.fullName;
+        const email = formData.workEmail;
         const message = formData.message;
-        console.log(message);
-
+        console.log(name,email,message);
+        
         if (!name || !email || !message) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }

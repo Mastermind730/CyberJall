@@ -7,10 +7,18 @@ import { CldUploadButton, CloudinaryUploadWidgetResults } from 'next-cloudinary'
 import Image from 'next/image';
 import axios, { AxiosError } from 'axios';
 
+interface Product {
+  name: string;
+  description: string;
+  image: string;
+  link?: string; // Optional product link
+}
+
 interface ServiceOffered {
   name: string;
   description: string;
   image: string; 
+
 }
 
 interface ExpertiseCertification {
@@ -47,6 +55,7 @@ interface CompanyFormData {
   headquarters_city: string;
   headquarters_country: string;
   services_offered: ServiceOffered[];
+  products: Product[];
   expertise_and_certifications: ExpertiseCertification[];
   case_studies: CaseStudy[];
   client_reviews: ClientReview[];
@@ -86,6 +95,7 @@ export default function CompanyProfile() {
       headquarters_city: '',
       headquarters_country: '',
       services_offered: [{ name: '', description: '', image: '' }],
+      products: [],
       expertise_and_certifications: [{ type: '', name: '' }],
       case_studies: [{ title: '', client: '', challenge: '', solution: '', result: '' }],
       industries_served: [],
@@ -123,6 +133,9 @@ export default function CompanyProfile() {
   
     const { fields: reviewFields, append: appendReview, remove: removeReview } = 
   useFieldArray({ control, name: "client_reviews" });
+
+  const { fields: productFields, append: appendProduct, remove: removeProduct } = 
+  useFieldArray({ control, name: "products" });
 
   
   // Watch the logo to display the preview
@@ -807,6 +820,132 @@ export default function CompanyProfile() {
         ></textarea>
         {errors.services_offered?.[index]?.description && (
           <p className="mt-1 text-red-500 text-sm">{errors.services_offered[index]?.description?.message}</p>
+        )}
+      </div>
+    </div>
+  ))}
+</motion.div>
+
+{/* Products Section */}
+<motion.div
+  initial={{ x: -20, opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  transition={{ delay: 1.2 }}
+  className="space-y-4"
+>
+  <div className="flex justify-between items-center">
+    <label className="block text-orange-400 font-medium">Products</label>
+    <button
+      type="button"
+      onClick={() => appendProduct({ name: '', description: '', image: '' })}
+      className="px-3 py-1 bg-orange-600 rounded-lg text-white text-sm hover:bg-orange-700 transition-colors"
+    >
+      + Add Product
+    </button>
+  </div>
+  
+  {productFields.map((field, index) => (
+    <div key={field.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700 space-y-3">
+      <div className="flex justify-between items-center">
+        <h4 className="text-orange-400 font-medium">Product #{index + 1}</h4>
+        {index > 0 && (
+          <button
+            type="button"
+            onClick={() => removeProduct(index)}
+            className="text-red-400 hover:text-red-300"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        )}
+      </div>
+      
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Product Name</label>
+        <input
+          {...register(`products.${index}.name`, { required: "Product name required" })}
+          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="e.g., Security Analytics Platform"
+        />
+        {errors.products?.[index]?.name && (
+          <p className="mt-1 text-red-500 text-sm">{errors.products[index]?.name?.message}</p>
+        )}
+      </div>
+      
+      {/* Product Image Upload */}
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Product Image</label>
+        <div className="flex items-center space-x-4">
+          <div className="flex-1">
+            <div className="flex flex-col items-center px-4 py-3 bg-gray-700 text-orange-400 rounded-lg border border-gray-600 border-dashed cursor-pointer hover:bg-gray-600 transition-colors">
+              <CldUploadButton 
+                uploadPreset="Product_image"
+                onSuccess={(result) => {
+                  if (result && typeof result.info !== 'string') {
+                    const info = result.info as { secure_url: string };
+                    if (info?.secure_url) {
+                      setValue(`products.${index}.image`, info.secure_url);
+                    }
+                  }
+                }}
+                options={{
+                  multiple: false,
+                  resourceType: "image",
+                  maxFileSize: 5000000,
+                }}
+                className="w-full"
+              >
+                <div className="flex flex-col items-center">
+                  <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <span className="text-sm">Upload Product Image</span>
+                </div>
+              </CldUploadButton>
+            </div>
+          </div>
+          {watch(`products.${index}.image`) && (
+            <div className="relative w-16 h-16 bg-gray-700 rounded-md overflow-hidden border border-gray-600 flex-shrink-0">
+              <Image
+                src={watch(`products.${index}.image`)}
+                alt={`Product ${index + 1} image`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Product Description</label>
+        <textarea
+          {...register(`products.${index}.description`, { required: "Description required" })}
+          rows={3}
+          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="Describe this product in detail"
+        ></textarea>
+        {errors.products?.[index]?.description && (
+          <p className="mt-1 text-red-500 text-sm">{errors.products[index]?.description?.message}</p>
+        )}
+      </div>
+      
+      <div>
+        <label className="block text-sm text-gray-300 mb-1">Product Link (Optional)</label>
+        <input
+          type="url"
+          {...register(`products.${index}.link`, {
+            pattern: {
+              value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
+              message: "Please enter a valid URL"
+            }
+          })}
+          className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="https://yourproduct.com"
+        />
+        {errors.products?.[index]?.link && (
+          <p className="mt-1 text-red-500 text-sm">{errors.products[index]?.link?.message}</p>
         )}
       </div>
     </div>
