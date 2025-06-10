@@ -126,9 +126,9 @@ export default function CloudPentesting() {
               variants={fadeIn}
               className="flex justify-center"
             >
-              <button className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105">
+              {/* <button className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105">
                 Get Started Now
-              </button>
+              </button> */}
             </motion.div>
           </motion.div>
         </div>

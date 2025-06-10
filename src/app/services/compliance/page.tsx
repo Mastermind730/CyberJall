@@ -21,6 +21,7 @@ import {
   Building,
   Sparkles,
 } from "lucide-react";
+import Link from "next/link";
 
 interface ComplianceService {
   id: string;
@@ -394,14 +395,14 @@ const CompliancePage = () => {
             </div>
           </div>
           
-          <button
+          {/* <button
             className="group px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xl font-bold transform hover:scale-110 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/50"
             onMouseEnter={() => setActiveCard("cta")}
             onMouseLeave={() => setActiveCard(null)}
           >
             Start Your Compliance Journey
             <ArrowRight className="inline-block ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
-          </button>
+          </button> */}
         </div>
       </section>
 
@@ -801,14 +802,15 @@ const CompliancePage = () => {
                 <ArrowRight className="inline-block ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </button>
               
-              <button
+              <Link
+              href={"/contact_us"}
                 className="group px-12 py-6 border-2 border-orange-500 text-orange-400 rounded-full text-xl font-bold hover:bg-orange-500 hover:text-black transition-all duration-300"
                 onMouseEnter={() => setActiveCard("secondary-cta")}
                 onMouseLeave={() => setActiveCard(null)}
               >
                 Schedule Consultation
                 <Users className="inline-block ml-3 w-6 h-6 group-hover:scale-110 transition-transform" />
-              </button>
+              </Link>
             </div>
             
             <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">

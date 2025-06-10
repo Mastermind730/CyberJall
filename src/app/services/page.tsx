@@ -173,6 +173,7 @@ export default function Services() {
                   Protect your digital assets from cyber threats with expert security testing
                 </motion.p>
                 <motion.button
+                onClick={()=>{router.push("/contact_us")}}
                   className="bg-gradient-to-r from-red-700 to-orange-900 text-white font-bold py-3 px-8 rounded-full hover:shadow-lg hover:shadow-red-900/50 transition duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

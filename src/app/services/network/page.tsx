@@ -231,6 +231,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <motion.button 
+                onClick={()=>{router.push("/contact_us")}}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 py-3 px-8 rounded-full text-white font-medium text-lg transition-all duration-300 shadow-lg hover:shadow-xl"

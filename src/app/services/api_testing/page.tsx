@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, CheckCircle, Code, Server, Database, AlertTriangle, Key, FileSearch } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ApiPentesting() {
   const [isVisible, setIsVisible] = useState(false);
@@ -133,9 +134,9 @@ export default function ApiPentesting() {
               variants={fadeIn}
               className="flex justify-center"
             >
-              <button className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105">
-                Get Started Now
-              </button>
+              <Link href={"/contact_us"} className="bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 px-8 rounded-full hover:from-red-700 hover:to-orange-600 transition-all duration-300 shadow-lg shadow-orange-600/30 transform hover:scale-105">
+                Get Started Now 
+              </Link>
             </motion.div>
           </motion.div>
         </div>
