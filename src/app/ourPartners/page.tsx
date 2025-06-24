@@ -29,6 +29,7 @@ export default function Partners() {
         }
 
         const data = await response.json();
+        console.log(data);
         setPartners(data);
         setError(null);
       } catch (err) {
@@ -351,7 +352,7 @@ export default function Partners() {
           </Link>
         </motion.div>
         
-        <motion.div 
+        {partner.website!=='' &&<motion.div 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="relative group/btn"
@@ -384,6 +385,7 @@ export default function Partners() {
             </span>
           </Link>
         </motion.div>
+}
       </div>
     </div>
   </motion.div>

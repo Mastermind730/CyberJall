@@ -1,16 +1,16 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NewNavbar from "./components/NewNavbar";
 import Footer from "./components/Footer";
-import DynamicBackground from "./components/Background";
+// import DynamicBackground from "./components/Background";
 import GlobalLayout from "./components/GLobalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -26,6 +26,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const router=useRouter();
+  // const isAdminRoute = router.pathname.startsWith('/admin');
+  // const pathName= usePathname();
+
   return (
     <html lang="en" className="!scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}>
@@ -34,7 +38,7 @@ export default function RootLayout({
         <GlobalLayout>
         {/* Content wrapper with higher z-index */}
         <div className="relative z-10 min-h-screen flex flex-col">
-          <NewNavbar />
+      <NewNavbar />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
