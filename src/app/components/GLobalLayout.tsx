@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // components/GlobalLayout.tsx
 "use client";
 import { motion } from 'framer-motion';
