@@ -10,6 +10,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ companyI
             where: {
                 id: companyId
             }
+            
         });
 
         if (!company) {

@@ -1,49 +1,120 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { 
+  FiSearch, 
+  FiChevronDown, 
+  FiX, 
+  FiMapPin, 
+  Frown,
+  FiEye,
+  FiExternalLink
+} from 'react-icons/fi';
 
-// Define Partner interface
 interface Partner {
   id: string;
   company_name: string;
   logo?: string;
   website: string;
+  year_founded: number;
+  headquarters_city: string;
+  headquarters_country: string;
+  industries_served: string[];
+  team_size: string;
+  services_offered: any;
+  expertise_and_certifications: any;
 }
+
+// Constants defined outside the component
+const industryOptions = [
+  "Fintech", "Healthcare", "E-commerce", "Government", 
+  "Education", "Manufacturing", "Retail", "Telecom"
+];
+
+const serviceOptions = [
+  "VAPT", "Compliance", "Cloud Security", "Network Security",
+  "Application Security", "Incident Response", "Risk Assessment",
+  "Security Training", "Penetration Testing", "Threat Intelligence"
+];
+
+const certificationOptions = [
+  "ISO 27001", "SOC 2", "GDPR", "PCI DSS",
+  "HIPAA", "NIST", "CIS", "CREST", "OSCP"
+];
+
+const teamSizeOptions = [
+  "Solo", "2-10", "11-50", "51-200", "201-500", "500+"
+];
+
+const experienceOptions = [
+  { label: "1+ years", value: "1" },
+  { label: "3+ years", value: "3" },
+  { label: "5+ years", value: "5" },
+  { label: "10+ years", value: "10" }
+];
 
 export default function Partners() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    industry: "",
+    service: "",
+    certification: "",
+    location: "",
+    teamSize: "",
+    minExperience: ""
+  });
+  const [showFilters, setShowFilters] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchPartners = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/company");
-
+        const params = new URLSearchParams();
+        
+        if (filters.industry) params.append('industry', filters.industry);
+        if (filters.service) params.append('service', filters.service);
+        if (filters.certification) params.append('certification', filters.certification);
+        if (filters.location) params.append('location', filters.location);
+        if (filters.teamSize) params.append('teamSize', filters.teamSize);
+        if (filters.minExperience) params.append('minExperience', filters.minExperience);
+        if (searchQuery) params.append('search', searchQuery);
+        
+        const response = await fetch(`/api/company?${params.toString()}`);
+        
         if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
+          throw new Error('Failed to fetch partners');
         }
-
+        
         const data = await response.json();
-        console.log(data);
         setPartners(data);
-        setError(null);
+        
       } catch (err) {
         console.error("Error fetching partners:", err);
-        setError("Failed to load partners. Please try again later.");
+        setError(err instanceof Error ? err.message : "Failed to load partners");
+        setPartners([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchPartners();
-  }, []);
+    const debounceTimer = setTimeout(() => {
+      fetchPartners();
+    }, 300);
 
-  // Functions to generate placeholder logos for partners without logos
+    return () => clearTimeout(debounceTimer);
+  }, [filters, searchQuery]);
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -53,26 +124,34 @@ export default function Partners() {
       .substring(0, 2);
   };
 
-  // const getRandomColor = (id: string) => {
-  //   const colors = [
-  //     "from-red-600 via-red-700 to-red-800",
-  //     "from-orange-400 via-orange-500 to-red-600",
-  //     "from-red-700 via-red-800 to-black",
-  //     "from-orange-400 via-orange-500 to-orange-600",
-  //     "from-red-500 via-red-700 to-black",
-  //     "from-black via-red-800 to-red-900",
-  //   ];
+  const handleFilterChange = (filterName: string, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterName]: value === prev[filterName] ? "" : value
+    }));
+  };
 
-  //   // Use the id's last character to select a color
-  //   const colorIndex = parseInt(id.charAt(id.length - 1), 16) % colors.length;
-  //   return colors[colorIndex];
-  // };
+  const clearFilters = () => {
+    setFilters({
+      industry: "",
+      service: "",
+      certification: "",
+      location: "",
+      teamSize: "",
+      minExperience: ""
+    });
+    setSearchQuery("");
+  };
+
+  const activeFilterCount = Object.values(filters).filter(v => v !== "").length;
+
+  if (!mounted) {
+    return null; // or return a loading spinner
+  }
 
   return (
     <div className="min-h-screen bg-black relative">
-    
-
-      {/* Background Gradient Mesh */}
+      {/* Background Elements */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-0 w-full h-1/3 bg-gradient-to-b from-red-900/20 to-transparent"></div>
         <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-red-900/20 to-transparent"></div>
@@ -80,46 +159,46 @@ export default function Partners() {
         <div className="absolute right-0 h-full w-1/3 bg-gradient-to-l from-red-900/10 to-transparent"></div>
       </div>
 
-      {/* Animated background elements */}
-      <div className="fixed inset-0 z-0 overflow-hidden opacity-40">
-        {/* Dynamic grid pattern */}
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 5% 15%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 85% 45%, #9a3412aa 0.5%, transparent 5%), radial-gradient(circle at 35% 75%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 65% 85%, #9a341222 0.5%, transparent 5%)" }}></div>
-        
-        {/* Floating particles */}
-        <div className="absolute top-0 left-0 w-full h-full">
-          {[...Array(12)].map((_, i) => (
-            <motion.div
-              key={`particle-${i}`}
-              className={`absolute rounded-full bg-gradient-to-br ${
-                i % 2 === 0 ? "from-red-600/30 to-red-800/10" : "from-orange-500/20 to-orange-700/10"
-              }`}
-              style={{
-                width: `${Math.floor(Math.random() * 10) + 3}px`,
-                height: `${Math.floor(Math.random() * 10) + 3}px`,
-                left: `${Math.floor(Math.random() * 100)}%`,
-                top: `${Math.floor(Math.random() * 100)}%`,
-              }}
-              animate={{
-                y: [0, Math.random() * 50 - 25],
-                x: [0, Math.random() * 50 - 25],
-                opacity: [0.5, 0.8, 0.5],
-              }}
-              transition={{
-                duration: Math.floor(Math.random() * 15) + 15,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-            />
-          ))}
+      {mounted && (
+        <div className="fixed inset-0 z-0 overflow-hidden opacity-40">
+          <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 5% 15%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 85% 45%, #9a3412aa 0.5%, transparent 5%), radial-gradient(circle at 35% 75%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 65% 85%, #9a341222 0.5%, transparent 5%)" }}></div>
+          
+          <div className="absolute top-0 left-0 w-full h-full">
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={`particle-${i}`}
+                className={`absolute rounded-full bg-gradient-to-br ${
+                  i % 2 === 0 ? "from-red-600/30 to-red-800/10" : "from-orange-500/20 to-orange-700/10"
+                }`}
+                style={{
+                  width: `${Math.floor(Math.random() * 10) + 3}px`,
+                  height: `${Math.floor(Math.random() * 10) + 3}px`,
+                  left: `${Math.floor(Math.random() * 100)}%`,
+                  top: `${Math.floor(Math.random() * 100)}%`,
+                }}
+                animate={{
+                  y: [0, Math.random() * 50 - 25],
+                  x: [0, Math.random() * 50 - 25],
+                  opacity: [0.5, 0.8, 0.5],
+                }}
+                transition={{
+                  duration: Math.floor(Math.random() * 15) + 15,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-20"
+          className="text-center mb-12"
         >
           <motion.h1 
             className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl mb-6"
@@ -140,7 +219,6 @@ export default function Partners() {
             to deliver excellence in everything we do.
           </motion.p>
 
-          {/* Decorative line with enhanced animation */}
           <motion.div 
             className="mt-8 flex justify-center"
             initial={{ width: 0 }}
@@ -164,6 +242,249 @@ export default function Partners() {
           </motion.div>
         </motion.div>
 
+        {/* Search and Filter Section */}
+        <div className="mb-12">
+          <div className="relative max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="relative"
+            >
+              <input
+                type="text"
+                placeholder="Search partners..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-6 py-4 bg-gray-900/70 backdrop-blur-sm border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <FiSearch className="w-5 h-5 text-gray-400" />
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 rounded-lg text-white shadow-lg transition-all"
+            >
+              <span>Advanced Filters</span>
+              <div className="relative">
+                {activeFilterCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {activeFilterCount}
+                  </span>
+                )}
+                <FiChevronDown className="w-5 h-5 transition-transform" />
+              </div>
+            </motion.button>
+          </div>
+
+          {/* Filter Panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-6 bg-gray-900/50 backdrop-blur-lg border border-gray-700 rounded-xl overflow-hidden"
+              >
+                <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Industry Filter */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Industry</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {industryOptions.map((industry) => (
+                        <motion.button
+                          key={`industry-${industry}`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleFilterChange('industry', industry)}
+                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+                            filters.industry === industry
+                              ? 'bg-red-500/20 border-red-500 text-white'
+                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
+                          }`}
+                        >
+                          {industry}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Service Filter */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Service</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {serviceOptions.map((service) => (
+                        <motion.button
+                          key={`service-${service}`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleFilterChange('service', service)}
+                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+                            filters.service === service
+                              ? 'bg-orange-500/20 border-orange-500 text-white'
+                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
+                          }`}
+                        >
+                          {service}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Certification Filter */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Certification</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {certificationOptions.map((cert) => (
+                        <motion.button
+                          key={`cert-${cert}`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleFilterChange('certification', cert)}
+                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+                            filters.certification === cert
+                              ? 'bg-amber-500/20 border-amber-500 text-white'
+                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
+                          }`}
+                        >
+                          {cert}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Location Filter */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Location</h3>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="City or Country"
+                        value={filters.location}
+                        onChange={(e) => handleFilterChange('location', e.target.value)}
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Team Size Filter */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Team Size</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {teamSizeOptions.map((size) => (
+                        <motion.button
+                          key={`size-${size}`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleFilterChange('teamSize', size)}
+                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+                            filters.teamSize === size
+                              ? 'bg-purple-500/20 border-purple-500 text-white'
+                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
+                          }`}
+                        >
+                          {size}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Experience Filter */}
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Min. Experience</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {experienceOptions.map((exp) => (
+                        <motion.button
+                          key={`exp-${exp.value}`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleFilterChange('minExperience', exp.value)}
+                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
+                            filters.minExperience === exp.value
+                              ? 'bg-blue-500/20 border-blue-500 text-white'
+                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
+                          }`}
+                        >
+                          {exp.label}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Clear Filters Button */}
+                <div className="px-6 pb-4 flex justify-end">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={clearFilters}
+                    className="px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 rounded-lg border border-gray-700 transition-all"
+                  >
+                    Clear All Filters
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Active Filters Display */}
+        {Object.values(filters).some(v => v !== "") && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div className="flex flex-wrap gap-3 justify-center">
+              {Object.entries(filters).map(([key, value]) => {
+                if (!value) return null;
+                
+                let displayValue = value;
+                if (key === 'minExperience') {
+                  displayValue = experienceOptions.find(e => e.value === value)?.label || `${value}+ years`;
+                }
+                
+                return (
+                  <motion.div
+                    key={`filter-${key}-${value}`}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 rounded-full border border-gray-700"
+                  >
+                    <span className="text-xs font-medium text-gray-300 capitalize">{key}:</span>
+                    <span className="text-sm font-medium text-white">{displayValue}</span>
+                    <button
+                      onClick={() => handleFilterChange(key, '')}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <FiX className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Results Count */}
+        {!isLoading && !error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center mb-8 text-gray-400"
+          >
+            Showing {partners.length} {partners.length === 1 ? 'partner' : 'partners'}
+          </motion.div>
+        )}
+
+        {/* Partners Grid */}
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <motion.div 
@@ -188,6 +509,28 @@ export default function Partners() {
           >
             <p>{error}</p>
           </motion.div>
+        ) : partners.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center p-12"
+          >
+            <div className="text-gray-400 mb-4">
+              <Frown className="w-16 h-16 mx-auto" />
+            </div>
+            <h3 className="text-xl font-medium text-white mb-2">No partners found</h3>
+            <p className="text-gray-400 max-w-md mx-auto">Try adjusting your filters or search query to find what you&apos;re looking for.</p>
+            <div className="mt-6">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={clearFilters}
+                className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg shadow-lg"
+              >
+                Clear all filters
+              </motion.button>
+            </div>
+          </motion.div>
         ) : (
           <motion.div 
             variants={{
@@ -204,256 +547,215 @@ export default function Partners() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
           >
             {partners.map((partner) => (
-            <motion.div
-  key={partner.id}
-  variants={{
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0 }
-  }}
-  transition={{ duration: 0.6, ease: "easeOut" }}
-  onHoverStart={() => setHoveredCard(partner.id)}
-  onHoverEnd={() => setHoveredCard(null)}
-  className="relative group"
->
-  {/* Ambient glow effect */}
-  <div 
-    className="absolute -inset-0.5 bg-gradient-to-r from-red-500/60 via-orange-400/60 to-amber-500/60 rounded-2xl opacity-0 group-hover:opacity-80 transition-all duration-500 ease-out"
-    style={{
-      filter: "blur(18px)",
-      transform: "translateZ(0)",
-    }}
-  />
-  
-  <motion.div
-    whileHover={{ y: -12, scale: 1.02 }}
-    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-    className="relative h-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 rounded-xl overflow-hidden border border-gray-800/50 group-hover:border-red-500/70 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-red-500/20"
-  >
-    {/* Subtle texture overlay */}
-    <div className="absolute inset-0 opacity-10 bg-[url('/noise-texture.png')] mix-blend-overlay pointer-events-none" />
-    
-    {/* Top accent line */}
-    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out" />
-    
-    {/* Card content container */}
-    <div className="p-8 h-full flex flex-col justify-between relative z-10">
-      <div>
-        {/* Company logo area with enhanced presentation */}
-        <div className="flex justify-center mb-6 h-36 items-center relative">
-          {partner.logo && partner.logo !== "" ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <Image
-                width={250}
-                height={250}
-                src={partner.logo}
-                alt={`${partner.company_name} logo`}
-                className="max-h-28 max-w-full object-contain filter drop-shadow-lg"
-              />
-              
-              {/* Enhanced logo glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 to-amber-500/20 filter blur-2xl opacity-0 group-hover:opacity-80 transition-opacity duration-700 -z-10 scale-110" />
-            </motion.div>
-          ) : (
-            <motion.div
-              whileHover={{ rotate: [0, -3, 3, -3, 0] }}
-              transition={{ duration: 0.5 }}
-              className="w-28 h-28 rounded-full bg-gradient-to-br from-red-600 via-red-500 to-orange-500 flex items-center justify-center text-white text-3xl font-bold shadow-xl relative z-10 border border-red-400/20"
-            >
-              {getInitials(partner.company_name)}
-              
-              {/* Multiple animated rings */}
               <motion.div
-                className="absolute inset-0 rounded-full border border-red-400/40"
-                animate={{
-                  scale: [1, 1.15, 1],
-                  opacity: [0.7, 0.2, 0.7],
+                key={partner.id}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  show: { opacity: 1, y: 0 }
                 }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-              <motion.div
-                className="absolute inset-0 rounded-full border border-orange-400/30"
-                animate={{
-                  scale: [1, 1.25, 1],
-                  opacity: [0.5, 0.1, 0.5],
-                }}
-                transition={{
-                  duration: 3,
-                  delay: 0.3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-          )}
-        </div>
-        
-        {/* Company name with sophisticated underline animation */}
-        <motion.h3 className="text-2xl font-bold text-center mt-2 mb-1">
-          <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-red-200 group-hover:via-white group-hover:to-amber-100 transition-all duration-500">
-            {partner.company_name}
-          </span>
-          <div className="relative h-0.5 w-16 mx-auto mt-2 overflow-hidden">
-            <motion.span
-              className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500 to-red-500/0"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: hoveredCard === partner.id ? 1 : 0 }}
-              transition={{ duration: 0.4 }}
-            />
-          </div>
-        </motion.h3>
-      </div>
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                onHoverStart={() => setHoveredCard(partner.id)}
+                onHoverEnd={() => setHoveredCard(null)}
+                className="relative group"
+              >
+                {/* Ambient glow effect */}
+                <div 
+                  className="absolute -inset-0.5 bg-gradient-to-r from-red-500/60 via-orange-400/60 to-amber-500/60 rounded-2xl opacity-0 group-hover:opacity-80 transition-all duration-500 ease-out"
+                  style={{
+                    filter: "blur(18px)",
+                    transform: "translateZ(0)",
+                  }}
+                />
+                
+                <motion.div
+                  whileHover={{ y: -12, scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="relative h-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 rounded-xl overflow-hidden border border-gray-800/50 group-hover:border-red-500/70 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-red-500/20"
+                >
+                  {/* Subtle texture overlay */}
+                  <div className="absolute inset-0 opacity-10 bg-[url('/noise-texture.png')] mix-blend-overlay pointer-events-none" />
+                  
+                  {/* Top accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out" />
+                  
+                  {/* Card content container */}
+                  <div className="p-8 h-full flex flex-col justify-between relative z-10">
+                    <div>
+                      {/* Company logo area */}
+                      <div className="flex justify-center mb-6 h-36 items-center relative">
+                        {partner.logo && partner.logo !== "" ? (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="relative"
+                          >
+                            <Image
+                              width={250}
+                              height={250}
+                              src={partner.logo}
+                              alt={`${partner.company_name} logo`}
+                              className="max-h-28 max-w-full object-contain filter drop-shadow-lg"
+                            />
+                            
+                            {/* Enhanced logo glow effect */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 to-amber-500/20 filter blur-2xl opacity-0 group-hover:opacity-80 transition-opacity duration-700 -z-10 scale-110" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            whileHover={{ rotate: [0, -3, 3, -3, 0] }}
+                            transition={{ duration: 0.5 }}
+                            className="w-28 h-28 rounded-full bg-gradient-to-br from-red-600 via-red-500 to-orange-500 flex items-center justify-center text-white text-3xl font-bold shadow-xl relative z-10 border border-red-400/20"
+                          >
+                            {getInitials(partner.company_name)}
+                            
+                            {/* Multiple animated rings */}
+                            <motion.div
+                              className="absolute inset-0 rounded-full border border-red-400/40"
+                              animate={{
+                                scale: [1, 1.15, 1],
+                                opacity: [0.7, 0.2, 0.7],
+                              }}
+                              transition={{
+                                duration: 2.5,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                            />
+                            <motion.div
+                              className="absolute inset-0 rounded-full border border-orange-400/30"
+                              animate={{
+                                scale: [1, 1.25, 1],
+                                opacity: [0.5, 0.1, 0.5],
+                              }}
+                              transition={{
+                                duration: 3,
+                                delay: 0.3,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              }}
+                            />
+                          </motion.div>
+                        )}
+                      </div>
+                      
+                      {/* Company name */}
+                      <motion.h3 className="text-2xl font-bold text-center mt-2 mb-1">
+                        <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-red-200 group-hover:via-white group-hover:to-amber-100 transition-all duration-500">
+                          {partner.company_name}
+                        </span>
+                        <div className="relative h-0.5 w-16 mx-auto mt-2 overflow-hidden">
+                          <motion.span
+                            className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500 to-red-500/0"
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: hoveredCard === partner.id ? 1 : 0 }}
+                            transition={{ duration: 0.4 }}
+                          />
+                        </div>
+                      </motion.h3>
 
-      {/* Action buttons with enhanced styling */}
-      <div className="mt-8 flex justify-center gap-4">
-        <motion.div 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative group/btn"
-        >
-          <Link
-            href={`/company/${partner.id}`}
-            className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-red-700 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-red-500/25 relative overflow-hidden"
-          >
-            {/* Button spotlight effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
-            
-            <span className="relative z-20 flex items-center">
-              View Details
-              <svg
-                className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
-            </span>
-          </Link>
-        </motion.div>
-        
-        {partner.website!=='' &&<motion.div 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative group/btn"
-        >
-          <Link
-            href={partner.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-orange-600 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-orange-500/25 relative overflow-hidden"
-          >
-            {/* Button spotlight effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
-            
-            <span className="relative z-20 flex items-center">
-              Visit Website
-              <svg
-                className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-            </span>
-          </Link>
-        </motion.div>
-}
-      </div>
-    </div>
-  </motion.div>
-</motion.div>
+                      {/* Additional Info */}
+                      <div className="mt-4 flex flex-wrap justify-center gap-2">
+                        {partner.headquarters_city && (
+                          <span className="text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-full flex items-center">
+                            <FiMapPin className="w-3 h-3 mr-1" />
+                            {partner.headquarters_city}
+                          </span>
+                        )}
+                        {partner.team_size && (
+                          <span className="text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-full">
+                            👥 {partner.team_size}
+                          </span>
+                        )}
+                        {partner.year_founded && (
+                          <span className="text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-full">
+                            🎂 {new Date().getFullYear() - partner.year_founded} years
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="mt-8 flex justify-center gap-4">
+                      <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="relative group/btn"
+                      >
+                        <Link
+                          href={`/company/${partner.id}`}
+                          className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-red-700 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-red-500/25 relative overflow-hidden"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
+                          
+                          <span className="relative z-20 flex items-center">
+                            View Details
+                            <FiEye className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                          </span>
+                        </Link>
+                      </motion.div>
+                      
+                      {partner.website && partner.website !== '' && (
+                        <motion.div 
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="relative group/btn"
+                        >
+                          <Link
+                            href={partner.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-orange-600 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-orange-500/25 relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
+                            
+                            <span className="relative z-20 flex items-center">
+                              Visit Website
+                              <FiExternalLink className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                            </span>
+                          </Link>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
             ))}
           </motion.div>
         )}
       </div>
 
-      {/* Decorative elements that don't interfere with buttons */}
-      <div className="fixed top-0 right-0 w-1/3 h-1/3 pointer-events-none">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-10">
-          <defs>
-            <linearGradient id="redGradient" gradientTransform="rotate(45)">
-              <stop offset="0%" stopColor="#ef4444" />
-              <stop offset="100%" stopColor="#991b1b" />
-            </linearGradient>
-          </defs>
-          <motion.path
-            fill="url(#redGradient)"
-            d="M41.9,-73.3C56.1,-66.4,70.3,-58.4,78.9,-46.1C87.4,-33.8,90.3,-16.9,88.2,-1.2C86.1,14.5,79,29,70.6,42.8C62.2,56.5,52.5,69.5,39.6,76.2C26.8,82.8,10.9,83.2,-3.5,79.5C-17.8,75.7,-30.6,67.9,-42.6,59.5C-54.6,51,-65.8,41.9,-73.1,29.9C-80.3,18,-83.5,3.1,-80.8,-10.6C-78,-24.4,-69.3,-37,-58.9,-45.2C-48.5,-53.5,-36.5,-57.4,-25.1,-65.7C-13.6,-74,-6.8,-86.7,3.4,-92.5C13.6,-98.3,27.7,-80.1,41.9,-73.3Z"
-            animate={{
-              d: [
-                "M41.9,-73.3C56.1,-66.4,70.3,-58.4,78.9,-46.1C87.4,-33.8,90.3,-16.9,88.2,-1.2C86.1,14.5,79,29,70.6,42.8C62.2,56.5,52.5,69.5,39.6,76.2C26.8,82.8,10.9,83.2,-3.5,79.5C-17.8,75.7,-30.6,67.9,-42.6,59.5C-54.6,51,-65.8,41.9,-73.1,29.9C-80.3,18,-83.5,3.1,-80.8,-10.6C-78,-24.4,-69.3,-37,-58.9,-45.2C-48.5,-53.5,-36.5,-57.4,-25.1,-65.7C-13.6,-74,-6.8,-86.7,3.4,-92.5C13.6,-98.3,27.7,-80.1,41.9,-73.3Z",
-                "M34.5,-59.9C45.5,-54.9,55.9,-47.5,62.7,-37.2C69.5,-26.9,72.7,-13.5,73.6,0.5C74.5,14.5,73.1,29.1,65.9,39.2C58.7,49.3,45.8,55,33.2,60.5C20.5,66.1,8.1,71.5,-3.8,69.9C-15.8,68.3,-27.3,59.8,-37.8,50.6C-48.3,41.4,-57.8,31.4,-61.7,19.6C-65.7,7.8,-64.1,-5.9,-60,-17.7C-55.9,-29.6,-49.3,-39.6,-40.1,-45.5C-30.9,-51.3,-19.1,-53,-7.2,-61.1C4.7,-69.2,18.5,-83.7,29.2,-80.9C39.9,-78.1,47.6,-58.2,34.5,-59.9Z",
-                "M31.8,-54.9C42.2,-52.2,52.2,-45.6,58.6,-36.2C65,-26.8,67.8,-14.4,68.6,-1.5C69.3,11.5,67.9,22.9,61.6,31.6C55.2,40.2,43.9,46,32.9,54C21.9,62.1,11,72.3,-0.7,73.3C-12.3,74.4,-24.6,66.2,-35.8,57.7C-47,49.1,-57.2,40.1,-62.7,28.9C-68.1,17.6,-68.9,4,-66.7,-9C-64.5,-22,-59.4,-34.4,-50.7,-41.7C-42,-49.1,-29.8,-51.3,-18.9,-53.1C-8,-55,-4,-56.5,3.2,-62C10.5,-67.5,21,-70.9,31.8,-54.9Z",
-                "M41.9,-73.3C56.1,-66.4,70.3,-58.4,78.9,-46.1C87.4,-33.8,90.3,-16.9,88.2,-1.2C86.1,14.5,79,29,70.6,42.8C62.2,56.5,52.5,69.5,39.6,76.2C26.8,82.8,10.9,83.2,-3.5,79.5C-17.8,75.7,-30.6,67.9,-42.6,59.5C-54.6,51,-65.8,41.9,-73.1,29.9C-80.3,18,-83.5,3.1,-80.8,-10.6C-78,-24.4,-69.3,-37,-58.9,-45.2C-48.5,-53.5,-36.5,-57.4,-25.1,-65.7C-13.6,-74,-6.8,-86.7,3.4,-92.5C13.6,-98.3,27.7,-80.1,41.9,-73.3Z"
-              ],
-            }}
-            transition={{
-              repeat: Infinity,
-              repeatType: "mirror",
-              duration: 20,
-              ease: "easeInOut",
-            }}
-            className="blur-md"
-          />
-        </svg>
-      </div>
-
-      <div className="fixed bottom-0 left-0 w-1/3 h-1/3 pointer-events-none">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-10">
-          <defs>
-            <linearGradient id="orangeGradient" gradientTransform="rotate(45)">
-              <stop offset="0%" stopColor="#f97316" />
-              <stop offset="100%" stopColor="#ea580c" />
-            </linearGradient>
-          </defs>
-          <motion.path
-            fill="url(#orangeGradient)"
-            d="M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
-            animate={{
-              d: [
-                "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z",
-                "M38.5,-65.8C49.8,-59.9,58.5,-48.5,65.4,-35.9C72.3,-23.3,77.5,-9.5,77.2,4.2C76.9,17.9,71.1,31.4,62.7,43.2C54.3,55,43.3,65,30.4,71.1C17.6,77.3,2.8,79.5,-12.3,77.7C-27.5,75.9,-42.9,70.1,-53.9,59.9C-64.8,49.7,-71.2,35.2,-74.5,20C-77.8,4.8,-78,-11,-73.1,-25.1C-68.3,-39.2,-58.4,-51.5,-46,-57.9C-33.6,-64.3,-18.5,-64.8,-3.4,-60.2C11.7,-55.6,27.2,-71.8,38.5,-65.8Z",
-                "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
-              ],
-            }}
-            transition={{
-              repeat: Infinity,
-              repeatType: "mirror",
-              duration: 25,
-              ease: "easeInOut",
-            }}
-            className="blur-md"
-          />
-        </svg>
-      </div>
+      {/* Decorative elements */}
+      {mounted && (
+        <div className="fixed bottom-0 left-0 w-1/3 h-1/3 pointer-events-none">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-10">
+            <defs>
+              <linearGradient id="orangeGradient" gradientTransform="rotate(45)">
+                <stop offset="0%" stopColor="#f97316" />
+                <stop offset="100%" stopColor="#ea580c" />
+              </linearGradient>
+            </defs>
+            <motion.path
+              fill="url(#orangeGradient)"
+              d="M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
+              animate={{
+                d: [
+                  "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z",
+                  "M38.5,-65.8C49.8,-59.9,58.5,-48.5,65.4,-35.9C72.3,-23.3,77.5,-9.5,77.2,4.2C76.9,17.9,71.1,31.4,62.7,43.2C54.3,55,43.3,65,30.4,71.1C17.6,77.3,2.8,79.5,-12.3,77.7C-27.5,75.9,-42.9,70.1,-53.9,59.9C-64.8,49.7,-71.2,35.2,-74.5,20C-77.8,4.8,-78,-11,-73.1,-25.1C-68.3,-39.2,-58.4,-51.5,-46,-57.9C-33.6,-64.3,-18.5,-64.8,-3.4,-60.2C11.7,-55.6,27.2,-71.8,38.5,-65.8Z",
+                  "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
+                ],
+              }}
+              transition={{
+                repeat: Infinity,
+                repeatType: "mirror",
+                duration: 25,
+                ease: "easeInOut",
+              }}
+              className="blur-md"
+            />
+          </svg>
+        </div>
+      )}
     </div>
   );
 }
