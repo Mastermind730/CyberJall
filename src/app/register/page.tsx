@@ -89,7 +89,7 @@ const Page = () => {
           });
 
           setTimeout(() => {
-            router.push("/createCompany");
+            router.push("/login");
           }, 3000);
         }
       } catch (error) {

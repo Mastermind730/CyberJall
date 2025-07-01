@@ -6,7 +6,7 @@ import prisma from "@/lib/prismadb";
 export async function GET(req: Request, { params }: { params: Promise<{ companyId: string }> }) {
     try {
         const { companyId } = await params
-        const company = await prisma.company.findUnique({
+        const company = await prisma.validated_Company.findUnique({
             where: {
                 id: companyId
             }

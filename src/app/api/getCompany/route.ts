@@ -7,7 +7,7 @@ export async function POST(req:Request){
     const {company_name}= body;
 
 
-    const company =await prisma.company.findFirst({
+    const company =await prisma.validated_Company.findFirst({
         where:{
             company_name:company_name
         }
