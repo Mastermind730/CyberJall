@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from 'next/server';
 import prisma  from '@/lib/prismadb';
+import type { Prisma,Company } from '@prisma/client';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -14,7 +16,7 @@ export async function GET(request: Request) {
     const minExperience = searchParams.get('minExperience') || '';
 
     // Build the where clause for Prisma
-    const where: any = {};
+    const where:Prisma.CompanyWhereInput  = {};
 
     // Search filter (company name)
     if (search) {

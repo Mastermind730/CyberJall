@@ -8,23 +8,37 @@ import {
   FiChevronDown, 
   FiX, 
   FiMapPin, 
-  Frown,
   FiEye,
-  FiExternalLink
+  FiExternalLink,
+  Frown
 } from 'react-icons/fi';
 
 interface Partner {
   id: string;
   company_name: string;
-  logo?: string;
+  logo?: string | null;
   website: string;
   year_founded: number;
   headquarters_city: string;
   headquarters_country: string;
   industries_served: string[];
   team_size: string;
-  services_offered: any;
-  expertise_and_certifications: any;
+  services_offered?: any;
+  expertise_and_certifications?: any;
+}
+
+interface ExperienceOption {
+  label: string;
+  value: string;
+}
+
+interface Filters {
+  industry: string;
+  service: string;
+  certification: string;
+  location: string;
+  teamSize: string;
+  minExperience: string;
 }
 
 // Constants defined outside the component
@@ -48,7 +62,7 @@ const teamSizeOptions = [
   "Solo", "2-10", "11-50", "51-200", "201-500", "500+"
 ];
 
-const experienceOptions = [
+const experienceOptions: ExperienceOption[] = [
   { label: "1+ years", value: "1" },
   { label: "3+ years", value: "3" },
   { label: "5+ years", value: "5" },
@@ -61,7 +75,7 @@ export default function Partners() {
   const [error, setError] = useState<string | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     industry: "",
     service: "",
     certification: "",
@@ -115,7 +129,7 @@ export default function Partners() {
     return () => clearTimeout(debounceTimer);
   }, [filters, searchQuery]);
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string): string => {
     return name
       .split(" ")
       .map((word) => word.charAt(0))
@@ -124,14 +138,14 @@ export default function Partners() {
       .substring(0, 2);
   };
 
-  const handleFilterChange = (filterName: string, value: string) => {
+  const handleFilterChange = (filterName: keyof Filters, value: string): void => {
     setFilters(prev => ({
       ...prev,
       [filterName]: value === prev[filterName] ? "" : value
     }));
   };
 
-  const clearFilters = () => {
+  const clearFilters = (): void => {
     setFilters({
       industry: "",
       service: "",
@@ -146,7 +160,7 @@ export default function Partners() {
   const activeFilterCount = Object.values(filters).filter(v => v !== "").length;
 
   if (!mounted) {
-    return null; // or return a loading spinner
+    return null;
   }
 
   return (
@@ -461,7 +475,7 @@ export default function Partners() {
                     <span className="text-xs font-medium text-gray-300 capitalize">{key}:</span>
                     <span className="text-sm font-medium text-white">{displayValue}</span>
                     <button
-                      onClick={() => handleFilterChange(key, '')}
+                      onClick={() => handleFilterChange(key as keyof Filters, '')}
                       className="text-gray-400 hover:text-white"
                     >
                       <FiX className="w-4 h-4" />
