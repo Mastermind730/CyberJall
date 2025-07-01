@@ -10,7 +10,7 @@ import {
   FiMapPin, 
   FiEye,
   FiExternalLink,
-  Frown
+  FiFrown,
 } from 'react-icons/fi';
 
 interface Partner {
@@ -530,7 +530,7 @@ export default function Partners() {
             className="text-center p-12"
           >
             <div className="text-gray-400 mb-4">
-              <Frown className="w-16 h-16 mx-auto" />
+              <FiFrown className="w-16 h-16 mx-auto" />
             </div>
             <h3 className="text-xl font-medium text-white mb-2">No partners found</h3>
             <p className="text-gray-400 max-w-md mx-auto">Try adjusting your filters or search query to find what you&apos;re looking for.</p>
