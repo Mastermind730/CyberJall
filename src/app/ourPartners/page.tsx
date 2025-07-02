@@ -208,53 +208,83 @@ export default function Partners() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-12"
-        >
-          <motion.h1 
-            className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl mb-6"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Our <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">Partners</span>
-          </motion.h1>
-          
-          <motion.p 
-            className="max-w-2xl mx-auto text-xl text-gray-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            We&apos;re proud to collaborate with these amazing organizations
-            to deliver excellence in everything we do.
-          </motion.p>
+     {/* Header Section */}
+<motion.div
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+  className="text-center mb-12 mt-20"
+>
+  <motion.div 
+    className="max-w-4xl mx-auto"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.6, delay: 0.2 }}
+  >
+    {/* Tagline */}
+    <motion.p
+      className="text-lg font-medium text-red-400 mb-3"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+    >
+      Your Cybersecurity Starts with the Right Partner
+    </motion.p>
+    
+    {/* Main Title */}
+    <motion.h1 
+      className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl mb-6"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, delay: 0.4 }}
+    >
+      <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+        Trusted Cybersecurity
+      </span> Partners
+    </motion.h1>
+    
+    {/* Description */}
+    <motion.div
+      className="max-w-3xl mx-auto"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, delay: 0.6 }}
+    >
+      <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+        Discover trusted cybersecurity companies ready to help secure your business. 
+        Whether you're a startup or an enterprise, use filters to find providers by 
+        service type, experience, certifications, and industry focus—all in one place.
+      </p>
+      <p className="text-lg text-gray-400 font-medium">
+        CyberJall brings you transparency, flexibility, and the power to collaborate 
+        with multiple experts in a single solution.
+      </p>
+    </motion.div>
 
-          <motion.div 
-            className="mt-8 flex justify-center"
-            initial={{ width: 0 }}
-            animate={{ width: "auto" }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <motion.div 
-              className="h-1 w-48 bg-gradient-to-r from-red-700 via-orange-500 to-red-600 rounded-full"
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{ 
-                duration: 5, 
-                repeat: Infinity,
-                ease: "linear" 
-              }}
-              style={{
-                backgroundSize: "200% 200%",
-              }}
-            />
-          </motion.div>
-        </motion.div>
+    {/* Decorative divider */}
+    <motion.div 
+      className="mt-8 flex justify-center"
+      initial={{ width: 0 }}
+      animate={{ width: "auto" }}
+      transition={{ duration: 0.8, delay: 0.8 }}
+    >
+      <motion.div 
+        className="h-1 w-48 bg-gradient-to-r from-red-700 via-orange-500 to-red-600 rounded-full"
+        animate={{
+          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+        }}
+        transition={{ 
+          duration: 5, 
+          repeat: Infinity,
+          ease: "linear" 
+        }}
+        style={{
+          backgroundSize: "200% 200%",
+        }}
+      />
+    </motion.div>
+  </motion.div>
+</motion.div>
 
         {/* Search and Filter Section */}
         <div className="mb-12">
