@@ -19,7 +19,7 @@ const Home: NextPage = () => {
       <EntityShowcase/>
       <AboutUs />
       <SmartestChoice />
-      <WhatWeOffer />
+      {/* <WhatWeOffer /> */}
       {/* <Scope /> */}
       {/* <HowItWorks /> */}
       {/* <GetStarted /> */}
