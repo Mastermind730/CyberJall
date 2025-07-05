@@ -11,6 +11,9 @@ import { HowWeWork } from './components/sections/HowWeWork';
 import { PlatformFeatures } from './components/sections/PlatformFeatures';
 // import ClientLogoShowcase from './components/ClientCarousel';
 import EntityShowcase from './components/ClientCarousel';
+import CyberJallBanner from './components/sections/AtAGlance';
+import ProblemSection from './components/sections/ProblemSection';
+import ApproachSection from './components/sections/ApproachSection';
 
 const Home: NextPage = () => {
   return (
@@ -19,12 +22,15 @@ const Home: NextPage = () => {
       <EntityShowcase/>
       <AboutUs />
       <SmartestChoice />
+      <CyberJallBanner />
+      <ProblemSection />
+      <ApproachSection />
       {/* <WhatWeOffer /> */}
       {/* <Scope /> */}
       {/* <HowItWorks /> */}
       {/* <GetStarted /> */}
       <SecurityFeatures />
-      <HowWeWork />
+      {/* <HowWeWork /> */}
       <PlatformFeatures />
     </main>
   );

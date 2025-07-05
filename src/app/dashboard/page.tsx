@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import axios from "axios";
+import EditCompanyForm from "../components/EditCompany";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -15,39 +16,124 @@ interface User {
   password: string;
 }
 
+interface Product {
+  name: string;
+  description: string;
+  image: string;
+  link?: string; // Optional product link
+}
+
+interface ServiceOffered {
+  name: string;
+  description: string;
+  image: string; 
+
+}
+
+interface ExpertiseCertification {
+  type: string;
+  name: string;
+  logo:string;
+}
+
+interface CaseStudy {
+  title: string;
+  client: string;
+  challenge: string;
+  solution: string;
+  result: string;
+}
+
+interface ClientReview {
+  clientName: string;
+  position: string;
+  company: string;
+  review: string;
+  rating: number;
+}
+
+interface SocialLink {
+  platform: string;
+  url: string;
+}
+
+interface Company {
+  id: string;
+  company_name: string;
+  logo: string;
+  overview: string;
+  year_founded: number;
+  headquarters_city: string;
+  headquarters_country: string;
+  industries_served: string[];
+  target_business_size: string[];
+  geographic_coverage: string[];
+  team_size: string;
+  services_offered: ServiceOffered[];
+  expertise_and_certifications: ExpertiseCertification[];
+  case_studies: CaseStudy[];
+  client_reviews: ClientReview[];
+  social_links: SocialLink;
+  website: string;
+  products: Product[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("Tasks"); // State to manage active tab
+  const [activeTab, setActiveTab] = useState("Tasks");
   const [user, setUser] = useState<User | null>(null);
-  const [logo,setLogo]=useState<string>("");
+  const [logo, setLogo] = useState<string>("/default-company-logo.png");
+  const [company, setCompany] = useState<Company | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Get the user from localStorage and parse it
+    setIsClient(true);
     const storedUser = localStorage.getItem("user");
-    console.log(storedUser)
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        console.log(parsedUser)
         setUser(parsedUser);
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
-  }, []); 
+  }, []);
 
-  const getLogo= async()=>{
-      const res= await axios.post("/api/getCompany",user?.company_name);
-      const logo = await res.data.company_logo;
-      if(logo){
-        setLogo(logo);
-      }
+ const getCompanyData = useCallback(async () => {
+  if (!user?.company_name) return;
+  
+  try {
+    const res = await axios.put("/api/editCompany", { 
+      company_name: user.company_name 
+    });
+    if (res.data) {
+      setCompany(res.data.company);
+      setLogo(res.data.logo || "/default-company-logo.png");
+    }
+  } catch (error) {
+    console.error("Error fetching company data:", error);
   }
+}, [user?.company_name]); // Add dependencies here
 
-  useEffect(()=>{
-    getLogo();
-  })
 
-  // Dummy data for tabs
+console.log(company);
+  useEffect(() => {
+    getCompanyData();
+  });
+
+  const handleSaveCompany = (updatedCompany: Company) => {
+    setCompany(updatedCompany);
+    setLogo(updatedCompany.logo || "/default-company-logo.png");
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return "Guest";
+    return user.company_name || user.work_email?.split('@')[0] || "User";
+  };
+
+  // Dummy data
   const tasksData = [
     { id: 1, title: "Review API Security", status: "Pending" },
     { id: 2, title: "Test Web Application", status: "In Progress" },
@@ -96,45 +182,9 @@ export default function Dashboard() {
     },
   };
 
-  const fetchUserDetails = async (): Promise<void> => {
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await axios.get("/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === 200) {
-        const user = response.data.user;
-        console.log("User details:", user);
-      } else {
-        console.error("Failed to fetch user details");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error(
-          "Axios error:",
-          error.response?.data?.error || error.message
-        );
-      } else {
-        console.error("Unknown error:", error);
-      }
-    }
-  };
-
-  // Get the display name based on user data
-  const getUserDisplayName = () => {
-    if (!user) return "Guest";
-    
-    // Use company_name if available, otherwise fallback to email
-    if (user.company_name) {
-      return user.company_name;
-    } else {
-      // Extract name from email (everything before @)
-      return user.work_email?.split('@')[0] || "User";
-    }
-  };
+  if (!isClient) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -153,26 +203,35 @@ export default function Dashboard() {
               <div className="bg-gray-900 rounded-full p-1">
                 <Image
                   src={logo}
-                  alt="User Icon"
+                  alt="Company Logo"
                   width={50}
                   height={50}
                   className="rounded-full"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/default-company-logo.png";
+                  }}
                 />
               </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-orange-500">
-                Good afternoon, {getUserDisplayName()}
-              </h2>
-              <p className="text-gray-300">
-                {user?.work_email || "Set your email"}
-              </p>
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-bold text-orange-500">
+                    Good afternoon, {getUserDisplayName()}
+                  </h2>
+                  <p className="text-gray-300">
+                    {user?.work_email || "Set your email"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowEditForm(true)}
+                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Edit Profile
+                </button>
+              </div>
             </div>
           </motion.div>
-
-         
-
-          {/* Rewards Section */}
           <motion.div className="mb-8" variants={itemVariants}>
             <h3 className="text-lg font-semibold text-orange-500 mb-4">
               Rewards
@@ -302,8 +361,19 @@ export default function Dashboard() {
               </Link>
             </div>
           </motion.div>
+
+          {/* Rest of your dashboard content... */}
+
         </motion.div>
       </main>
+
+      {showEditForm && company && (
+        <EditCompanyForm
+          company={company}
+          onClose={() => setShowEditForm(false)}
+          onSave={handleSaveCompany}
+        />
+      )}
     </div>
   );
 }

@@ -4,14 +4,14 @@ export const SecurityFeatures: React.FC = () => {
   return (
     <section className="py-20 bg-gray-900 relative overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+      {/* <div className="absolute inset-0 opacity-5">
         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           <pattern id="security-grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
             <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.5"/>
           </pattern>
           <rect width="100" height="100" fill="url(#security-grid)" />
         </svg>
-      </div>
+      </div> */}
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-12">

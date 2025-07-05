@@ -86,7 +86,7 @@ model Validated_User{
 
 model Company {
   id                        String   @id @default(auto()) @map("_id") @db.ObjectId
-  company_name              String
+  company_name              String   @unique
   logo                      String
   overview                  String
   year_founded              Int
@@ -106,7 +106,6 @@ model Company {
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
 
-  @@index([company_name])
   @@index([year_founded])
   @@index([headquarters_city])
   @@index([headquarters_country])
@@ -116,7 +115,7 @@ model Company {
 
 model Validated_Company {
   id                        String   @id @default(auto()) @map("_id") @db.ObjectId
-  company_name              String
+  company_name              String   @unique
   logo                      String
   overview                  String
   year_founded              Int
@@ -136,7 +135,7 @@ model Validated_Company {
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
 
-  @@index([company_name])
+  // @@index([company_name])
   @@index([year_founded])
   @@index([headquarters_city])
   @@index([headquarters_country])
