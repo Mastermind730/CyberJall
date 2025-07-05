@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -16,13 +17,14 @@ interface Product {
 interface ServiceOffered {
   name: string;
   description: string;
-  image: string;
+  image: string; 
+
 }
 
 interface ExpertiseCertification {
   type: string;
   name: string;
-  logo: string;
+  logo:string;
 }
 
 interface CaseStudy {
@@ -47,23 +49,26 @@ interface SocialLink {
 }
 
 interface CompanyFormData {
+  id: string;
   company_name: string;
+  logo: string;
   overview: string;
   year_founded: string;
   headquarters_city: string;
   headquarters_country: string;
-  services_offered: ServiceOffered[];
-  products: Product[];
-  expertise_and_certifications: ExpertiseCertification[];
-  case_studies: CaseStudy[];
-  client_reviews: ClientReview[];
-  social_links: SocialLink[];
-  website: string;
-  logo: string;
   industries_served: string[];
   target_business_size: string[];
   geographic_coverage: string[];
   team_size: string;
+  services_offered: ServiceOffered[];
+  expertise_and_certifications: ExpertiseCertification[];
+  case_studies: CaseStudy[];
+  client_reviews: ClientReview[];
+  social_links: SocialLink;
+  website: string;
+  products: Product[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface EditCompanyFormProps {

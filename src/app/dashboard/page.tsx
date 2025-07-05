@@ -62,7 +62,7 @@ interface Company {
   company_name: string;
   logo: string;
   overview: string;
-  year_founded: number;
+  year_founded: string;
   headquarters_city: string;
   headquarters_country: string;
   industries_served: string[];
@@ -123,7 +123,7 @@ console.log(company);
     getCompanyData();
   });
 
-  const handleSaveCompany = (updatedCompany: Company) => {
+  const handleSaveCompany = (originalCompany: Company) => (updatedCompany: Company) => {
     setCompany(updatedCompany);
     setLogo(updatedCompany.logo || "/default-company-logo.png");
   };
@@ -145,7 +145,7 @@ console.log(company);
     { id: 2, description: "Submitted a report", timestamp: "5 hours ago" },
     { id: 3, description: "Joined a new program", timestamp: "1 day ago" },
   ];
-
+  
   const announcementsData = [
     {
       id: 1,
@@ -366,12 +366,13 @@ console.log(company);
 
         </motion.div>
       </main>
+    
 
       {showEditForm && company && (
         <EditCompanyForm
           company={company}
           onClose={() => setShowEditForm(false)}
-          onSave={handleSaveCompany}
+          onSave={handleSaveCompany(company)}
         />
       )}
     </div>
