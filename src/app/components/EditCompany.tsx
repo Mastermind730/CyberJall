@@ -1211,8 +1211,7 @@ const EditCompanyForm = ({ company, onClose, onSave }: EditCompanyFormProps) => 
                       {errors.expertise_and_certifications?.[index]?.type && (
                         <p className="mt-1 text-sm text-red-400">
                           {
-                            errors.expertise_and_certifications[index]?.type
-                              ?.message
+                            errors.expertise_and_certifications[index].message
                           }
                         </p>
                       )}
