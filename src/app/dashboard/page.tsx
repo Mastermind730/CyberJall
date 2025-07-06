@@ -73,7 +73,7 @@ interface Company {
   expertise_and_certifications: ExpertiseCertification[];
   case_studies: CaseStudy[];
   client_reviews: ClientReview[];
-  social_links: SocialLink;
+  social_links: SocialLink[];
   website: string;
   products: Product[];
   createdAt: string;
