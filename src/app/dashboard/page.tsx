@@ -118,10 +118,10 @@ export default function Dashboard() {
 }, [user?.company_name]); // Add dependencies here
 
 
-console.log(company);
+// console.log(company);
   useEffect(() => {
     getCompanyData();
-  });
+  },[getCompanyData]);
 
   const handleSaveCompany = (originalCompany: Company) => (updatedCompany: Company) => {
     setCompany(updatedCompany);
@@ -229,6 +229,12 @@ console.log(company);
                 >
                   Edit Profile
                 </button>
+                <Link
+                  href={"/createCompany"}
+                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Create Profile
+                </Link>
               </div>
             </div>
           </motion.div>

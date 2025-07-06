@@ -153,10 +153,13 @@ const EditCompanyForm = ({ company, onClose, onSave }: EditCompanyFormProps) => 
 
   const onSubmit: SubmitHandler<CompanyFormData> = async (data) => {
     try {
+      console.log("Form data being submitted:", data); // Add this line
+
       setIsSubmitting(true);
       setSubmitStatus({ type: "info", message: "Updating company profile..." });
 
       const response = await axios.put("/api/editCompany", data);
+      console.log(response)
 
       setSubmitStatus({
         type: "success",

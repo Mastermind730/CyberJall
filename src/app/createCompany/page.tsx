@@ -194,6 +194,20 @@ export default function CompanyProfile() {
   
   return (
     <div className="min-h-screen bg-black text-white">
+
+      {/* Success message that appears above the form */}
+      {submitStatus.type === 'success' && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-4 right-4 bg-green-900 text-green-100 px-6 py-4 rounded-lg shadow-lg z-50 flex items-center"
+        >
+          <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {submitStatus.message}
+        </motion.div>
+      )}
       
       <motion.div 
         initial={{ y: -100, opacity: 0 }}

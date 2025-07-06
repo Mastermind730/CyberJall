@@ -3,7 +3,7 @@ import prisma from "@/lib/prismadb";
 
 export async function PUT(req: Request) {
   try {
-    // First check if request has a body
+    // Check if request has a body
     if (!req.body) {
       return NextResponse.json(
         { error: 'Request body is required' },
@@ -12,17 +12,9 @@ export async function PUT(req: Request) {
     }
 
     // Parse the body as JSON
-    let data;
-    try {
-      data = await req.json();
-    } catch (e) {
-      return NextResponse.json(
-        { error: 'Invalid JSON payload' },
-        { status: 400 }
-      );
-    }
-
-    // Now check for company_name
+    const data = await req.json();
+    
+    // Validate required fields
     if (!data?.company_name) {
       return NextResponse.json(
         { error: 'Company name is required' },
@@ -30,14 +22,15 @@ export async function PUT(req: Request) {
       );
     }
 
-    // Rest of your existing code...
+    // Remove non-updatable fields and prepare update data
+    const { id, createdAt, updatedAt, ...updateData } = data;
+
+    // Process array fields
     const arrayFields = [
       'industries_served',
       'target_business_size',
       'geographic_coverage'
     ];
-    
-    const updateData = { ...data };
     
     arrayFields.forEach(field => {
       if (typeof updateData[field] === 'string') {
@@ -45,40 +38,65 @@ export async function PUT(req: Request) {
           .split(',')
           .map((item: string) => item.trim())
           .filter((item: string) => item.length > 0);
+      } else if (!updateData[field]) {
+        updateData[field] = []; // Ensure array fields are at least empty arrays
       }
     });
-    console.log(data,"data",updateData);
 
-    const updatedCompany = await prisma.company.upsert({
+    // Handle nested array fields with proper typing
+    if (updateData.services_offered) {
+      updateData.services_offered = updateData.services_offered.map((service: any) => ({
+        name: service.name || '',
+        description: service.description || '',
+        image: service.image || ''
+      }));
+    }
+
+    if (updateData.expertise_and_certifications) {
+      updateData.expertise_and_certifications = updateData.expertise_and_certifications.map((cert: any) => ({
+        type: cert.type || '',
+        name: cert.name || '',
+        logo: cert.logo || ''
+      }));
+    }
+
+    // Update the company
+    const updatedCompany = await prisma.company.update({
       where: { company_name: data.company_name },
-      update: updateData,
-      create: {
-        ...updateData,
-        logo: data.logo || '',
-        overview: data.overview || '',
-        year_founded: data.year_founded || 0,
-        headquarters_city: data.headquarters_city || '',
-        headquarters_country: data.headquarters_country || '',
-        team_size: data.team_size || '',
-        website: data.website || '',
-        services_offered: data.services_offered || {},
-        expertise_and_certifications: data.expertise_and_certifications || {},
-        case_studies: data.case_studies || {},
-        client_reviews: data.client_reviews || {},
-        social_links: data.social_links || {},
-        products: data.products || {}
-      }
+      data: updateData
     });
-    console.log(updatedCompany,"updatedCompany")
 
     return NextResponse.json({
       message: 'Company updated successfully',
       company: updatedCompany
     });
-  } catch (error) {
+
+  } catch (error: any) {
     console.error('Error updating company:', error);
+    
+    // Handle specific Prisma errors
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Company not found', details: error.meta?.cause },
+        { status: 404 }
+      );
+    }
+
+    // Handle validation errors
+    if (error.name === 'PrismaClientValidationError') {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.message.split('\n').slice(0, 5).join('\n') },
+        { status: 400 }
+      );
+    }
+
+    // Generic error response
     return NextResponse.json(
-      { error: 'Failed to update company data' },
+      { 
+        error: 'Failed to update company data',
+        details: error.message,
+        ...(error.code && { code: error.code })
+      },
       { status: 500 }
     );
   }
