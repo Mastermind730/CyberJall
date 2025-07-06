@@ -500,7 +500,7 @@ const DataProtectionPage = () => {
             Start <span className="text-red-500">Protecting</span> Your Sensitive Data
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
-            Don't wait for a data breach to take action. Secure your cloud environments today.
+            Don&apos;t wait for a data breach to take action. Secure your cloud environments today.
           </p>
           <motion.button
             whileHover={{ scale: 1.03 }}
