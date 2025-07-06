@@ -70,12 +70,12 @@ export default function GlobalLayout({ children }: { children: React.ReactNode }
         {/* Floating cosmic elements */}
         <motion.div
           className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/10 blur-3xl"
-          variants={floatingVariants}
+          // variants={floatingVariants}
           animate="float"
         />
         <motion.div
           className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/10 blur-3xl"
-          variants={floatingVariants}
+          // variants={floatingVariants}
           animate="floatFast"
         />
       </div>
