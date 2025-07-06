@@ -1,12 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NewNavbar from "./components/NewNavbar";
 import Footer from "./components/Footer";
 // import DynamicBackground from "./components/Background";
-import GlobalLayout from "./components/GLobalLayout";
-import NavbarNew, { Navbar } from "./components/Navbar";
+import NavbarNew from "./components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,14 +35,14 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}>
         {/* Background for ALL pages */}
         {/* <DynamicBackground /> */}
-        <GlobalLayout>
+        {/* <GlobalLayout> */}
         {/* Content wrapper with higher z-index */}
         <div className="relative z-10 min-h-screen flex flex-col">
       <NavbarNew />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
-        </GlobalLayout>
+        {/* </GlobalLayout> */}
       </body>
     </html>
   );

@@ -716,7 +716,7 @@ export default function Home() {
               {activeSection === 1 && (
                 <motion.div
                   key="section1"
-                  variants={sectionVariants}
+                  // variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -732,7 +732,7 @@ export default function Home() {
                     </div>
 
                     <div className="space-y-8">
-                      <motion.div variants={itemVariants} className="group">
+                      <motion.div  className="group">
                         <label className="block text-gray-300 mb-2 font-medium">
                           Company Name
                         </label>
