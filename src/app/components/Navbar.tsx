@@ -1,131 +1,215 @@
-'use client';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState } from 'react';
-import type { FC } from 'react';
+"use client"
+import Link from "next/link"
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  NavbarLogo,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "./ui/resizable-navbar"
+import { useState } from "react"
 
-export const Navbar: FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
+export default function NavbarNew() {
+  const navItems = [
+    {
+      name: "Home",
+      link: "/",
+    },
+    {
+      name: "Company",
+      link: "/company",
+       hasDropdown: true,
+      dropdownItems: [
+        {
+          category: "Company",
+          items: [
+            {
+              name: "Why Choose CyberJall",
+              link: "/company#why-choose-us",
+              description: "Comprehensive web application security testing",
+            },
+            {
+              name: "Our Clients",
+              link: "/company#clients",
+              description: "Cloud infrastructure security assessment",
+            },
+            {
+              name: "Our Service Partners",
+              link: "/ourPartners",
+              description: "Network security vulnerability testing",
+            },
+            {
+              name: "Get Free Consultation",
+              link: "/contact_us",
+              description: "API security and vulnerability assessment",
+            },
+          
+          ],
+        },
+      
+      ],
+    },
+    // {
+    //   name: "Services",
+    //   link: "#services",
+    // },
+    {
+      name: "Services",
+      link: "/services",
+      hasDropdown: true,
+      dropdownItems: [
+        {
+          category: "VAPT Services",
+          items: [
+            {
+              name: "Web App Testing",
+              link: "/services#consultation",
+              description: "Comprehensive web application security testing",
+            },
+            {
+              name: "Cloud Pen Testing",
+              link: "/services/cloud",
+              description: "Cloud infrastructure security assessment",
+            },
+            {
+              name: "Network Pen Testing",
+              link: "/services/network",
+              description: "Network security vulnerability testing",
+            },
+            {
+              name: "API Pen Testing",
+              link: "/services/api_testing",
+              description: "API security and vulnerability assessment",
+            },
+            // { name: "IoT Pen Testing", link: "#iot-pen-testing", description: "Internet of Things security testing" },
+            {
+              name: "Mobile App Testing",
+              link: "/services/mobile_pentesting",
+              description: "Mobile application security assessment",
+            },
+          ],
+        },
+        {
+          category: "Compliance Standards",
+          items: [
+            { name: "ISO 27001", link: "/services/compliance", description: "Information security management certification" },
+            { name: "HIPAA", link: "/services/compliance", description: "Healthcare data protection compliance" },
+            { name: "SOC 2", link: "/services/compliance", description: "Service organization control compliance" },
+            { name: "GDPR", link: "/services/compliance", description: "General data protection regulation" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Product",
+      link: "#product",
+    },
+  ]
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <nav className="bg-gray-900 fixed w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Link href="/">
-                <div className="flex items-center">
-                  <Image
-                    src="/image.png"
-                    alt="CyberJall Logo"
-                    width={65}
-                    height={65}
-                    className="cursor-pointer"
-                  />
-                </div>
-              </Link>
-            </div>
+    <div className="relative w-full">
+      <Navbar>
+        {/* Desktop Navigation */}
+        <NavBody>
+          <NavbarLogo />
+          <NavItems items={navItems} />
+          <div className="flex items-center gap-4">
+            <NavbarButton variant="secondary">Login</NavbarButton>
+            <NavbarButton variant="primary">Book a call</NavbarButton>
           </div>
-          
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <Link href="/" className="text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                Home
-              </Link>
-              <Link href="/about" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                About
-              </Link>
-              <Link href="/services" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                Services
-              </Link>
-              
-              {/* Company Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center"
-                >
-                  Company
-                  <svg
-                    className={`ml-2 h-4 w-4 transition-transform ${isCompanyDropdownOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                
-                {isCompanyDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
-                    <div className="py-1" role="menu">
-                      <Link
-                        href="/why-choose-cyberjall"
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
-                        role="menuitem"
-                        onClick={() => setIsCompanyDropdownOpen(false)}
-                      >
-                        Why Choose CyberJall
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+        </NavBody>
 
-              <Link href="/contact_us" className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium">
-                Contact Us
-              </Link>
-            </div>
-          </div>
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <MobileNavToggle isOpen={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
+          </MobileNavHeader>
 
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
-            >
-              <svg
-                className="h-6 w-6"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 24 24"
+          <MobileNavMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)}>
+            {navItems.map((item, idx) => (
+              <MobileNavItem key={`mobile-link-${idx}`} item={item} onClose={() => setIsMobileMenuOpen(false)} />
+            ))}
+            <div className="flex w-full flex-col gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+              <NavbarButton
+                onClick={() => setIsMobileMenuOpen(false)}
+                variant="secondary"
+                className="w-full justify-center"
               >
-                {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+                Login
+              </NavbarButton>
+              <NavbarButton
+                onClick={() => setIsMobileMenuOpen(false)}
+                variant="primary"
+                className="w-full justify-center"
+              >
+                Book a call
+              </NavbarButton>
+            </div>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
+      
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/" className="text-white block px-3 py-2 rounded-md text-base font-medium">
-              Home
-            </Link>
-            <Link href="/about" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              About
-            </Link>
-            <Link href="/services" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              Services
-            </Link>
-            <Link href="/marketplace" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              Marketplace
-            </Link>
-            <Link href="/why-choose-cyberjall" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              Why Choose CyberJall
-            </Link>
-            <Link href="/contact_us" className="bg-red-600 text-white hover:bg-red-700 block px-3 py-2 rounded-md text-base font-medium">
-              Contact Us
-            </Link>
+      {/* Navbar */}
+    </div>
+  )
+}
+interface NavItem {
+  name: string
+  link: string
+  hasDropdown?: boolean
+  dropdownItems?: {
+    category: string
+    items: {
+      name: string
+      link: string
+      description: string
+    }[]
+  }[]
+}
+interface MobileNavItemProps {
+  item: NavItem
+  onClose: () => void
+}
+
+const MobileNavItem = ({ item, onClose }:MobileNavItemProps) => {
+  const handleClick = () => {
+    onClose()
+  }
+
+  if (item.hasDropdown && item.dropdownItems) {
+    return (
+      <div>
+        <span className="block">{item.name}</span>
+        {item.dropdownItems.map((category, index) => (
+          <div key={index}>
+            <h6 className="text-sm font-bold">{category.category}</h6>
+            {category.items.map((dropdownItem, i) => (
+              <a
+                key={i}
+                href={dropdownItem.link}
+                onClick={handleClick}
+                className="relative text-neutral-600 dark:text-neutral-300"
+              >
+                <span className="block">{dropdownItem.name}</span>
+              </a>
+            ))}
           </div>
-        </div>
-      )}
-    </nav>
-  );
-};
+        ))}
+      </div>
+    )
+  } else {
+    return (
+      <Link href={item.link} onClick={handleClick} className="relative text-neutral-600 dark:text-neutral-300">
+        <span className="block">{item.name}</span>
+      </Link>
+    )
+  }
+}
