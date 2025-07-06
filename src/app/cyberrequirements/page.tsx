@@ -716,7 +716,7 @@ export default function Home() {
               {activeSection === 1 && (
                 <motion.div
                   key="section1"
-                  // variants={sectionVariants}
+                  // //variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -757,7 +757,7 @@ export default function Home() {
                         )}
                       </motion.div>
 
-                      <motion.div variants={itemVariants} className="group">
+                      <motion.div  className="group">
                         <label className="block text-gray-300 mb-2 font-medium">
                           Industry
                         </label>
@@ -794,7 +794,7 @@ export default function Home() {
                         )}
                       </motion.div>
 
-                      <motion.div variants={itemVariants} className="group">
+                      <motion.div  className="group">
                         <label className="block text-gray-300 mb-2 font-medium">
                           Company Size
                         </label>
@@ -830,7 +830,7 @@ export default function Home() {
                         )}
                       </motion.div>
 
-                      <motion.div variants={itemVariants} className="group">
+                      <motion.div  className="group">
                         <label className="block text-gray-300 mb-2 font-medium">
                           Contact Person Name
                         </label>
@@ -855,7 +855,7 @@ export default function Home() {
                         )}
                       </motion.div>
 
-                      <motion.div variants={itemVariants} className="group">
+                      <motion.div  className="group">
                         <label className="block text-gray-300 mb-2 font-medium">
                           Email Address
                         </label>
@@ -914,7 +914,7 @@ export default function Home() {
               {activeSection === 2 && (
                 <motion.div
                   key="section2"
-                  variants={sectionVariants}
+                  // //variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -928,7 +928,7 @@ export default function Home() {
                       </h2>
                     </div>
 
-                    <motion.div variants={itemVariants} className="mb-6">
+                    <motion.div  className="mb-6">
                       <label className="block text-gray-300 mb-4 font-medium">
                         What type of cybersecurity services are you interested
                         in?
@@ -1073,7 +1073,7 @@ export default function Home() {
               {activeSection === 3 && (
                 <motion.div
                   key="section3"
-                  variants={sectionVariants}
+                  // //variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -1088,7 +1088,7 @@ export default function Home() {
                     </div>
 
                     <div className="space-y-8">
-                      <motion.div variants={itemVariants}>
+                      <motion.div >
                         <label className="block text-gray-300 mb-4 font-medium">
                           What do you value most in a service provider?
                         </label>
@@ -1167,7 +1167,7 @@ export default function Home() {
                         )}
                       </motion.div>
 
-                      <motion.div variants={itemVariants}>
+                      <motion.div >
                         <label className="block text-gray-300 mb-4 font-medium">
                           Would you like to work with multiple providers in a
                           single package?
@@ -1308,7 +1308,7 @@ export default function Home() {
               {activeSection === 4 && (
                 <motion.div
                   key="section4"
-                  variants={sectionVariants}
+                  //variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -1323,7 +1323,7 @@ export default function Home() {
                     </div>
 
                     <div className="space-y-8">
-                      <motion.div variants={itemVariants}>
+                      <motion.div >
                         <label className="block text-gray-300 mb-4 font-medium">
                           Select Preferred Package Duration
                         </label>
@@ -1381,7 +1381,7 @@ export default function Home() {
                         )}
                       </motion.div>
 
-                      <motion.div variants={itemVariants}>
+                      <motion.div >
                         <label className="block text-gray-300 mb-2 font-medium">
                           Add any special requirements or notes
                         </label>
@@ -1457,7 +1457,7 @@ export default function Home() {
 {activeSection === 5 && (
   <motion.div
     key="section5"
-    variants={sectionVariants}
+    //variants={sectionVariants}
     initial="hidden"
     animate="visible"
     exit="exit"
@@ -1471,7 +1471,7 @@ export default function Home() {
         </h2>
       </div>
 
-      <motion.div variants={itemVariants} className="mb-6">
+      <motion.div  className="mb-6">
         <label className="block text-gray-300 mb-4 font-medium">
           Choose from our verified partners (optional)
         </label>
@@ -1630,7 +1630,7 @@ export default function Home() {
               {activeSection === 6 && (
                 <motion.div
                   key="section5"
-                  variants={sectionVariants}
+                  //variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -1646,7 +1646,7 @@ export default function Home() {
 
                     <div className="space-y-8">
                       <motion.div
-                        variants={itemVariants}
+                        
                         className="bg-gray-900/50 rounded-xl p-6 border border-gray-700"
                       >
                         <h3 className="text-xl font-semibold mb-4 text-gray-200">
@@ -1765,7 +1765,7 @@ export default function Home() {
                       </motion.div>
 
                       <motion.div
-                        variants={itemVariants}
+                        
                         className="flex items-start"
                       >
                         <div className="flex items-center h-5">
