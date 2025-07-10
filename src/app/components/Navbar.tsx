@@ -11,9 +11,26 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "./ui/resizable-navbar"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function NavbarNew() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check if user exists in localStorage when component mounts
+    const user = localStorage.getItem('user')
+    setIsLoggedIn(!!user)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    setIsLoggedIn(false)
+    router.push('/login')
+    if (isMobileMenuOpen) setIsMobileMenuOpen(false)
+  }
+
   const navItems = [
     {
       name: "Home",
@@ -22,7 +39,7 @@ export default function NavbarNew() {
     {
       name: "Company",
       link: "/company",
-       hasDropdown: true,
+      hasDropdown: true,
       dropdownItems: [
         {
           category: "Company",
@@ -47,16 +64,14 @@ export default function NavbarNew() {
               link: "/contact_us",
               description: "API security and vulnerability assessment",
             },
-          
           ],
         },
-      
       ],
     },
-    // {
-    //   name: "Services",
-    //   link: "#services",
-    // },
+    {
+      name: "CyberJall Insights",
+      link: "/cyberjall_insights",
+    },
     {
       name: "Services",
       link: "/services",
@@ -85,7 +100,6 @@ export default function NavbarNew() {
               link: "/services/api_testing",
               description: "API security and vulnerability assessment",
             },
-            // { name: "IoT Pen Testing", link: "#iot-pen-testing", description: "Internet of Things security testing" },
             {
               name: "Mobile App Testing",
               link: "/services/mobile_pentesting",
@@ -120,8 +134,18 @@ export default function NavbarNew() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary">Login</NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
+            {isLoggedIn ? (
+              <NavbarButton variant="secondary" onClick={handleLogout}>
+                Logout
+              </NavbarButton>
+            ) : (
+              <Link href="/login">
+                <NavbarButton variant="secondary">Login</NavbarButton>
+              </Link>
+            )}
+            <Link href="/contact_us">
+              <NavbarButton variant="primary">Contact Us</NavbarButton>
+            </Link>
           </div>
         </NavBody>
 
@@ -137,30 +161,42 @@ export default function NavbarNew() {
               <MobileNavItem key={`mobile-link-${idx}`} item={item} onClose={() => setIsMobileMenuOpen(false)} />
             ))}
             <div className="flex w-full flex-col gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="secondary"
-                className="w-full justify-center"
-              >
-                Login
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full justify-center"
-              >
-                Book a call
-              </NavbarButton>
+              {isLoggedIn ? (
+                <NavbarButton
+                  onClick={handleLogout}
+                  variant="secondary"
+                  className="w-full justify-center"
+                >
+                  Logout
+                </NavbarButton>
+              ) : (
+                <Link href="/login" className="w-full">
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="secondary"
+                    className="w-full justify-center"
+                  >
+                    Login
+                  </NavbarButton>
+                </Link>
+              )}
+              <Link href="/contact_us" className="w-full">
+                <NavbarButton
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  variant="primary"
+                  className="w-full justify-center"
+                >
+                  Contact Us
+                </NavbarButton>
+              </Link>
             </div>
           </MobileNavMenu>
         </MobileNav>
       </Navbar>
-      
-
-      {/* Navbar */}
     </div>
   )
 }
+
 interface NavItem {
   name: string
   link: string
@@ -174,12 +210,13 @@ interface NavItem {
     }[]
   }[]
 }
+
 interface MobileNavItemProps {
   item: NavItem
   onClose: () => void
 }
 
-const MobileNavItem = ({ item, onClose }:MobileNavItemProps) => {
+const MobileNavItem = ({ item, onClose }: MobileNavItemProps) => {
   const handleClick = () => {
     onClose()
   }
@@ -192,14 +229,14 @@ const MobileNavItem = ({ item, onClose }:MobileNavItemProps) => {
           <div key={index}>
             <h6 className="text-sm font-bold">{category.category}</h6>
             {category.items.map((dropdownItem, i) => (
-              <a
+              <Link
                 key={i}
                 href={dropdownItem.link}
                 onClick={handleClick}
                 className="relative text-neutral-600 dark:text-neutral-300"
               >
                 <span className="block">{dropdownItem.name}</span>
-              </a>
+              </Link>
             ))}
           </div>
         ))}
