@@ -67,9 +67,22 @@ export const AboutUs: FC = () => {
             </div>
           </div>
 
-          {/* Right Column - Image */}
-          <div className="relative">
-            <div className="relative h-[600px] w-full rounded-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
+          {/* Right Column - Images */}
+          <div className="relative space-y-6">
+            {/* New Image Added Above Existing Image */}
+            <div className="relative h-[300px] w-full rounded-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
+              <Image
+                src="/aboutus.jpg"  // New image path
+                alt="CyberJall Team"
+                fill
+                className="object-cover rounded-2xl"
+                priority
+              />
+              <div className="absolute inset-0 bg-black/20"></div>
+            </div>
+            
+            {/* Existing Image */}
+            <div className="relative h-[300px] w-full rounded-2xl overflow-hidden transform hover:scale-[1.02] transition-all duration-500">
               <Image
                 src="/1.jpg"
                 alt="CyberJall Security"
@@ -77,7 +90,6 @@ export const AboutUs: FC = () => {
                 className="object-cover rounded-2xl"
                 priority
               />
-              {/* Simple Overlay */}
               <div className="absolute inset-0 bg-black/20"></div>
             </div>
           </div>

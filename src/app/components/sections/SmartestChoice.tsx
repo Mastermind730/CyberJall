@@ -1,21 +1,34 @@
 'use client';
 import type { FC } from 'react';
+import Image from 'next/image';
 
 export const SmartestChoice: FC = () => {
   return (
     <section className="bg-black py-24 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Left side - Heading and subheading */}
+          {/* Left side - Heading, subheading and image */}
           <div className="lg:w-1/3 flex flex-col justify-center">
             <h2 className="text-5xl font-bold mb-6">
               <span className="bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
                 Smartest Choice
               </span>
             </h2>
-            <p className="text-xl text-gray-400">
-              Here's why CyberJall is your smartest choice for vulnerability identification and management.
+            <p className="text-xl text-gray-400 mb-8">
+              Here&apos;s why CyberJall is your smartest choice for vulnerability identification and management.
             </p>
+            
+            {/* Added Image */}
+            <div className="relative h-72 w-full rounded-xl overflow-hidden border border-gray-700/50 transition-all duration-500 hover:border-red-500/50">
+              <Image
+                src="/smart_choice.png" // Replace with your image path
+                alt="Cyber Security"
+                fill
+                className="object-cover animate-bounce hover:animate-pulse"
+                priority
+              />
+              {/* <div className="absolute inset-0 bg-black/30"></div> */}
+            </div>
           </div>
 
           {/* Right side - Cards grid */}
