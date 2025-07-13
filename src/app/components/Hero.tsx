@@ -68,7 +68,7 @@ export const Hero: FC = () => {
 
   return (
     <div className="relative w-full overflow-hidden bg-gray-900 min-h-screen">
-      <div className="pt-16">
+      <div className="">
         <div className="relative h-screen w-full overflow-hidden flex items-center justify-center">
           {/* Full Width Background Image - No Blur */}
           <div className="absolute inset-0 w-full h-full">
