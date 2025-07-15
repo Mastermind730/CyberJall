@@ -185,6 +185,10 @@ export default function CompanyDetails(props: { params: Promise<Params> }) {
   const params = use(props.params);
   const companyId = params.companyId;
 
+
+  const [visibleServices, setVisibleServices] = useState(3);
+const [visibleProducts, setVisibleProducts] = useState(3);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -367,35 +371,7 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
 
-      <AnimatedSection title="Company Details" icon={MapPin} delay={0.9}>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <motion.div
-      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-    >
-      <div className="flex items-center mb-3">
-        <Calendar className="text-red-500 mr-3" size={20} />
-        <h3 className="text-lg font-semibold">Year Founded</h3>
-      </div>
-      <p className="text-gray-300 pl-9">2015</p>
-    </motion.div>
-
-    <motion.div
-      className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl p-6 border border-zinc-700"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <div className="flex items-center mb-3">
-        <MapPin className="text-red-500 mr-3" size={20} />
-        <h3 className="text-lg font-semibold">Headquarters</h3>
-      </div>
-      <p className="text-gray-300 pl-9">San Francisco, United States</p>
-    </motion.div>
-  </div>
-</AnimatedSection>
+    
 
 {/* Company Details Section */}
 <AnimatedSection title="Company Details" icon={MapPin} delay={0.9}>
@@ -625,10 +601,11 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
 
 
         {/* Services Section */}
+{/* Services Section */}
 {formattedServices.length > 0 && (
   <AnimatedSection title="Services Offered" icon={Shield} delay={0.3}>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-      {formattedServices.map((service, index) => (
+      {formattedServices.slice(0, visibleServices).map((service, index) => (
         <motion.div
           key={index}
           className="bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg p-6 border border-zinc-700 shadow-lg overflow-hidden"
@@ -637,7 +614,6 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
           transition={{ duration: 0.5, delay: 0.1 * index }}
           whileHover={{ y: -5, transition: { duration: 0.2 } }}
         >
-          {/* Service Image */}
           {service.image && (
             <div className="relative h-40 mb-4 rounded-md overflow-hidden">
               <Image
@@ -656,6 +632,17 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
         </motion.div>
       ))}
     </div>
+    
+    {formattedServices.length > 3 && (
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={() => setVisibleServices(prev => prev === 3 ? formattedServices.length : 3)}
+          className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-500 rounded-full text-white font-medium hover:opacity-90 transition-opacity"
+        >
+          {visibleServices === 3 ? 'Show All Services' : 'Show Less'}
+        </button>
+      </div>
+    )}
   </AnimatedSection>
 )}
 
@@ -677,7 +664,7 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
           }
         }}
       >
-        {company.products.map((product, index) => (
+        {company.products.slice(0, visibleProducts).map((product, index) => (
           <motion.div
             key={index}
             className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 shadow-2xl h-full"
@@ -720,16 +707,6 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
               )}
             </div>
 
-            {/* Floating product badge */}
-            <motion.div 
-              className="absolute -top-3 -right-3 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1, transition: { delay: 0.2 + index * 0.05 } }}
-              whileHover={{ rotate: 10 }}
-            >
-              Product
-            </motion.div>
-
             {/* Product Content */}
             <div className="p-6 relative z-10">
               <div className="flex justify-between items-start mb-3">
@@ -751,7 +728,6 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
               
               <p className="text-gray-300 mb-4">{product.description}</p>
               
-              {/* Interactive elements */}
               <motion.div 
                 className="flex justify-between items-center pt-4 border-t border-zinc-700"
                 initial={{ opacity: 0 }}
@@ -771,15 +747,30 @@ const formattedServices: FormattedService[] = company.services_offered.map(servi
                 </div>
               </motion.div>
             </div>
-
-            {/* Animated background elements */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-red-600 rounded-full filter blur-3xl opacity-20"></div>
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-orange-600 rounded-full filter blur-3xl opacity-20"></div>
-            </div>
           </motion.div>
         ))}
       </motion.div>
+      
+      {company.products.length > 3 && (
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={() => setVisibleProducts(prev => prev === 3 ? company.products.length : 3)}
+            className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-500 rounded-full text-white font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+          >
+            {visibleProducts === 3 ? (
+              <>
+                <span>Show All Products</span>
+                <ChevronDown size={18} />
+              </>
+            ) : (
+              <>
+                <span>Show Less</span>
+                <ChevronUp size={18} />
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   </AnimatedSection>
 )}

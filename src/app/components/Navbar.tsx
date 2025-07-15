@@ -68,6 +68,10 @@ export default function NavbarNew() {
         },
       ],
     },
+        {
+      name: "MarktetPlace",
+      link: "/ourPartners",
+    },
     {
       name: "CyberJall Insights",
       link: "/cyberjall_insights",

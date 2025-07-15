@@ -207,9 +207,9 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
                               <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                 {subItem.name}
                               </span>
-                              <span className="text-xs text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors">
+                              {/* <span className="text-xs text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors">
                                 {subItem.description}
-                              </span>
+                              </span> */}
                             </div>
                           </motion.a>
                         ))}
