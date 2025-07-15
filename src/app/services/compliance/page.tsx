@@ -793,14 +793,15 @@ const CompliancePage = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-              <button
+              <Link
+              href={"/contact_us"}
                 className="group px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xl font-bold transform hover:scale-110 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/50"
                 onMouseEnter={() => setActiveCard("primary-cta")}
                 onMouseLeave={() => setActiveCard(null)}
               >
                 Get Started Today
                 <ArrowRight className="inline-block ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
-              </button>
+              </Link>
               
               <Link
               href={"/contact_us"}

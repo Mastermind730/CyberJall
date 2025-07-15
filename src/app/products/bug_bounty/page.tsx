@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Target, Users, Zap, ChevronRight, Globe, Lock, TrendingUp, Award, CheckCircle, ArrowRight, Bug, Search, Eye } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface FloatingOrbProps{
   size:string;
@@ -27,6 +28,8 @@ const CyberJallBugBounty = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // const router = useRouter();
 
   const industries: Industry[] = [
     { icon: "🏦", name: "Fintech & Banking" },

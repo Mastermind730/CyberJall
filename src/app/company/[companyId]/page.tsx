@@ -6,6 +6,7 @@ import { ArrowLeft, Globe, Shield, Award, FileText, ChevronDown, ChevronUp, Star
 import axios from 'axios';
 import Image from 'next/image';
 import { Calendar, MapPin, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // SVG placeholder for company logo
 const LogoPlaceholder = ({ name }: { name: string }) => {
@@ -48,6 +49,8 @@ interface AnimatedSectionProps {
 // Animated section component for reuse
 const AnimatedSection = ({ title, icon, children, delay = 0 }: AnimatedSectionProps) => {
   const [isOpen, setIsOpen] = useState(true);
+
+  // const router = useRouter();
   
   const IconComponent = icon;
   

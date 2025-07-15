@@ -291,6 +291,7 @@ export default function CloudPentesting() {
                           </ul>
                         </div>
                         <motion.button
+                        onClick={()=>{router.push("/contact_us")}}
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.98 }}
                           className={`w-full py-3 px-4 rounded-lg font-semibold transition ${

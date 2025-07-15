@@ -2,6 +2,7 @@
 "use client";
 import { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function AttackSurfaceManagement() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -383,12 +384,12 @@ export default function AttackSurfaceManagement() {
             Visibility is the first step to defence — let CyberJall help you see what hackers see before they act.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105">
+            <Link href={"/contact_us"} className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105">
               Get Started Today
-            </button>
-            <button className="border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-black px-8 py-3 rounded-lg font-medium transition-all">
+            </Link>
+            <Link  href={"/contact_us"} className="border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-black px-8 py-3 rounded-lg font-medium transition-all">
               Request Demo
-            </button>
+            </Link>
           </div>
         </div>
       </section>

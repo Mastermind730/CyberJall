@@ -25,6 +25,7 @@ import {
   Award,
   Sparkles
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CyberJallInsights() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -388,14 +389,14 @@ export default function CyberJallInsights() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <button className="group relative px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl font-bold text-xl hover:from-red-500 hover:to-orange-500 transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-red-500/25">
+                <Link href={"/contact_us"} className="group relative px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl font-bold text-xl hover:from-red-500 hover:to-orange-500 transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-red-500/25">
                   <span className="relative z-10 flex items-center gap-3">
                     <Sparkles className="w-6 h-6" />
                     Get Started Free
                     <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
+                </Link>
               </div>
 
               <div className="mt-8 flex items-center justify-center gap-3 text-gray-400">

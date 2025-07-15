@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function XDRServicePage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -469,9 +470,9 @@ function EngagementTab() {
               ))}
             </ul>
             <div className="text-orange-400 text-xl font-bold mb-4">{pkg.price}</div>
-            <button className={`w-full py-3 rounded-md font-medium transition ${pkg.popular ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-gray-800 hover:bg-gray-700 text-white'}`}>
+            <Link href={"/contact_us"} className={`w-full py-3 rounded-md font-medium transition ${pkg.popular ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-gray-800 hover:bg-gray-700 text-white'}`}>
               Get Started
-            </button>
+            </Link>
           </div>
         ))}
       </div>

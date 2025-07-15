@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function AIThreatHunting() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -290,9 +291,9 @@ export default function AIThreatHunting() {
                         </li>
                       ))}
                     </ul>
-                    <button className={`w-full py-3 rounded-lg font-medium ${option.popular ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-800 hover:bg-gray-700'} transition-all`}>
+                    <Link className={`w-full py-3 rounded-lg font-medium ${option.popular ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-800 hover:bg-gray-700'} transition-all`}>
                       Get Started
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}

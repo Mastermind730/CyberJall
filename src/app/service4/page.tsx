@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function XDRServicePage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -65,12 +66,12 @@ export default function XDRServicePage() {
               See & stop threats across all layers with Extended Detection and Response solutions tailored to your environment
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-md font-medium text-lg transition transform hover:scale-105 shadow-lg shadow-red-900/30">
+              <Link href={"/contact_us"} className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-md font-medium text-lg transition transform hover:scale-105 shadow-lg shadow-red-900/30">
                 Get Started
-              </button>
-              <button className="border border-gray-700 hover:border-gray-600 text-white px-8 py-4 rounded-md font-medium text-lg transition transform hover:scale-105">
+              </Link>
+              <Link href={"/contact_us"} className="border border-gray-700 hover:border-gray-600 text-white px-8 py-4 rounded-md font-medium text-lg transition transform hover:scale-105">
                 Speak to Expert
-              </button>
+              </Link>
             </div>
           </div>
         </div>

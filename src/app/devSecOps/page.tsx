@@ -4,10 +4,14 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiArrowRight, FiCheck, FiShield, FiCpu, FiCode, FiLock, FiCloud, FiUsers } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 const DevSecOpsPage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isHovering, setIsHovering] = useState("");
+
+
+  const router = useRouter();
 
   const engagementOptions = [
     {
@@ -314,6 +318,7 @@ const DevSecOpsPage = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.button
+              onClick={()=>{router.push("/contact_us")}}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-white text-black px-8 py-4 rounded-lg font-medium"

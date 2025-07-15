@@ -3,10 +3,13 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { motion } from 'framer-motion';
 import { FiShield, FiLock, FiEye, FiAlertCircle, FiCheckCircle, FiDatabase, FiFileText, FiUsers } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 const DataProtectionPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -399,6 +402,7 @@ const DataProtectionPage = () => {
                     <p className="text-gray-200 font-medium">{solution.bestFor}</p>
                   </div>
                   <motion.button
+                  onClick={()=>{router.push("/contact_us")}}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
                     className={`w-full py-3 rounded-lg font-medium ${solution.popular ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-700 hover:bg-gray-600'}`}

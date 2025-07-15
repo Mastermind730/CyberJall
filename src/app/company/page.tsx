@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState('hero');
   const [isMounted, setIsMounted] = useState(false);
  
+
+  const router = useRouter();
 
   useEffect(() => {
     setIsLoaded(true);
@@ -96,6 +99,7 @@ export default function Home() {
               className="flex flex-col sm:flex-row justify-center md:justify-start gap-4"
             >
               <motion.button 
+              onClick={()=>{router.push("/contact_us")}}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-r from-red-600 to-orange-500 px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-red-600/30"
@@ -765,6 +769,7 @@ export default function Home() {
                 
                 <div className="flex flex-col sm:flex-row justify-center gap-6">
                   <motion.button 
+                  onClick={()=>{router.push("/contact_us")}}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="bg-gradient-to-r from-red-600 to-orange-500 px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-red-600/30"

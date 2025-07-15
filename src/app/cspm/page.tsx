@@ -3,10 +3,13 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { motion } from 'framer-motion';
 import { FiShield, FiCloud, FiAlertTriangle, FiCheckCircle, FiSettings, FiBarChart2, FiUsers } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 const CSPMPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -482,6 +485,7 @@ const CSPMPage = () => {
             Don&apos;t leave your cloud infrastructure vulnerable to misconfigurations and compliance gaps.
           </p>
           <motion.button
+          onClick={()=>router.push("/contact_us")}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
             className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-medium text-lg shadow-lg shadow-red-900/50"
