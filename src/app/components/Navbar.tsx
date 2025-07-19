@@ -120,6 +120,24 @@ export default function NavbarNew() {
             { name: "GDPR", link: "/services/compliance", description: "General data protection regulation" },
           ],
         },
+        {
+          category: "Advanced Threat Defense",
+          items: [
+            { name: "XDR ", link: "/service1", description: "Extended Detection & Response" },
+            { name: "AI Extended Detection & Response", link: "/service2", description: "AI Extended Detection & Response" },
+            { name: "ASM", link: "/service3", description: "Attack Surface Management " },
+            { name: " Zero Trust Implementation", link: "/service4", description: " Zero Trust Implementation" },
+          ],
+        },
+         {
+          category: "Cloud Security Services",
+          items: [
+            { name: "CSPM", link: "/cspm", description: "Extended Detection & Response" },
+            { name: " Cloud Data Protection & DLP", link: "/cloudPndDLP", description: "AI Extended Detection & Response" },
+            { name: "Cloud Compliance Mapping", link: "/cloudCompliance", description: "Attack Surface Management " },
+            { name: "DevSecOps Implementation", link: "/devSecOps", description: " Zero Trust Implementation" },
+          ],
+        },
       ],
     },
     {
