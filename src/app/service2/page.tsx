@@ -291,7 +291,7 @@ export default function AIThreatHunting() {
                         </li>
                       ))}
                     </ul>
-                    <Link className={`w-full py-3 rounded-lg font-medium ${option.popular ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-800 hover:bg-gray-700'} transition-all`}>
+                    <Link href={"/contact_us"} className={`w-full py-3 rounded-lg font-medium ${option.popular ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-800 hover:bg-gray-700'} transition-all`}>
                       Get Started
                     </Link>
                   </div>
