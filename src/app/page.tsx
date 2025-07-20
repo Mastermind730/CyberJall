@@ -14,6 +14,9 @@ import EntityShowcase from './components/ClientCarousel';
 import CyberJallBanner from './components/sections/AtAGlance';
 import ProblemSection from './components/sections/ProblemSection';
 import ApproachSection from './components/sections/ApproachSection';
+import { RequirementSubmission } from './components/sections/OnBoarding';
+import { InsightsSection } from './components/sections/CyberInsights';
+import { ComparisonSection } from './components/sections/Comparison';
 
 const Home: NextPage = () => {
   return (
@@ -21,6 +24,9 @@ const Home: NextPage = () => {
       <Hero />
       <EntityShowcase/>
       <AboutUs />
+      <RequirementSubmission/>
+      <InsightsSection/>
+      <ComparisonSection/>
       <SmartestChoice />
       <CyberJallBanner />
       <ProblemSection />
