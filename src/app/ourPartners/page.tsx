@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,37 +12,73 @@ import {
   FiEye,
   FiExternalLink,
   FiFrown,
+  FiFilter,
+  FiStar,
+  FiCheck,
+  FiShield,
+  FiUsers,
+  FiCalendar,
+  FiLayers,
+  FiAward,
+  FiBarChart2,
+  FiTrendingUp
 } from 'react-icons/fi';
 
 interface Partner {
   id: string;
   company_name: string;
-  logo?: string | null;
-  website: string;
+  logo: string;
+  overview?: string;
   year_founded: number;
   headquarters_city: string;
   headquarters_country: string;
   industries_served: string[];
+  target_business_size?: string[];
+  geographic_coverage?: string[];
   team_size: string;
-  services_offered?: any;
-  expertise_and_certifications?: any;
-}
-
-interface ExperienceOption {
-  label: string;
-  value: string;
+  services_offered?: {
+    name: string;
+    description?: string;
+  }[];
+  expertise_and_certifications?: {
+    name: string;
+    description?: string;
+  }[];
+  case_studies?: {
+    title: string;
+    description: string;
+  }[];
+  client_reviews?: {
+    rating: number;
+    comment: string;
+  }[];
+  social_links?: {
+    platform: string;
+    url: string;
+  }[];
+  website: string;
+  products?: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface Filters {
-  industry: string;
-  service: string;
-  certification: string;
-  location: string;
-  teamSize: string;
-  minExperience: string;
+  industry: string[];
+  service: string[];
+  certification: string[];
+  location: string[];
+  teamSize: string[];
+  minExperience: string[];
+  minRating: string[];
+  pricingModel: string[];
 }
 
-// Constants defined outside the component
+// Helper function to safely get display name
+const getDisplayName = (item: string | { name: string }): string => {
+  return typeof item === 'string' ? item : item.name;
+};
+
+// Constants
 const industryOptions = [
   "Fintech", "Healthcare", "E-commerce", "Government", 
   "Education", "Manufacturing", "Retail", "Telecom"
@@ -62,32 +99,45 @@ const teamSizeOptions = [
   "Solo", "2-10", "11-50", "51-200", "201-500", "500+"
 ];
 
-const experienceOptions: ExperienceOption[] = [
+const experienceOptions = [
   { label: "1+ years", value: "1" },
   { label: "3+ years", value: "3" },
   { label: "5+ years", value: "5" },
   { label: "10+ years", value: "10" }
 ];
 
+const ratingOptions = [
+  { label: "4+ Stars", value: "4" },
+  { label: "3+ Stars", value: "3" },
+  { label: "2+ Stars", value: "2" }
+];
+
+const pricingModelOptions = [
+  "Hourly", "Project-based", "Retainer", "Subscription"
+];
+
 export default function Partners() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<Filters>({
-    industry: "",
-    service: "",
-    certification: "",
-    location: "",
-    teamSize: "",
-    minExperience: ""
+    industry: [],
+    service: [],
+    certification: [],
+    location: [],
+    teamSize: [],
+    minExperience: [],
+    minRating: [],
+    pricingModel: []
   });
-  const [showFilters, setShowFilters] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
@@ -96,13 +146,15 @@ export default function Partners() {
         setIsLoading(true);
         const params = new URLSearchParams();
         
-        if (filters.industry) params.append('industry', filters.industry);
-        if (filters.service) params.append('service', filters.service);
-        if (filters.certification) params.append('certification', filters.certification);
-        if (filters.location) params.append('location', filters.location);
-        if (filters.teamSize) params.append('teamSize', filters.teamSize);
-        if (filters.minExperience) params.append('minExperience', filters.minExperience);
         if (searchQuery) params.append('search', searchQuery);
+        filters.industry.forEach(i => params.append('industry', i));
+        filters.service.forEach(s => params.append('service', s));
+        filters.certification.forEach(c => params.append('certification', c));
+        filters.location.forEach(l => params.append('location', l));
+        filters.teamSize.forEach(t => params.append('teamSize', t));
+        filters.minExperience.forEach(e => params.append('minExperience', e));
+        filters.minRating.forEach(r => params.append('minRating', r));
+        filters.pricingModel.forEach(p => params.append('pricingModel', p));
         
         const response = await fetch(`/api/company?${params.toString()}`);
         
@@ -129,677 +181,1015 @@ export default function Partners() {
     return () => clearTimeout(debounceTimer);
   }, [filters, searchQuery]);
 
+  const toggleFilter = (category: keyof Filters, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [category]: prev[category].includes(value)
+        ? prev[category].filter(v => v !== value)
+        : [...prev[category], value]
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      industry: [],
+      service: [],
+      certification: [],
+      location: [],
+      teamSize: [],
+      minExperience: [],
+      minRating: [],
+      pricingModel: []
+    });
+    setSearchQuery("");
+  };
+
+  const activeFilterCount = Object.values(filters).reduce(
+    (count, values) => count + values.length, 0
+  );
+
+  const toggleCompanySelection = (id: string) => {
+    setSelectedCompanies(prev => 
+      prev.includes(id) 
+        ? prev.filter(companyId => companyId !== id)
+        : [...prev, id]
+    );
+  };
+
+  const companiesToCompare = useMemo(() => {
+    return partners.filter(partner => selectedCompanies.includes(partner.id));
+  }, [selectedCompanies, partners]);
+
   const getInitials = (name: string): string => {
     return name
       .split(" ")
-      .map((word) => word.charAt(0))
+      .map(word => word.charAt(0))
       .join("")
       .toUpperCase()
       .substring(0, 2);
   };
 
-  const handleFilterChange = (filterName: keyof Filters, value: string): void => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value === prev[filterName] ? "" : value
-    }));
+  // Calculate average rating from client reviews
+  const getAverageRating = (partner: Partner) => {
+    if (!partner.client_reviews || partner.client_reviews.length === 0) {
+      return 0;
+    }
+    const sum = partner.client_reviews.reduce((acc, review) => acc + review.rating, 0);
+    return sum / partner.client_reviews.length;
   };
 
-  const clearFilters = (): void => {
-    setFilters({
-      industry: "",
-      service: "",
-      certification: "",
-      location: "",
-      teamSize: "",
-      minExperience: ""
-    });
-    setSearchQuery("");
-  };
-
-  const activeFilterCount = Object.values(filters).filter(v => v !== "").length;
-
-  if (!mounted) {
-    return null;
+  // Only render UI after confirming we're on the client
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-black relative">
-      {/* Background Elements */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 w-full h-1/3 bg-gradient-to-b from-red-900/20 to-transparent"></div>
-        <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-red-900/20 to-transparent"></div>
-        <div className="absolute left-0 h-full w-1/3 bg-gradient-to-r from-orange-800/10 to-transparent"></div>
-        <div className="absolute right-0 h-full w-1/3 bg-gradient-to-l from-red-900/10 to-transparent"></div>
-      </div>
-
-      {mounted && (
-        <div className="fixed inset-0 z-0 overflow-hidden opacity-40">
-          <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 5% 15%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 85% 45%, #9a3412aa 0.5%, transparent 5%), radial-gradient(circle at 35% 75%, #7f1d1d33 1%, transparent 8%), radial-gradient(circle at 65% 85%, #9a341222 0.5%, transparent 5%)" }}></div>
-          
-          <div className="absolute top-0 left-0 w-full h-full">
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={`particle-${i}`}
-                className={`absolute rounded-full bg-gradient-to-br ${
-                  i % 2 === 0 ? "from-red-600/30 to-red-800/10" : "from-orange-500/20 to-orange-700/10"
-                }`}
-                style={{
-                  width: `${Math.floor(Math.random() * 10) + 3}px`,
-                  height: `${Math.floor(Math.random() * 10) + 3}px`,
-                  left: `${Math.floor(Math.random() * 100)}%`,
-                  top: `${Math.floor(Math.random() * 100)}%`,
-                }}
-                animate={{
-                  y: [0, Math.random() * 50 - 25],
-                  x: [0, Math.random() * 50 - 25],
-                  opacity: [0.5, 0.8, 0.5],
-                }}
-                transition={{
-                  duration: Math.floor(Math.random() * 15) + 15,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }}
-              />
-            ))}
-          </div>
+    <div className="min-h-screen bg-gray-900 relative">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumbs */}
+        <div className="flex items-center text-sm text-gray-400 mb-6">
+          <Link href="/" className="hover:text-blue-400">Home</Link>
+          <span className="mx-2">/</span>
+          <span className="text-white font-medium">Security Partners</span>
         </div>
-      )}
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Header Section */}
-     {/* Header Section */}
-<motion.div
-  initial={{ opacity: 0, y: -20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, ease: "easeOut" }}
-  className="text-center mb-12 mt-20"
->
-  <motion.div 
-    className="max-w-4xl mx-auto"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.6, delay: 0.2 }}
-  >
-    {/* Tagline */}
-    <motion.p
-      className="text-lg font-medium text-red-400 mb-3"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-    >
-      Your Cybersecurity Starts with the Right Partner
-    </motion.p>
-    
-    {/* Main Title */}
-    <motion.h1 
-      className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl mb-6"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
-    >
-      <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-        Trusted Cybersecurity
-      </span> Partners
-    </motion.h1>
-    
-    {/* Description */}
-    <motion.div
-      className="max-w-3xl mx-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6, delay: 0.6 }}
-    >
-      <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-        Discover trusted cybersecurity companies ready to help secure your business. 
-        Whether you're a startup or an enterprise, use filters to find providers by 
-        service type, experience, certifications, and industry focus—all in one place.
-      </p>
-      <p className="text-lg text-gray-400 font-medium">
-        CyberJall brings you transparency, flexibility, and the power to collaborate 
-        with multiple experts in a single solution.
-      </p>
-    </motion.div>
-
-    {/* Decorative divider */}
-    <motion.div 
-      className="mt-8 flex justify-center"
-      initial={{ width: 0 }}
-      animate={{ width: "auto" }}
-      transition={{ duration: 0.8, delay: 0.8 }}
-    >
-      <motion.div 
-        className="h-1 w-48 bg-gradient-to-r from-red-700 via-orange-500 to-red-600 rounded-full"
-        animate={{
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-        }}
-        transition={{ 
-          duration: 5, 
-          repeat: Infinity,
-          ease: "linear" 
-        }}
-        style={{
-          backgroundSize: "200% 200%",
-        }}
-      />
-    </motion.div>
-  </motion.div>
-</motion.div>
-
-        {/* Search and Filter Section */}
-        <div className="mb-12">
-          <div className="relative max-w-2xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="relative"
-            >
-              <input
-                type="text"
-                placeholder="Search partners..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-6 py-4 bg-gray-900/70 backdrop-blur-sm border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300"
-              />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <FiSearch className="w-5 h-5 text-gray-400" />
-              </div>
-            </motion.div>
-          </div>
-
-          <div className="mt-6 flex justify-center">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 rounded-lg text-white shadow-lg transition-all"
-            >
-              <span>Advanced Filters</span>
-              <div className="relative">
-                {activeFilterCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {activeFilterCount}
-                  </span>
-                )}
-                <FiChevronDown className="w-5 h-5 transition-transform" />
-              </div>
-            </motion.button>
-          </div>
-
-          {/* Filter Panel */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mt-6 bg-gray-900/50 backdrop-blur-lg border border-gray-700 rounded-xl overflow-hidden"
+        {/* Page Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-white">
+            Cybersecurity Service Providers
+            <span className="text-gray-400 font-normal ml-2">
+              ({partners.length} {partners.length === 1 ? 'company' : 'companies'})
+            </span>
+          </h1>
+          <div className="flex items-center space-x-4">
+            {selectedCompanies.length > 0 && (
+              <button
+                onClick={() => setShowComparison(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
               >
-                <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* Industry Filter */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-2">Industry</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {industryOptions.map((industry) => (
-                        <motion.button
-                          key={`industry-${industry}`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleFilterChange('industry', industry)}
-                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                            filters.industry === industry
-                              ? 'bg-red-500/20 border-red-500 text-white'
-                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
-                          }`}
-                        >
-                          {industry}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Service Filter */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-2">Service</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {serviceOptions.map((service) => (
-                        <motion.button
-                          key={`service-${service}`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleFilterChange('service', service)}
-                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                            filters.service === service
-                              ? 'bg-orange-500/20 border-orange-500 text-white'
-                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
-                          }`}
-                        >
-                          {service}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Certification Filter */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-2">Certification</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {certificationOptions.map((cert) => (
-                        <motion.button
-                          key={`cert-${cert}`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleFilterChange('certification', cert)}
-                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                            filters.certification === cert
-                              ? 'bg-amber-500/20 border-amber-500 text-white'
-                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
-                          }`}
-                        >
-                          {cert}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Location Filter */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-2">Location</h3>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="City or Country"
-                        value={filters.location}
-                        onChange={(e) => handleFilterChange('location', e.target.value)}
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Team Size Filter */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-2">Team Size</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {teamSizeOptions.map((size) => (
-                        <motion.button
-                          key={`size-${size}`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleFilterChange('teamSize', size)}
-                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                            filters.teamSize === size
-                              ? 'bg-purple-500/20 border-purple-500 text-white'
-                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
-                          }`}
-                        >
-                          {size}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Experience Filter */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-300 mb-2">Min. Experience</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {experienceOptions.map((exp) => (
-                        <motion.button
-                          key={`exp-${exp.value}`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleFilterChange('minExperience', exp.value)}
-                          className={`px-3 py-1.5 text-sm rounded-lg border transition-all ${
-                            filters.minExperience === exp.value
-                              ? 'bg-blue-500/20 border-blue-500 text-white'
-                              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-gray-600'
-                          }`}
-                        >
-                          {exp.label}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Clear Filters Button */}
-                <div className="px-6 pb-4 flex justify-end">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={clearFilters}
-                    className="px-4 py-2 text-sm text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 rounded-lg border border-gray-700 transition-all"
-                  >
-                    Clear All Filters
-                  </motion.button>
-                </div>
-              </motion.div>
+                <FiBarChart2 className="mr-2" />
+                Compare ({selectedCompanies.length})
+              </button>
             )}
-          </AnimatePresence>
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="md:hidden px-3 py-2 bg-gray-800 border border-gray-700 rounded-md shadow-sm text-sm font-medium text-white hover:bg-gray-700 flex items-center"
+            >
+              <FiFilter className="mr-2" />
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="ml-2 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Active Filters Display */}
-        {Object.values(filters).some(v => v !== "") && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="flex flex-wrap gap-3 justify-center">
-              {Object.entries(filters).map(([key, value]) => {
-                if (!value) return null;
-                
-                let displayValue = value;
-                if (key === 'minExperience') {
-                  displayValue = experienceOptions.find(e => e.value === value)?.label || `${value}+ years`;
-                }
-                
-                return (
-                  <motion.div
-                    key={`filter-${key}-${value}`}
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 rounded-full border border-gray-700"
+        {/* Main Grid */}
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Sidebar Filters - Desktop */}
+          <div className="hidden md:block w-64 flex-shrink-0">
+            <div className="bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-700 sticky top-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-medium text-white">Filters</h2>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-blue-400 hover:text-blue-300"
                   >
-                    <span className="text-xs font-medium text-gray-300 capitalize">{key}:</span>
-                    <span className="text-sm font-medium text-white">{displayValue}</span>
-                    <button
-                      onClick={() => handleFilterChange(key as keyof Filters, '')}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      <FiX className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
+                    Clear all
+                  </button>
+                )}
+              </div>
 
-        {/* Results Count */}
-        {!isLoading && !error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center mb-8 text-gray-400"
-          >
-            Showing {partners.length} {partners.length === 1 ? 'partner' : 'partners'}
-          </motion.div>
-        )}
+              {/* Smart Filters */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2 flex items-center">
+                  <FiTrendingUp className="mr-2 text-blue-400" />
+                  Smart Filters
+                </h3>
+                <div className="space-y-2">
+                  <button 
+                    className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50"
+                  >
+                    <span>Top Rated</span>
+                    <FiStar className="text-yellow-400" />
+                  </button>
+                  <button 
+                    className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50"
+                  >
+                    <span>Fast Response</span>
+                    <FiShield className="text-green-400" />
+                  </button>
+                  <button 
+                    className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50"
+                  >
+                    <span>Enterprise Ready</span>
+                    <FiUsers className="text-purple-400" />
+                  </button>
+                </div>
+              </div>
 
-        {/* Partners Grid */}
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <motion.div 
-              className="relative w-20 h-20"
-              animate={{ rotate: 360 }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity,
-                ease: "linear" 
-              }}
-            >
-              <div className="absolute inset-0 rounded-full border-4 border-t-red-600 border-r-orange-500 border-b-red-700 border-l-orange-600"></div>
-              <div className="absolute inset-2 rounded-full border-4 border-t-orange-500 border-r-red-700 border-b-orange-600 border-l-red-600"></div>
-            </motion.div>
-          </div>
-        ) : error ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center text-red-500 p-8 bg-gradient-to-br from-red-900/30 to-black rounded-xl border border-red-800/50 shadow-lg shadow-red-900/20"
-          >
-            <p>{error}</p>
-          </motion.div>
-        ) : partners.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center p-12"
-          >
-            <div className="text-gray-400 mb-4">
-              <FiFrown className="w-16 h-16 mx-auto" />
-            </div>
-            <h3 className="text-xl font-medium text-white mb-2">No partners found</h3>
-            <p className="text-gray-400 max-w-md mx-auto">Try adjusting your filters or search query to find what you&apos;re looking for.</p>
-            <div className="mt-6">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={clearFilters}
-                className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg shadow-lg"
-              >
-                Clear all filters
-              </motion.button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1
-                }
-              }
-            }}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
-          >
-            {partners.map((partner) => (
-              <motion.div
-                key={partner.id}
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  show: { opacity: 1, y: 0 }
-                }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                onHoverStart={() => setHoveredCard(partner.id)}
-                onHoverEnd={() => setHoveredCard(null)}
-                className="relative group"
-              >
-                {/* Ambient glow effect */}
-                <div 
-                  className="absolute -inset-0.5 bg-gradient-to-r from-red-500/60 via-orange-400/60 to-amber-500/60 rounded-2xl opacity-0 group-hover:opacity-80 transition-all duration-500 ease-out"
-                  style={{
-                    filter: "blur(18px)",
-                    transform: "translateZ(0)",
-                  }}
-                />
-                
-                <motion.div
-                  whileHover={{ y: -12, scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="relative h-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 rounded-xl overflow-hidden border border-gray-800/50 group-hover:border-red-500/70 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-red-500/20"
-                >
-                  {/* Subtle texture overlay */}
-                  <div className="absolute inset-0 opacity-10 bg-[url('/noise-texture.png')] mix-blend-overlay pointer-events-none" />
-                  
-                  {/* Top accent line */}
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out" />
-                  
-                  {/* Card content container */}
-                  <div className="p-8 h-full flex flex-col justify-between relative z-10">
-                    <div>
-                      {/* Company logo area */}
-                      <div className="flex justify-center mb-6 h-36 items-center relative">
-                        {partner.logo && partner.logo !== "" ? (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className="relative"
-                          >
-                            <Image
-                              width={250}
-                              height={250}
-                              src={partner.logo}
-                              alt={`${partner.company_name} logo`}
-                              className="max-h-28 max-w-full object-contain filter drop-shadow-lg"
-                            />
-                            
-                            {/* Enhanced logo glow effect */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-red-500/30 to-amber-500/20 filter blur-2xl opacity-0 group-hover:opacity-80 transition-opacity duration-700 -z-10 scale-110" />
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            whileHover={{ rotate: [0, -3, 3, -3, 0] }}
-                            transition={{ duration: 0.5 }}
-                            className="w-28 h-28 rounded-full bg-gradient-to-br from-red-600 via-red-500 to-orange-500 flex items-center justify-center text-white text-3xl font-bold shadow-xl relative z-10 border border-red-400/20"
-                          >
-                            {getInitials(partner.company_name)}
-                            
-                            {/* Multiple animated rings */}
-                            <motion.div
-                              className="absolute inset-0 rounded-full border border-red-400/40"
-                              animate={{
-                                scale: [1, 1.15, 1],
-                                opacity: [0.7, 0.2, 0.7],
-                              }}
-                              transition={{
-                                duration: 2.5,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                              }}
-                            />
-                            <motion.div
-                              className="absolute inset-0 rounded-full border border-orange-400/30"
-                              animate={{
-                                scale: [1, 1.25, 1],
-                                opacity: [0.5, 0.1, 0.5],
-                              }}
-                              transition={{
-                                duration: 3,
-                                delay: 0.3,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                              }}
-                            />
-                          </motion.div>
-                        )}
-                      </div>
-                      
-                      {/* Company name */}
-                      <motion.h3 className="text-2xl font-bold text-center mt-2 mb-1">
-                        <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-red-200 group-hover:via-white group-hover:to-amber-100 transition-all duration-500">
-                          {partner.company_name}
-                        </span>
-                        <div className="relative h-0.5 w-16 mx-auto mt-2 overflow-hidden">
-                          <motion.span
-                            className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500 to-red-500/0"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: hoveredCard === partner.id ? 1 : 0 }}
-                            transition={{ duration: 0.4 }}
-                          />
-                        </div>
-                      </motion.h3>
-
-                      {/* Additional Info */}
-                      <div className="mt-4 flex flex-wrap justify-center gap-2">
-                        {partner.headquarters_city && (
-                          <span className="text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-full flex items-center">
-                            <FiMapPin className="w-3 h-3 mr-1" />
-                            {partner.headquarters_city}
-                          </span>
-                        )}
-                        {partner.team_size && (
-                          <span className="text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-full">
-                            👥 {partner.team_size}
-                          </span>
-                        )}
-                        {partner.year_founded && (
-                          <span className="text-xs bg-gray-800/50 text-gray-300 px-2 py-1 rounded-full">
-                            🎂 {new Date().getFullYear() - partner.year_founded} years
-                          </span>
-                        )}
-                      </div>
+              {/* Industry Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2">Industry Focus</h3>
+                <div className="space-y-2">
+                  {industryOptions.map(industry => (
+                    <div key={`industry-option-${industry}`} className="flex items-center">
+                      <input
+                        id={`industry-${industry}`}
+                        type="checkbox"
+                        checked={filters.industry.includes(industry)}
+                        onChange={() => toggleFilter('industry', industry)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      />
+                      <label htmlFor={`industry-${industry}`} className="ml-2 text-sm text-gray-300">
+                        {industry}
+                      </label>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    {/* Action buttons */}
-                    <div className="mt-8 flex justify-center gap-4">
-                      <motion.div 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="relative group/btn"
+              {/* Services Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2">Services Offered</h3>
+                <div className="space-y-2">
+                  {serviceOptions.map(service => (
+                    <div key={`service-option-${service}`} className="flex items-center">
+                      <input
+                        id={`service-${service}`}
+                        type="checkbox"
+                        checked={filters.service.includes(service)}
+                        onChange={() => toggleFilter('service', service)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      />
+                      <label htmlFor={`service-${service}`} className="ml-2 text-sm text-gray-300">
+                        {service}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Certifications Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2">Certifications</h3>
+                <div className="space-y-2">
+                  {certificationOptions.map(cert => (
+                    <div key={`cert-option-${cert}`} className="flex items-center">
+                      <input
+                        id={`cert-${cert}`}
+                        type="checkbox"
+                        checked={filters.certification.includes(cert)}
+                        onChange={() => toggleFilter('certification', cert)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      />
+                      <label htmlFor={`cert-${cert}`} className="ml-2 text-sm text-gray-300">
+                        {cert}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Team Size Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2">Team Size</h3>
+                <div className="space-y-2">
+                  {teamSizeOptions.map(size => (
+                    <div key={`size-option-${size}`} className="flex items-center">
+                      <input
+                        id={`size-${size}`}
+                        type="checkbox"
+                        checked={filters.teamSize.includes(size)}
+                        onChange={() => toggleFilter('teamSize', size)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      />
+                      <label htmlFor={`size-${size}`} className="ml-2 text-sm text-gray-300">
+                        {size}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Experience Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2">Minimum Experience</h3>
+                <div className="space-y-2">
+                  {experienceOptions.map(exp => (
+                    <div key={`exp-option-${exp.value}`} className="flex items-center">
+                      <input
+                        id={`exp-${exp.value}`}
+                        type="checkbox"
+                        checked={filters.minExperience.includes(exp.value)}
+                        onChange={() => toggleFilter('minExperience', exp.value)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      />
+                      <label htmlFor={`exp-${exp.value}`} className="ml-2 text-sm text-gray-300">
+                        {exp.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rating Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2">Minimum Rating</h3>
+                <div className="space-y-2">
+                  {ratingOptions.map(rating => (
+                    <div key={`rating-option-${rating.value}`} className="flex items-center">
+                      <input
+                        id={`rating-${rating.value}`}
+                        type="checkbox"
+                        checked={filters.minRating.includes(rating.value)}
+                        onChange={() => toggleFilter('minRating', rating.value)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                      />
+                      <label htmlFor={`rating-${rating.value}`} className="ml-2 text-sm text-gray-300">
+                        {rating.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1">
+            {/* Search and Active Filters */}
+            <div className="bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-700 mb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="relative flex-1 max-w-2xl">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiSearch className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search security providers..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md leading-5 bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-400">Sort by:</span>
+                  <select 
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-gray-700 text-white"
+                    defaultValue="Featured"
+                  >
+                    <option value="Featured">Featured</option>
+                    <option value="Highest Rated">Highest Rated</option>
+                    <option value="Most Experienced">Most Experienced</option>
+                    <option value="Newest">Newest</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Active Filters */}
+              {activeFilterCount > 0 && (
+                <div className="mt-4">
+                  <div className="flex flex-wrap gap-2">
+                    {filters.industry.map(industry => (
+                      <span 
+                        key={`active-industry-${industry}`} 
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-200"
                       >
+                        {industry}
+                        <button
+                          onClick={() => toggleFilter('industry', industry)}
+                          className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-300 hover:bg-blue-800 hover:text-blue-200"
+                        >
+                          <FiX className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {filters.service.map(service => (
+                      <span 
+                        key={`active-service-${service}`} 
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-200"
+                      >
+                        {service}
+                        <button
+                          onClick={() => toggleFilter('service', service)}
+                          className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-green-300 hover:bg-green-800 hover:text-green-200"
+                        >
+                          <FiX className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {filters.certification.map(cert => (
+                      <span 
+                        key={`active-cert-${cert}`} 
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-200"
+                      >
+                        {cert}
+                        <button
+                          onClick={() => toggleFilter('certification', cert)}
+                          className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-purple-300 hover:bg-purple-800 hover:text-purple-200"
+                        >
+                          <FiX className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {filters.teamSize.map(size => (
+                      <span 
+                        key={`active-size-${size}`} 
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900 text-yellow-200"
+                      >
+                        {size}
+                        <button
+                          onClick={() => toggleFilter('teamSize', size)}
+                          className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-yellow-300 hover:bg-yellow-800 hover:text-yellow-200"
+                        >
+                          <FiX className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {filters.minExperience.map(exp => {
+                      const label = experienceOptions.find(e => e.value === exp)?.label || `${exp}+ years`;
+                      return (
+                        <span 
+                          key={`active-exp-${exp}`} 
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-900 text-red-200"
+                        >
+                          {label}
+                          <button
+                            onClick={() => toggleFilter('minExperience', exp)}
+                            className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-red-300 hover:bg-red-800 hover:text-red-200"
+                          >
+                            <FiX className="w-3 h-3" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                    <button
+                      onClick={clearFilters}
+                      className="text-sm text-blue-400 hover:text-blue-300"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Results */}
+            {isLoading ? (
+              <div className="bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-700 flex justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : error ? (
+              <div className="bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-700 text-center">
+                <div className="text-red-400 mb-4">
+                  <FiFrown className="w-12 h-12 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-white mb-2">Error loading partners</h3>
+                <p className="text-gray-400">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : partners.length === 0 ? (
+              <div className="bg-gray-800 p-8 rounded-lg shadow-sm border border-gray-700 text-center">
+                <div className="text-gray-500 mb-4">
+                  <FiFrown className="w-12 h-12 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-white mb-2">No partners found</h3>
+                <p className="text-gray-400 mb-4">Try adjusting your filters or search query to find what you&apos;re looking for.</p>
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {partners.map(partner => {
+                  const averageRating = getAverageRating(partner);
+                  const reviewCount = partner.client_reviews?.length || 0;
+                  
+                  return (
+                    <div 
+                      key={`partner-${partner.id}`}
+                      className={`bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-blue-500/50 relative ${selectedCompanies.includes(partner.id) ? 'ring-2 ring-blue-500' : ''}`}
+                    >
+                      {/* Compare checkbox */}
+                      <div className="absolute top-2 right-2 z-10">
+                        <label className="inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedCompanies.includes(partner.id)}
+                            onChange={() => toggleCompanySelection(partner.id)}
+                            className="h-5 w-5 text-blue-600 rounded border-gray-600 focus:ring-blue-500 bg-gray-700"
+                          />
+                        </label>
+                      </div>
+
+                      {/* Partner logo and basic info */}
+                      <div className="p-4 border-b border-gray-700">
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0 h-16 w-16 rounded-md bg-gray-700 overflow-hidden border border-gray-600 flex items-center justify-center">
+                            {partner.logo ? (
+                              <Image
+                                width={64}
+                                height={64}
+                                src={partner.logo}
+                                alt={`${partner.company_name} logo`}
+                                className="max-h-full max-w-full object-contain"
+                              />
+                            ) : (
+                              <span className="text-xl font-bold text-gray-400">
+                                {getInitials(partner.company_name)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <h3 className="text-lg font-medium text-white line-clamp-1">
+                              {partner.company_name}
+                            </h3>
+                            <div className="flex items-center mt-1">
+                              <div className="flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                  <FiStar
+                                    key={`star-${partner.id}-${i}`}
+                                    className={`h-4 w-4 ${i < averageRating ? 'text-yellow-400 fill-current' : 'text-gray-500'}`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-xs text-gray-400 ml-1">
+                                ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                              </span>
+                            </div>
+                            <div className="mt-1 flex items-center text-sm text-gray-400">
+                              <FiMapPin className="flex-shrink-0 mr-1.5 h-4 w-4" />
+                              <span>
+                                {partner.headquarters_city}, {partner.headquarters_country}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Partner details */}
+                      <div className="p-4">
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="flex items-center">
+                            <FiUsers className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
+                            <span className="text-sm text-gray-400">
+                              {partner.team_size} team
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <FiCalendar className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
+                            <span className="text-sm text-gray-400">
+                              Est. {partner.year_founded}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <FiLayers className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
+                            <span className="text-sm text-gray-400">
+                              {partner.services_offered?.length || 0} services
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <FiAward className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
+                            <span className="text-sm text-gray-400">
+                              {partner.expertise_and_certifications?.length || 0} certs
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Industries served */}
+                        <div className="mb-4">
+                          <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+                            Industries
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {partner.industries_served?.slice(0, 3).map((industry, i) => (
+                              <span 
+                                key={`industry-${partner.id}-${i}`} 
+                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-900/50 text-blue-200"
+                              >
+                                {industry}
+                              </span>
+                            ))}
+                            {partner.industries_served?.length > 3 && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
+                                +{partner.industries_served.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Top services */}
+                        <div className="mb-4">
+                          <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+                            Top Services
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {partner.services_offered?.slice(0, 3).map((service, i) => (
+                              <span 
+                                key={`service-${partner.id}-${i}`}
+                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/50 text-green-200"
+                              >
+                                {service.name}
+                              </span>
+                            ))}
+                            {/* {partner.services_offered?.length > 3 && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
+                                +{partner.services_offered.length - 3} more
+                              </span>
+                            )} */}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="px-4 py-3 bg-gray-700/50 flex justify-between">
                         <Link
                           href={`/company/${partner.id}`}
-                          className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-red-700 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-red-500/25 relative overflow-hidden"
+                          className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
-                          
-                          <span className="relative z-20 flex items-center">
-                            View Details
-                            <FiEye className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
-                          </span>
+                          <FiEye className="mr-2 h-4 w-4" />
+                          View
                         </Link>
-                      </motion.div>
-                      
-                      {partner.website && partner.website !== '' && (
-                        <motion.div 
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="relative group/btn"
-                        >
+                        {partner.website && (
                           <Link
                             href={partner.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-orange-600 to-red-600 rounded-lg transition-all duration-300 shadow-md group-hover/btn:shadow-lg group-hover/btn:shadow-orange-500/25 relative overflow-hidden"
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                           >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out" />
-                            
-                            <span className="relative z-20 flex items-center">
-                              Visit Website
-                              <FiExternalLink className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
-                            </span>
+                            <FiExternalLink className="mr-2 h-4 w-4" />
+                            Website
                           </Link>
-                        </motion.div>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {partners.length > 0 && (
+              <div className="mt-8 flex justify-center">
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <button
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-600 bg-gray-700 text-sm font-medium text-gray-400 hover:bg-gray-600"
+                  >
+                    <span className="sr-only">Previous</span>
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                  <button
+                    className="z-10 bg-blue-900 border-blue-500 text-blue-100 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  >
+                    1
+                  </button>
+                  <button
+                    className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  >
+                    2
+                  </button>
+                  <button
+                    className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  >
+                    3
+                  </button>
+                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-600 bg-gray-700 text-sm font-medium text-gray-400">
+                    ...
+                  </span>
+                  <button
+                    className="bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  >
+                    8
+                  </button>
+                  <button
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-600 bg-gray-700 text-sm font-medium text-gray-400 hover:bg-gray-600"
+                  >
+                    <span className="sr-only">Next</span>
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Decorative elements */}
-      {mounted && (
-        <div className="fixed bottom-0 left-0 w-1/3 h-1/3 pointer-events-none">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full opacity-10">
-            <defs>
-              <linearGradient id="orangeGradient" gradientTransform="rotate(45)">
-                <stop offset="0%" stopColor="#f97316" />
-                <stop offset="100%" stopColor="#ea580c" />
-              </linearGradient>
-            </defs>
-            <motion.path
-              fill="url(#orangeGradient)"
-              d="M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
-              animate={{
-                d: [
-                  "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z",
-                  "M38.5,-65.8C49.8,-59.9,58.5,-48.5,65.4,-35.9C72.3,-23.3,77.5,-9.5,77.2,4.2C76.9,17.9,71.1,31.4,62.7,43.2C54.3,55,43.3,65,30.4,71.1C17.6,77.3,2.8,79.5,-12.3,77.7C-27.5,75.9,-42.9,70.1,-53.9,59.9C-64.8,49.7,-71.2,35.2,-74.5,20C-77.8,4.8,-78,-11,-73.1,-25.1C-68.3,-39.2,-58.4,-51.5,-46,-57.9C-33.6,-64.3,-18.5,-64.8,-3.4,-60.2C11.7,-55.6,27.2,-71.8,38.5,-65.8Z",
-                  "M49.6,-83.5C63.1,-75.4,72.3,-60.1,79.7,-44.4C87.1,-28.7,92.8,-12.5,89.5,1.9C86.2,16.3,74,28.9,62.8,40.9C51.6,53,41.4,64.5,28.8,71.2C16.1,77.9,0.9,79.7,-15.3,78.4C-31.5,77.1,-48.7,72.5,-60.1,61.9C-71.5,51.3,-77.2,34.6,-81.3,17.3C-85.4,-0.1,-88,-18.1,-82.5,-32.9C-76.9,-47.7,-63.3,-59.3,-48.3,-66.7C-33.3,-74,-16.7,-77.1,0.7,-78.2C18,-79.3,36.1,-91.7,49.6,-83.5Z"
-                ],
-              }}
-              transition={{
-                repeat: Infinity,
-                repeatType: "mirror",
-                duration: 25,
-                ease: "easeInOut",
-              }}
-              className="blur-md"
-            />
-          </svg>
-        </div>
-      )}
+      {/* Mobile Filters */}
+      <AnimatePresence>
+        {showMobileFilters && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed inset-0 z-50 overflow-y-auto"
+          >
+            <div className="flex min-h-screen">
+              <div 
+                className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" 
+                onClick={() => setShowMobileFilters(false)}
+              ></div>
+              
+              <div className="ml-auto relative w-full max-w-xs bg-gray-800 shadow-xl border-l border-gray-700">
+                <div className="h-full flex flex-col py-4 pb-6">
+                  <div className="px-4 flex items-center justify-between border-b border-gray-700 pb-4">
+                    <h2 className="text-lg font-medium text-white">Filters</h2>
+                    <button
+                      type="button"
+                      onClick={() => setShowMobileFilters(false)}
+                      className="-mr-2 w-10 h-10 bg-gray-700 p-2 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-300"
+                    >
+                      <FiX className="h-6 w-6" />
+                    </button>
+                  </div>
+
+                  {/* Mobile Filters Content */}
+                  <div className="mt-4 px-4 flex-1 overflow-y-auto">
+                    {/* Industry Filter */}
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-white mb-2">Industry Focus</h3>
+                      <div className="space-y-2">
+                        {industryOptions.map(industry => (
+                          <div key={`mobile-industry-${industry}`} className="flex items-center">
+                            <input
+                              id={`mobile-industry-${industry}`}
+                              type="checkbox"
+                              checked={filters.industry.includes(industry)}
+                              onChange={() => toggleFilter('industry', industry)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                            />
+                            <label htmlFor={`mobile-industry-${industry}`} className="ml-2 text-sm text-gray-300">
+                              {industry}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Services Filter */}
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-white mb-2">Services Offered</h3>
+                      <div className="space-y-2">
+                        {serviceOptions.map(service => (
+                          <div key={`mobile-service-${service}`} className="flex items-center">
+                            <input
+                              id={`mobile-service-${service}`}
+                              type="checkbox"
+                              checked={filters.service.includes(service)}
+                              onChange={() => toggleFilter('service', service)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                            />
+                            <label htmlFor={`mobile-service-${service}`} className="ml-2 text-sm text-gray-300">
+                              {service}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Certifications Filter */}
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-white mb-2">Certifications</h3>
+                      <div className="space-y-2">
+                        {certificationOptions.map(cert => (
+                          <div key={`mobile-cert-${cert}`} className="flex items-center">
+                            <input
+                              id={`mobile-cert-${cert}`}
+                              type="checkbox"
+                              checked={filters.certification.includes(cert)}
+                              onChange={() => toggleFilter('certification', cert)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                            />
+                            <label htmlFor={`mobile-cert-${cert}`} className="ml-2 text-sm text-gray-300">
+                              {cert}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Team Size Filter */}
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-white mb-2">Team Size</h3>
+                      <div className="space-y-2">
+                        {teamSizeOptions.map(size => (
+                          <div key={`mobile-size-${size}`} className="flex items-center">
+                            <input
+                              id={`mobile-size-${size}`}
+                              type="checkbox"
+                              checked={filters.teamSize.includes(size)}
+                              onChange={() => toggleFilter('teamSize', size)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
+                            />
+                            <label htmlFor={`mobile-size-${size}`} className="ml-2 text-sm text-gray-300">
+                              {size}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="px-4 py-4 border-t border-gray-700">
+                    <div className="flex space-x-3">
+                      <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="flex-1 bg-gray-700 py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Clear all
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowMobileFilters(false)}
+                        className="flex-1 bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Comparison Modal */}
+      <AnimatePresence>
+        {showComparison && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 overflow-y-auto"
+          >
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div className="absolute inset-0 bg-gray-900 opacity-75" onClick={() => setShowComparison(false)}></div>
+              </div>
+
+              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-gray-700"
+              >
+                <div className="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg leading-6 font-medium text-white">
+                          Compare Security Providers
+                        </h3>
+                        <button
+                          onClick={() => setShowComparison(false)}
+                          className="text-gray-400 hover:text-gray-300"
+                        >
+                          <FiX className="h-6 w-6" />
+                        </button>
+                      </div>
+                      <div className="mt-4">
+                        {companiesToCompare.length === 0 ? (
+                          <div className="text-center py-8">
+                            <p className="text-gray-400">Select companies to compare by checking the boxes</p>
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-700">
+                              <thead className="bg-gray-700">
+                                <tr>
+                                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Feature
+                                  </th>
+                                  {companiesToCompare.map(company => (
+                                    <th key={`compare-header-${company.id}`} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                      {company.company_name}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="bg-gray-800 divide-y divide-gray-700">
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Rating
+                                  </td>
+                                  {companiesToCompare.map(company => {
+                                    const avgRating = getAverageRating(company);
+                                    return (
+                                      <td key={`compare-rating-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                        <div className="flex items-center">
+                                          {[...Array(5)].map((_, i) => (
+                                            <FiStar
+                                              key={`compare-star-${company.id}-${i}`}
+                                              className={`h-4 w-4 ${i < avgRating ? 'text-yellow-400 fill-current' : 'text-gray-500'}`}
+                                            />
+                                          ))}
+                                          <span className="ml-1 text-xs text-gray-400">
+                                            ({company.client_reviews?.length || 0})
+                                          </span>
+                                        </div>
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Location
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-location-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      {company.headquarters_city}, {company.headquarters_country}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Team Size
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-team-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      {company.team_size}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Founded
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-founded-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      {company.year_founded}
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Industries
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-industries-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      <div className="flex flex-wrap gap-1">
+                                        {company.industries_served?.slice(0, 3).map((industry, i) => (
+                                          <span key={`compare-industry-${company.id}-${i}`} className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-900/50 text-blue-200">
+                                            {industry}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Services
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-services-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      <div className="flex flex-wrap gap-1">
+                                        {company.services_offered?.slice(0, 3).map((service, i) => (
+                                          <span key={`compare-service-${company.id}-${i}`} className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-900/50 text-green-200">
+                                            {service.name}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Certifications
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-certs-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      <div className="flex flex-wrap gap-1">
+                                        {company.expertise_and_certifications?.slice(0, 3).map((cert, i) => (
+                                          <span key={`compare-cert-${company.id}-${i}`} className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-purple-900/50 text-purple-200">
+                                            {cert.name}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </td>
+                                  ))}
+                                </tr>
+                                <tr>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                    Actions
+                                  </td>
+                                  {companiesToCompare.map(company => (
+                                    <td key={`compare-actions-${company.id}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                                      <div className="flex space-x-2">
+                                        <Link
+                                          href={`/company/${company.id}`}
+                                          className="inline-flex items-center px-2.5 py-1.5 border border-gray-600 shadow-sm text-xs font-medium rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        >
+                                          View
+                                        </Link>
+                                        {company.website && (
+                                          <Link
+                                            href={company.website}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                          >
+                                            Website
+                                          </Link>
+                                        )}
+                                      </div>
+                                    </td>
+                                  ))}
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button
+                    type="button"
+                    onClick={() => setShowComparison(false)}
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCompanies([])}
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

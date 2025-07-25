@@ -162,11 +162,13 @@ export default function NavbarNew() {
               </NavbarButton>
             ) : (
               <Link href="/login">
-                <NavbarButton variant="secondary">Login</NavbarButton>
+                Login
+                {/* <NavbarButton variant="secondary">Login</NavbarButton> */}
               </Link>
             )}
             <Link href="/contact_us">
-              <NavbarButton variant="primary">Contact Us</NavbarButton>
+            Contact Us
+              {/* <NavbarButton variant="primary">Contact Us</NavbarButton> */}
             </Link>
           </div>
         </NavBody>

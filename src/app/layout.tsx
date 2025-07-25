@@ -33,12 +33,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="!scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}>
+      <NavbarNew />
         {/* Background for ALL pages */}
         {/* <DynamicBackground /> */}
         {/* <GlobalLayout> */}
         {/* Content wrapper with higher z-index */}
         <div className="relative z-10 min-h-screen flex flex-col">
-      <NavbarNew />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
