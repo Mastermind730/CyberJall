@@ -143,6 +143,20 @@ export default function NavbarNew() {
     {
       name: "Product",
       link: "#product",
+      hasDropdown: true,
+      dropdownItems: [
+        {
+          category: "Products",
+          items: [
+            {
+              name: "CyberJall Insights",
+              link: "/cyberjall_insights",
+              description: "Comprehensive web application security testing",
+            },
+          ]
+        }
+      ]
+      
     },
   ]
 
