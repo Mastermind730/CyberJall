@@ -8,17 +8,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
-
-
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
   directUrl = env("DIRECT_DATABASE_URL")
   relationMode = "prisma"
-
 }
-
 
 enum Rewards{
   Bounty
@@ -26,10 +21,45 @@ enum Rewards{
 
 enum Severity{
   low
-  medium 
+  medium   
   high
   critical
 }
+
+enum PackageStatus {
+  active
+  upcoming
+  completed
+  cancelled
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum TicketPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum InvoiceStatus {
+  pending
+  paid
+  overdue
+  cancelled
+}
+
+enum UserRole {
+  customer
+  provider
+  admin
+}
+
 model Contacts{
   id String @id @default(auto()) @map("_id")@db.ObjectId
   name String
@@ -39,7 +69,6 @@ model Contacts{
   message String
   createdAt   DateTime @default(now()) @map("createdAt")
   updatedAt   DateTime @updatedAt @map("updatedAt")
-
 }
 
 model Programs{
@@ -50,38 +79,61 @@ model Programs{
 }
 
 model Reports{
-    id String @id @default(auto()) @map("_id")@db.ObjectId
-    name String
-    email String
-    title String
-    severity Severity
-    type String
-    detail String
-    steps String[]
-    impact String
-    affected_system String
-    poc Bytes?
-    createdAt   DateTime @default(now()) @map("createdAt")
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  name String
+  email String
+  title String
+  severity Severity
+  type String
+  detail String
+  steps String[]
+  impact String
+  affected_system String
+  poc Bytes?
+  createdAt   DateTime @default(now()) @map("createdAt")
   updatedAt   DateTime @updatedAt @map("updatedAt")
 }
 
 model User{
-      id String @id @default(auto()) @map("_id")@db.ObjectId
-    // name String 
-    work_email String
-    company_name String
-    contact String
-    message String
-    password String
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  work_email String @unique
+  company_name String
+  contact String
+  message String
+  password String
+  role UserRole @default(customer)
+  profile Profile?
+  packages Package[]
+  invoices Invoice[]
+  tickets SupportTicket[]
+  messages Message[]
+  cyberHealthScore CyberHealthScore?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+model Profile {
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  userId String @unique @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String?
+  lastName String?
+  jobTitle String?
+  phone String?
+  avatar String?
+  twoFactorEnabled Boolean @default(false)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Validated_User{
-      id String @id @default(auto()) @map("_id")@db.ObjectId
-    // name String 
-    work_email String
-    company_name String
-    contact String
-    message String
-    password String
+  id String @id @default(auto()) @map("_id")@db.ObjectId
+  work_email String
+  company_name String
+  contact String
+  message String
+  password String
 }
 
 model Company {
@@ -102,7 +154,8 @@ model Company {
   client_reviews            Json
   social_links              Json
   website                   String
-  products                  Json @default("{}") // Default empty object
+  products                  Json @default("{}")
+  packages                  Package[]
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
 
@@ -131,20 +184,16 @@ model Validated_Company {
   client_reviews            Json
   social_links              Json
   website                   String
-  products                  Json @default("{}") // Default empty object
+  products                  Json @default("{}")
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
 
-  // @@index([company_name])
   @@index([year_founded])
   @@index([headquarters_city])
   @@index([headquarters_country])
   @@index([industries_served])
   @@index([team_size])
 }
-
-
-
 
 model SecurityAssessmentRequest {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -162,4 +211,124 @@ model SecurityAssessmentRequest {
   confirmSubmission  Boolean
   createdAt          DateTime @default(now()) @map("createdAt")
   updatedAt          DateTime @updatedAt @map("updatedAt")
+}
+
+model Package {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String
+  status PackageStatus
+  startDate DateTime?
+  endDate DateTime?
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerId String? @db.ObjectId
+  provider Company? @relation(fields: [providerId], references: [id])
+  services String[]
+  totalAmount Float
+  reports Json @default("[]")
+  summary String?
+  messages Message[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  content String
+  senderId String @db.ObjectId
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  packageId String @db.ObjectId
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  isFromProvider Boolean @default(false)
+  attachments String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invoice {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNumber String @unique
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount Float
+  paidAmount Float @default(0)
+  status InvoiceStatus @default(pending)
+  dueDate DateTime
+  description String
+  items Json @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SupportTicket {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  ticketNumber String @unique
+  title String
+  description String
+  status TicketStatus @default(open)
+  priority TicketPriority @default(medium)
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedTo String?
+  responses Json @default("[]")
+  attachments String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CyberHealthScore {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score Int
+  lastAssessment DateTime
+  improvements Json @default("[]")
+  riskFactors Json @default("[]")
+  recommendations Json @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NewsArticle {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  content String
+  summary String
+  category String
+  industry String[]
+  severity Severity?
+  imageUrl String?
+  sourceUrl String?
+  publishedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CaseStudy {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  industry String
+  challenge String
+  solution String
+  results String
+  imageUrl String?
+  tags String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Webinar {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  presenter String
+  scheduledAt DateTime
+  duration Int
+  registrationUrl String?
+  recordingUrl String?
+  isLive Boolean @default(false)
+  tags String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -3,9 +3,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "./components/Footer";
+import LayoutContent from "./components/LayoutContent";
 // import DynamicBackground from "./components/Background";
-import NavbarNew from "./components/Navbar";
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,23 +27,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const router=useRouter();
-  // const isAdminRoute = router.pathname.startsWith('/admin');
-  // const pathName= usePathname();
-
   return (
     <html lang="en" className="!scroll-smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}>
-      <NavbarNew />
-        {/* Background for ALL pages */}
-        {/* <DynamicBackground /> */}
-        {/* <GlobalLayout> */}
-        {/* Content wrapper with higher z-index */}
-        <div className="relative z-10 min-h-screen flex flex-col">
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-        {/* </GlobalLayout> */}
+        <LayoutContent>{children}</LayoutContent>
       </body>
     </html>
   );
