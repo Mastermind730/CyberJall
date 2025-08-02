@@ -69,7 +69,7 @@ export default function NavbarNew() {
       ],
     },
         {
-      name: "MarktetPlace",
+      name: "MarketPlace",
       link: "/ourPartners",
     },
     {
@@ -149,8 +149,8 @@ export default function NavbarNew() {
           category: "Products",
           items: [
             {
-              name: "CyberJall Insights",
-              link: "/cyberjall_insights",
+              name: "Bug Bounty",
+              link: "/products/bug_bounty",
               description: "Comprehensive web application security testing",
             },
           ]

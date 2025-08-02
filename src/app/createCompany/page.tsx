@@ -966,7 +966,8 @@ export default function CompanyProfile() {
   ))}
 </motion.div>
               {/* Expertise & Certifications (JSON Structure) */}
-              <motion.div
+            {/* Expertise & Certifications (JSON Structure) */}
+<motion.div
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ delay: 1.3 }}
@@ -1001,7 +1002,7 @@ export default function CompanyProfile() {
       </div>
       <button
         type="button"
-        onClick={() => appendCert({ type: '', name: '', logo: '' })}
+        onClick={() => appendCert({ type: 'certification', name: '', logo: '' })}
         className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg text-white text-sm hover:from-orange-600 hover:to-red-600 transition-all flex items-center"
       >
         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1035,11 +1036,10 @@ export default function CompanyProfile() {
               {...register(`expertise_and_certifications.${index}.type`, { required: "Type required" })}
               className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white"
             >
-              <option value="">Select type</option>
-              <option value="certification" className="bg-gray-800">Certification</option>
-              <option value="partnership" className="bg-gray-800">Partnership</option>
-              <option value="expertise" className="bg-gray-800">Expertise</option>
-              <option value="achievement" className="bg-gray-800">Achievement</option>
+              <option value="certification">Certification</option>
+              <option value="partnership">Partnership</option>
+              <option value="expertise">Expertise</option>
+              <option value="achievement">Achievement</option>
             </select>
             {errors.expertise_and_certifications?.[index]?.type && (
               <p className="mt-1 text-sm text-red-400">{errors.expertise_and_certifications[index]?.message}</p>
@@ -1047,12 +1047,23 @@ export default function CompanyProfile() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Name/Description</label>
-            <input
-              {...register(`expertise_and_certifications.${index}.name`, { required: "Name required" })}
+            <label className="block text-sm font-medium text-gray-300 mb-2">Certification</label>
+            <select
+              {...register(`expertise_and_certifications.${index}.name`, { required: "Certification required" })}
               className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white"
-              placeholder="e.g., CISSP, ISO 27001"
-            />
+            >
+              <option value="">Select certification</option>
+              <option value="ISO 27001">ISO 27001</option>
+              <option value="SOC 2">SOC 2</option>
+              <option value="GDPR">GDPR</option>
+              <option value="PCI DSS">PCI DSS</option>
+              <option value="HIPAA">HIPAA</option>
+              <option value="NIST">NIST</option>
+              <option value="CIS">CIS</option>
+              <option value="CREST">CREST</option>
+              <option value="OSCP">OSCP</option>
+              <option value="other">Other</option>
+            </select>
             {errors.expertise_and_certifications?.[index]?.name && (
               <p className="mt-1 text-sm text-red-400">{errors.expertise_and_certifications[index]?.name?.message}</p>
             )}
@@ -1113,7 +1124,6 @@ export default function CompanyProfile() {
     ))}
   </div>
 </motion.div>
-              
               {/* Case Studies (JSON Structure) */}
               <motion.div
                 initial={{ x: -20, opacity: 0 }}

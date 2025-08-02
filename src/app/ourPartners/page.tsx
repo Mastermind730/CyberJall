@@ -80,8 +80,19 @@ const getDisplayName = (item: string | { name: string }): string => {
 
 // Constants
 const industryOptions = [
-  "Fintech", "Healthcare", "E-commerce", "Government", 
-  "Education", "Manufacturing", "Retail", "Telecom"
+  
+  'Finance & Banking', 
+        'Healthcare & Life Sciences',
+        'E-commerce & Retail',
+        'Telecommunications',
+        'Agriculture & Agritech',
+        'Hospitality & Travel',
+        'Aerospace & Defense',
+        'Government & Public Sector',
+        'Education & EdTech',
+        'Transportation & Logistics',
+        'Real Estate & Construction',
+        'Other'
 ];
 
 const serviceOptions = [

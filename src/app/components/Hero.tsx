@@ -100,14 +100,14 @@ export const Hero: FC = () => {
             <div 
               key={position}
               className="absolute rounded-full bg-white/5 backdrop-blur-sm"
-              style={{
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                left: `${position}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
-                animationDelay: `${Math.random() * 5}s`
-              }}
+              // style={{
+              //   width: `${Math.random() * 10 + 5}px`,
+              //   height: `${Math.random() * 10 + 5}px`,
+              //   left: `${position}%`,
+              //   top: `${Math.random() * 100}%`,
+              //   animation: `float ${Math.random() * 10 + 10}s infinite ease-in-out`,
+              //   animationDelay: `${Math.random() * 5}s`
+              // }}
             />
           ))}
         </div>
