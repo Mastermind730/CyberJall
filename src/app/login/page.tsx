@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -40,7 +41,7 @@ export default function Login() {
       const response = await axios.post('/api/login', body);
 
       if (response.data) {
-        toast.success('User successfully logged in!', {
+        toast.success('Authentication successful!', {
           position: 'top-right',
           autoClose: 3000,
           hideProgressBar: false,
@@ -48,15 +49,27 @@ export default function Login() {
           pauseOnHover: true,
           draggable: true,
         });
-        // console.log(response.data.token)
-        localStorage.setItem("token",response.data.token)
-        localStorage.setItem("user",JSON.stringify(response.data.user))
-        // console.log(response.data.user)
-        router.push('/dashboard');
+
+        // Store token and user data
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+
+        // Redirect based on role
+        if (response.data.user.role === 'provider') {
+          router.push('/dashboard');
+        } else if (response.data.user.role === 'customer') {
+          router.push('/customer');
+        } else if (response.data.user.role === 'admin') {
+          router.push('/admin');
+        } else {
+          // Default fallback
+          router.push('/dashboard');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
-      toast.error('Login failed. Please check your credentials.', {
+      const errorMessage = error.response?.data?.error || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage, {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -155,7 +168,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label htmlFor="email" className="block text-orange-500 text-sm font-medium mb-1">EMAIL</label>
+            <label htmlFor="email" className="block text-orange-500 text-sm font-medium mb-1">WORK EMAIL</label>
             <div className="relative group">
               <input
                 type="email"
@@ -164,7 +177,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-gray-800 text-white border border-gray-700 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
                 required
-                placeholder="Enter your email"
+                placeholder="your@company.com"
               />
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-600 via-orange-500 to-red-600 transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300" />
             </div>
@@ -180,7 +193,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-gray-800 text-white border border-gray-700 rounded px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
                 required
-                placeholder="Enter your password"
+                placeholder="••••••••"
               />
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-600 via-orange-500 to-red-600 transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300" />
             </div>
@@ -202,7 +215,12 @@ export default function Login() {
           </button>
 
           <div className="flex justify-between mt-6 text-sm">
-            <Link href="/register" className="text-gray-400 hover:text-orange-500 transition-colors">Create Account</Link>
+            <Link href="/forgot-password" className="text-gray-400 hover:text-orange-500 transition-colors">
+              Forgot Password?
+            </Link>
+            <Link href="/register" className="text-gray-400 hover:text-orange-500 transition-colors">
+              Create Account
+            </Link>
           </div>
         </form>
 

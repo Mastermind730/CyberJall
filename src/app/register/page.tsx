@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
@@ -13,6 +14,7 @@ interface FormData {
   phoneNumber: string;
   password: string;
   confirmPassword: string;
+  userType: "customer" | "provider";
 }
 
 interface FormErrors {
@@ -21,6 +23,7 @@ interface FormErrors {
   phoneNumber?: string;
   password?: string;
   confirmPassword?: string;
+  userType?: string;
 }
 
 const Page = () => {
@@ -30,6 +33,7 @@ const Page = () => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
+    userType: "customer",
   });
 
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -37,7 +41,7 @@ const Page = () => {
 
   const router = useRouter();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -63,6 +67,9 @@ const Page = () => {
     }
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
+    }
+    if (!formData.userType) {
+      errors.userType = "Please select your role";
     }
     return errors;
   };
@@ -92,9 +99,10 @@ const Page = () => {
             router.push("/login");
           }, 3000);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Registration failed:", error);
-        toast.error("Registration failed. Please try again.", {
+        const errorMessage = error.response?.data?.error || "Registration failed. Please try again.";
+        toast.error(errorMessage, {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -155,7 +163,7 @@ const Page = () => {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Get Started with CyberJall InfoTech 
+            Join CyberJall InfoTech
           </motion.h1>
           <motion.p
             className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto"
@@ -163,7 +171,7 @@ const Page = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            Secure your applications with our comprehensive platform designed for companies of all sizes.
+            Secure your digital assets with our comprehensive security platform.
           </motion.p>
         </div>
       </motion.header>
@@ -193,13 +201,33 @@ const Page = () => {
                   Create Your Account
                 </motion.h2>
 
+                {/* User Type */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <label className="text-white/90 text-sm font-medium mb-1 block">I am a</label>
+                  <select
+                    name="userType"
+                    value={formData.userType}
+                    onChange={handleChange}
+                    className={`w-full bg-black/10 border border-red-500/30 rounded-lg py-2 px-4 text-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent`}
+                  >
+                    <option value="customer">Security Service Customer</option>
+                    <option value="provider">Security Service Provider</option>
+                  </select>
+                </motion.div>
+
                 {/* Company Name */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <label className="text-white/90 text-sm font-medium mb-1 block">Company Name</label>
+                  <label className="text-white/90 text-sm font-medium mb-1 block">
+                    {formData.userType === 'provider' ? 'Company Name' : 'Your Organization'}
+                  </label>
                   <input
                     type="text"
                     name="companyName"
@@ -207,9 +235,12 @@ const Page = () => {
                     onChange={handleChange}
                     className={`w-full bg-black/10 border ${
                       formErrors.companyName ? "border-red-400" : "border-red-500/30"
-                    } 
-                      rounded-lg py-2 px-4 text-white placeholder-red-300/60 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent`}
-                    placeholder="Enter your company name"
+                    } rounded-lg py-2 px-4 text-white placeholder-red-300/60 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent`}
+                    placeholder={
+                      formData.userType === 'provider' 
+                        ? 'Enter your company name' 
+                        : 'Enter your organization name'
+                    }
                   />
                   {formErrors.companyName && (
                     <p className="text-red-300 text-xs mt-1">{formErrors.companyName}</p>
@@ -222,7 +253,7 @@ const Page = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <label className="text-white/90 text-sm font-medium mb-1 block">Email</label>
+                  <label className="text-white/90 text-sm font-medium mb-1 block">Work Email</label>
                   <input
                     type="email"
                     name="email"
@@ -231,7 +262,7 @@ const Page = () => {
                     className={`w-full bg-black/10 border ${
                       formErrors.email ? "border-red-400" : "border-red-500/30"
                     } rounded-lg py-2 px-4 text-white placeholder-red-300/60 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-transparent`}
-                    placeholder="Enter your email"
+                    placeholder="Enter your work email"
                   />
                   {formErrors.email && (
                     <p className="text-red-300 text-xs mt-1">{formErrors.email}</p>
@@ -307,13 +338,38 @@ const Page = () => {
                 {/* Submit Button */}
                 <motion.button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg py-2 font-semibold hover:bg-gradient-to-r hover:from-red-700 hover:to-orange-600 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg py-3 font-semibold hover:bg-gradient-to-r hover:from-red-700 hover:to-orange-600 transition-all"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting..." : "Sign Up"}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating Account...
+                    </span>
+                  ) : (
+                    "Create Account"
+                  )}
                 </motion.button>
+
+                <motion.p 
+                  className="text-center text-white/70 text-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2 }}
+                >
+                  Already have an account?{' '}
+                  <a 
+                    href="/login" 
+                    className="text-red-400 hover:text-red-300 underline transition-colors"
+                  >
+                    Sign in
+                  </a>
+                </motion.p>
               </motion.form>
             </motion.div>
 
@@ -339,10 +395,10 @@ const Page = () => {
                   className="relative z-10"
                 >
                   <Image
-                    src="/security-vector.svg" // Replace with your security vector image
-                    alt="Security Animation"
-                    width={400}
-                    height={400}
+                    src="/security-vector.svg"
+                    alt="Security Illustration"
+                    width={500}
+                    height={500}
                     className="drop-shadow-2xl"
                   />
                 </motion.div>
