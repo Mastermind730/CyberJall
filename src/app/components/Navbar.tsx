@@ -169,22 +169,26 @@ export default function NavbarNew() {
         <NavBody>
           <NavbarLogo />
           <NavItems items={navItems} />
-          <div className="flex items-center gap-4">
-            {isLoggedIn ? (
-              <NavbarButton variant="secondary" onClick={handleLogout}>
-                Logout
-              </NavbarButton>
-            ) : (
-              <Link href="/login">
-                Login
-                {/* <NavbarButton variant="secondary">Login</NavbarButton> */}
-              </Link>
-            )}
-            <Link href="/contact_us">
-            Contact Us
-              {/* <NavbarButton variant="primary">Contact Us</NavbarButton> */}
-            </Link>
-          </div>
+         <div className="flex items-center gap-4">
+  {isLoggedIn ? (
+    <NavbarButton variant="secondary" onClick={handleLogout}>
+      Logout
+    </NavbarButton>
+  ) : (
+    <NavbarButton 
+      variant="secondary" 
+      onClick={() => router.push('/login')}
+    >
+      Login
+    </NavbarButton>
+  )}
+  <NavbarButton 
+    variant="primary" 
+    onClick={() => router.push('/contact_us')}
+  >
+    Contact Us
+  </NavbarButton>
+</div>
         </NavBody>
 
         {/* Mobile Navigation */}
