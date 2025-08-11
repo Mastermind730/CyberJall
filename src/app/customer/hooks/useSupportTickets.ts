@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import type { SupportTicket } from "@/lib/types"
 
 export function useSupportTickets(status?: string, priority?: string) {
@@ -8,11 +8,7 @@ export function useSupportTickets(status?: string, priority?: string) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchTickets()
-  }, [status, priority])
-
-  const fetchTickets = async () => {
+   const fetchTickets = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -33,7 +29,13 @@ export function useSupportTickets(status?: string, priority?: string) {
     } finally {
       setLoading(false)
     }
-  }
+  },[priority,status])
+
+  useEffect(() => {
+    fetchTickets()
+  }, [status,fetchTickets, priority])
+
+ 
 
   const createTicket = async (ticketData: {
     title: string

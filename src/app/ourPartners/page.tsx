@@ -278,15 +278,25 @@ export default function Partners() {
             </span>
           </h1>
           <div className="flex items-center space-x-4">
-            {selectedCompanies.length > 0 && (
-              <button
-                onClick={() => setShowComparison(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
-              >
-                <FiBarChart2 className="mr-2" />
-                Compare ({selectedCompanies.length})
-              </button>
-            )}
+            
+{selectedCompanies.length > 0 && (
+  <>
+    <button
+      onClick={() => setShowComparison(true)}
+      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
+    >
+      <FiBarChart2 className="mr-2" />
+      Compare ({selectedCompanies.length})
+    </button>
+    <Link
+      href="/bid/create"
+      className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center"
+    >
+      <FiTrendingUp className="mr-2" />
+      Smart Bid ({selectedCompanies.length})
+    </Link>
+  </>
+)}
             <button
               onClick={() => setShowMobileFilters(!showMobileFilters)}
               className="md:hidden px-3 py-2 bg-gray-800 border border-gray-700 rounded-md shadow-sm text-sm font-medium text-white hover:bg-gray-700 flex items-center"

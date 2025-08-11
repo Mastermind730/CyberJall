@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState } from "react"
@@ -29,43 +30,58 @@ import {
   Trash2,
   Lock,
   Plus,
+  Loader2,
+  Info,
 } from "lucide-react"
 
-const invoices = [
-  {
-    id: "INV-2024-001",
-    date: "2024-01-01",
-    description: "Penetration Testing Service",
-    amount: 15000,
-    paidAmount: 15000,
-    status: "paid",
-    dueDate: "2024-01-15",
-  },
-  {
-    id: "INV-2024-002",
-    date: "2024-01-10",
-    description: "Compliance Audit Service",
-    amount: 25000,
-    paidAmount: 12500,
-    status: "partial",
-    dueDate: "2024-01-25",
-  },
-  {
-    id: "INV-2024-003",
-    date: "2024-01-15",
-    description: "Security Awareness Training",
-    amount: 8000,
-    paidAmount: 0,
-    status: "pending",
-    dueDate: "2024-01-30",
-  },
-]
-
 export default function SettingsPage() {
+  // Dummy state for password settings
   const [showPassword, setShowPassword] = useState(false)
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true)
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false)
+  const [passwordChangeError, setPasswordChangeError] = useState<string | null>(null)
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false)
+
+  // Dummy state for 2FA
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false)
+
+  // Dummy state for notifications
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [smsNotifications, setSmsNotifications] = useState(false)
+
+  // Dummy invoice data
+  const invoices = [
+    {
+      id: "inv_123",
+      invoiceNumber: "INV-2023-001",
+      description: "Monthly Subscription",
+      status: "paid",
+      createdAt: "2023-01-15",
+      dueDate: "2023-02-15",
+      amount: 99.99,
+      paidAmount: 99.99
+    },
+    {
+      id: "inv_124",
+      invoiceNumber: "INV-2023-002",
+      description: "Additional Services",
+      status: "pending",
+      createdAt: "2023-02-15",
+      dueDate: "2023-03-15",
+      amount: 49.99,
+      paidAmount: 0
+    }
+  ]
+
+  // Dummy summary data
+  const summary = {
+    totalAmount: 149.98,
+    paidAmount: 99.99,
+    unpaidAmount: 49.99
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -82,9 +98,33 @@ export default function SettingsPage() {
     }
   }
 
-  const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0)
-  const paidAmount = invoices.reduce((sum, inv) => sum + inv.paidAmount, 0)
-  const unpaidAmount = totalAmount - paidAmount
+  const handleChangePassword = () => {
+    setPasswordChangeLoading(true)
+    setPasswordChangeError(null)
+    setPasswordChangeSuccess(false)
+
+    // Simulate API call
+    setTimeout(() => {
+      if (newPassword !== confirmPassword) {
+        setPasswordChangeError("New password and confirm password do not match.")
+      } else {
+        setPasswordChangeSuccess(true)
+        setCurrentPassword("")
+        setNewPassword("")
+        setConfirmPassword("")
+      }
+      setPasswordChangeLoading(false)
+    }, 1000)
+  }
+
+  const handleToggleTwoFactor = (checked: boolean) => {
+    setTwoFactorLoading(true)
+    // Simulate API call
+    setTimeout(() => {
+      setTwoFactorEnabled(checked)
+      setTwoFactorLoading(false)
+    }, 800)
+  }
 
   return (
     <div className="space-y-6">
@@ -128,6 +168,8 @@ export default function SettingsPage() {
                     <Input
                       id="currentPassword"
                       type={showPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
                       className="bg-gray-800 border-gray-700 text-white pr-10"
                     />
                     <Button
@@ -145,16 +187,42 @@ export default function SettingsPage() {
                   <Label htmlFor="newPassword" className="text-gray-300">
                     New Password
                   </Label>
-                  <Input id="newPassword" type="password" className="bg-gray-800 border-gray-700 text-white" />
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-gray-300">
                   Confirm New Password
                 </Label>
-                <Input id="confirmPassword" type="password" className="bg-gray-800 border-gray-700 text-white" />
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="bg-gray-800 border-gray-700 text-white"
+                />
               </div>
-              <Button className="bg-orange-500 hover:bg-orange-600">Update Password</Button>
+              {passwordChangeError && <p className="text-red-400 text-sm">{passwordChangeError}</p>}
+              {passwordChangeSuccess && <p className="text-green-400 text-sm">Password updated successfully!</p>}
+              <Button
+                onClick={handleChangePassword}
+                disabled={passwordChangeLoading}
+                className="bg-orange-500 hover:bg-orange-600"
+              >
+                {passwordChangeLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                  </>
+                ) : (
+                  "Update Password"
+                )}
+              </Button>
             </CardContent>
           </Card>
 
@@ -176,7 +244,11 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-400">Secure your account with two-factor authentication</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
+                  <Switch
+                    checked={twoFactorEnabled}
+                    onCheckedChange={handleToggleTwoFactor}
+                    disabled={twoFactorLoading}
+                  />
                   <Badge
                     variant="secondary"
                     className={twoFactorEnabled ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400"}
@@ -185,6 +257,11 @@ export default function SettingsPage() {
                   </Badge>
                 </div>
               </div>
+              {twoFactorLoading && (
+                <p className="text-gray-400 text-sm flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating 2FA...
+                </p>
+              )}
               {twoFactorEnabled && (
                 <div className="p-4 bg-gray-800 rounded-lg">
                   <p className="text-sm text-gray-300 mb-2">
@@ -233,7 +310,7 @@ export default function SettingsPage() {
                 <DollarSign className="h-4 w-4 text-orange-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">${totalAmount.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-white">${summary.totalAmount.toLocaleString()}</div>
                 <p className="text-xs text-gray-400">All time billing</p>
               </CardContent>
             </Card>
@@ -244,7 +321,7 @@ export default function SettingsPage() {
                 <DollarSign className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">${paidAmount.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-white">${summary.paidAmount.toLocaleString()}</div>
                 <p className="text-xs text-green-400">Successfully paid</p>
               </CardContent>
             </Card>
@@ -255,7 +332,7 @@ export default function SettingsPage() {
                 <DollarSign className="h-4 w-4 text-red-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">${unpaidAmount.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-white">${summary.unpaidAmount.toLocaleString()}</div>
                 <p className="text-xs text-red-400">Outstanding balance</p>
               </CardContent>
             </Card>
@@ -271,41 +348,48 @@ export default function SettingsPage() {
               <CardDescription className="text-gray-400">View and manage your billing history</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {invoices.map((invoice) => (
-                  <div key={invoice.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3">
-                        <div>
-                          <p className="text-white font-medium">{invoice.id}</p>
-                          <p className="text-sm text-gray-400">{invoice.description}</p>
+              {invoices.length > 0 ? (
+                <div className="space-y-4">
+                  {invoices.map((invoice) => (
+                    <div key={invoice.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <p className="text-white font-medium">{invoice.invoiceNumber}</p>
+                            <p className="text-sm text-gray-400">{invoice.description}</p>
+                          </div>
+                          <Badge variant="secondary" className={getStatusColor(invoice.status)}>
+                            {invoice.status}
+                          </Badge>
                         </div>
-                        <Badge variant="secondary" className={getStatusColor(invoice.status)}>
-                          {invoice.status}
-                        </Badge>
+                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-400">
+                          <span>Date: {new Date(invoice.createdAt).toLocaleDateString()}</span>
+                          <span>Due: {new Date(invoice.dueDate).toLocaleDateString()}</span>
+                          <span>
+                            Paid: ${invoice.paidAmount.toLocaleString()} / ${invoice.amount.toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-400">
-                        <span>Date: {invoice.date}</span>
-                        <span>Due: {invoice.dueDate}</span>
-                        <span>
-                          Paid: ${invoice.paidAmount.toLocaleString()} / ${invoice.amount.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm" className="border-gray-700 bg-transparent">
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </Button>
-                      {invoice.status === "pending" || invoice.status === "partial" ? (
-                        <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
-                          Pay Now
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm" className="border-gray-700 bg-transparent">
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
                         </Button>
-                      ) : null}
+                        {invoice.status === "pending" && (
+                          <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
+                            Pay Now
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                  <Info className="h-8 w-8 mb-2" />
+                  <p>No invoices found.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -355,11 +439,11 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-gray-400 text-sm">Account ID</Label>
-                  <p className="text-white">CUST-2024-001</p>
+                  <p className="text-white">cust_123456789</p>
                 </div>
                 <div>
                   <Label className="text-gray-400 text-sm">Account Type</Label>
-                  <p className="text-white">Enterprise Customer</p>
+                  <p className="text-white">Premium</p>
                 </div>
                 <div>
                   <Label className="text-gray-400 text-sm">Member Since</Label>
@@ -367,7 +451,7 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400 text-sm">Last Login</Label>
-                  <p className="text-white">2 hours ago</p>
+                  <p className="text-white">Just now</p>
                 </div>
               </div>
             </CardContent>
@@ -409,7 +493,7 @@ export default function SettingsPage() {
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="confirmText" className="text-gray-300">
-                            Type "DEACTIVATE" to confirm
+                            Type &quot;DEACTIVATE&quot; to confirm
                           </Label>
                           <Input
                             id="confirmText"

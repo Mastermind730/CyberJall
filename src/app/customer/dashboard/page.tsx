@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Calendar,
 } from "lucide-react"
+import { Progress } from "@radix-ui/react-progress"
 
 export default function CustomerDashboard() {
   return (

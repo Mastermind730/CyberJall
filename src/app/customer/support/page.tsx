@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -17,40 +18,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/app/components/ui/dialog"
-import { MessageSquare, Phone, Mail, Plus, Search, Filter, Send, Paperclip, Bot, User } from "lucide-react"
-
-const tickets = [
-  {
-    id: "TKT-2024-001",
-    title: "Unable to access penetration test reports",
-    status: "open",
-    priority: "high",
-    category: "Technical",
-    createdAt: "2024-01-08",
-    lastUpdate: "2024-01-08",
-    assignedTo: "Sarah Johnson",
-  },
-  {
-    id: "TKT-2024-002",
-    title: "Request for additional security assessment",
-    status: "in_progress",
-    priority: "medium",
-    category: "Service Request",
-    createdAt: "2024-01-05",
-    lastUpdate: "2024-01-07",
-    assignedTo: "Mike Chen",
-  },
-  {
-    id: "TKT-2024-003",
-    title: "Billing inquiry for invoice INV-2024-002",
-    status: "resolved",
-    priority: "low",
-    category: "Billing",
-    createdAt: "2024-01-03",
-    lastUpdate: "2024-01-04",
-    assignedTo: "Lisa Rodriguez",
-  },
-]
+import {
+  MessageSquare,
+  Phone,
+  Mail,
+  Plus,
+  Search,
+  Filter,
+  Send,
+  Paperclip,
+  Bot,
+  User,
+  Loader2,
+  Info,
+} from "lucide-react"
+import { useSupportTickets } from "../hooks/useSupportTickets"
 
 const chatMessages = [
   {
@@ -75,8 +57,15 @@ const chatMessages = [
 ]
 
 export default function SupportPage() {
+  const { tickets, loading, error, refetch, createTicket, updateTicket } = useSupportTickets()
   const [newMessage, setNewMessage] = useState("")
-  const [selectedTicket, setSelectedTicket] = useState<any>(null)
+  const [newTicketTitle, setNewTicketTitle] = useState("")
+  const [newTicketDescription, setNewTicketDescription] = useState("")
+  const [newTicketCategory, setNewTicketCategory] = useState("")
+  const [newTicketPriority, setNewTicketPriority] = useState("")
+  const [isCreatingTicket, setIsCreatingTicket] = useState(false)
+  const [currentTicketResponse, setCurrentTicketResponse] = useState("")
+  const [isSendingResponse, setIsSendingResponse] = useState(false)
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -110,9 +99,76 @@ export default function SupportPage() {
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
-      // Handle sending message
+      // This is a client-side simulation. For a real chat, you'd send to a backend API.
+      chatMessages.push({
+        id: chatMessages.length + 1,
+        sender: "user",
+        message: newMessage,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      })
       setNewMessage("")
+      // Simulate bot response
+      setTimeout(() => {
+        chatMessages.push({
+          id: chatMessages.length + 1,
+          sender: "bot",
+          message: "Thank you for your message. I'm processing your request...",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        })
+      }, 1000)
     }
+  }
+
+  const handleCreateTicket = async () => {
+    setIsCreatingTicket(true)
+    try {
+      await createTicket({
+        title: newTicketTitle,
+        description: newTicketDescription,
+        category: newTicketCategory,
+        priority: newTicketPriority,
+      })
+      alert("Support ticket created successfully!")
+      setNewTicketTitle("")
+      setNewTicketDescription("")
+      setNewTicketCategory("")
+      setNewTicketPriority("")
+      refetch() // Refresh the ticket list
+    } catch (err) {
+      console.error("Failed to create ticket:", err)
+      alert("Failed to create ticket. Please try again.")
+    } finally {
+      setIsCreatingTicket(false)
+    }
+  }
+
+  const handleAddTicketResponse = async (ticketId: string) => {
+    setIsSendingResponse(true)
+    try {
+      await updateTicket(ticketId, currentTicketResponse)
+      alert("Response added successfully!")
+      setCurrentTicketResponse("")
+      refetch() // Refresh the ticket details
+    } catch (err) {
+      console.error("Failed to add response:", err)
+      alert("Failed to add response. Please try again.")
+    } finally {
+      setIsSendingResponse(false)
+    }
+  }
+
+  const renderLoadingOrError = (loading: boolean, error: string | null, message: string) => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center h-48 text-white">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading {message}...
+        </div>
+      )
+    }
+    if (error) {
+      return <div className="flex items-center justify-center h-48 text-red-400">Error: {error}. Please try again.</div>
+    }
+    return null
   }
 
   return (
@@ -152,7 +208,7 @@ export default function SupportPage() {
           <CardContent className="p-6 text-center">
             <Mail className="h-12 w-12 text-orange-500 mx-auto mb-4" />
             <h3 className="text-white font-semibold mb-2">Email Support</h3>
-            <p className="text-gray-400 text-sm mb-4">Send us a detailed message and we'll get back to you soon</p>
+            <p className="text-gray-400 text-sm mb-4">Send us a detailed message and we&apos;ll get back to you soon</p>
             <Button variant="outline" className="w-full border-gray-700 bg-transparent">
               Send Email
             </Button>
@@ -188,125 +244,148 @@ export default function SupportPage() {
             </div>
           </div>
 
-          <div className="space-y-4">
-            {tickets.map((ticket) => (
-              <Card key={ticket.id} className="bg-gray-900 border-gray-800 hover:border-gray-700 transition-colors">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h4 className="text-white font-medium">{ticket.title}</h4>
-                        <Badge variant="secondary" className={getStatusColor(ticket.status)}>
-                          {ticket.status.replace("_", " ")}
-                        </Badge>
-                        <Badge variant="secondary" className={getPriorityColor(ticket.priority)}>
-                          {ticket.priority}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-400 mb-3">
-                        <span>#{ticket.id}</span>
-                        <span>{ticket.category}</span>
-                        <span>Created: {ticket.createdAt}</span>
-                        <span>Updated: {ticket.lastUpdate}</span>
-                      </div>
-                      <p className="text-sm text-gray-400">Assigned to: {ticket.assignedTo}</p>
-                    </div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-gray-700 bg-transparent"
-                          onClick={() => setSelectedTicket(ticket)}
-                        >
-                          View Details
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-gray-900 border-gray-800 max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle className="text-white">{ticket.title}</DialogTitle>
-                          <DialogDescription className="text-gray-400">
-                            Ticket #{ticket.id} • {ticket.category}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-4">
+          {renderLoadingOrError(loading, error, "support tickets") ||
+            (tickets.length > 0 ? (
+              <div className="space-y-4">
+                {tickets.map((ticket) => (
+                  <Card key={ticket.id} className="bg-gray-900 border-gray-800 hover:border-gray-700 transition-colors">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h4 className="text-white font-medium">{ticket.title}</h4>
                             <Badge variant="secondary" className={getStatusColor(ticket.status)}>
                               {ticket.status.replace("_", " ")}
                             </Badge>
                             <Badge variant="secondary" className={getPriorityColor(ticket.priority)}>
-                              {ticket.priority} priority
+                              {ticket.priority}
                             </Badge>
                           </div>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-gray-400">Created:</span>
-                              <span className="text-white ml-2">{ticket.createdAt}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400">Last Update:</span>
-                              <span className="text-white ml-2">{ticket.lastUpdate}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400">Assigned to:</span>
-                              <span className="text-white ml-2">{ticket.assignedTo}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400">Category:</span>
-                              <span className="text-white ml-2">{ticket.category}</span>
-                            </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-400 mb-3">
+                            <span>#{ticket.ticketNumber}</span>
+                            <span>{/* Category not directly in schema, assuming from title/description */}</span>
+                            <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                            <span>Updated: {new Date(ticket.updatedAt).toLocaleDateString()}</span>
                           </div>
-                          <div className="space-y-2">
-                            <h4 className="text-white font-medium">Ticket History</h4>
-                            <div className="space-y-2 max-h-60 overflow-y-auto">
-                              <div className="p-3 bg-gray-800 rounded-lg">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-sm font-medium text-white">You</span>
-                                  <span className="text-xs text-gray-400">{ticket.createdAt}</span>
-                                </div>
-                                <p className="text-sm text-gray-300">
-                                  Initial ticket description and details about the issue...
-                                </p>
-                              </div>
-                              <div className="p-3 bg-gray-800 rounded-lg">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-sm font-medium text-white">{ticket.assignedTo}</span>
-                                  <span className="text-xs text-gray-400">{ticket.lastUpdate}</span>
-                                </div>
-                                <p className="text-sm text-gray-300">
-                                  Thank you for contacting support. We're looking into this issue...
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="response" className="text-gray-300">
-                              Add Response
-                            </Label>
-                            <Textarea
-                              id="response"
-                              placeholder="Type your response here..."
-                              className="bg-gray-800 border-gray-700 text-white"
-                            />
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button className="bg-orange-500 hover:bg-orange-600">
-                              <Send className="mr-2 h-4 w-4" />
-                              Send Response
-                            </Button>
-                            <Button variant="outline" className="border-gray-700 bg-transparent">
-                              <Paperclip className="mr-2 h-4 w-4" />
-                              Attach File
-                            </Button>
-                          </div>
+                          <p className="text-sm text-gray-400">Assigned to: {ticket.assignedTo || "Unassigned"}</p>
                         </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </CardContent>
-              </Card>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="border-gray-700 bg-transparent">
+                              View Details
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-gray-900 border-gray-800 max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle className="text-white">{ticket.title}</DialogTitle>
+                              <DialogDescription className="text-gray-400">
+                                Ticket #{ticket.ticketNumber}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="flex items-center space-x-4">
+                                <Badge variant="secondary" className={getStatusColor(ticket.status)}>
+                                  {ticket.status.replace("_", " ")}
+                                </Badge>
+                                <Badge variant="secondary" className={getPriorityColor(ticket.priority)}>
+                                  {ticket.priority} priority
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="text-gray-400">Created:</span>
+                                  <span className="text-white ml-2">
+                                    {new Date(ticket.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Last Update:</span>
+                                  <span className="text-white ml-2">
+                                    {new Date(ticket.updatedAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Assigned to:</span>
+                                  <span className="text-white ml-2">{ticket.assignedTo || "N/A"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Category:</span>
+                                  <span className="text-white ml-2">
+                                    {/* Category is not in schema, derive from title or add to schema */}
+                                    General
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <h4 className="text-white font-medium">Ticket History</h4>
+                                <div className="space-y-2 max-h-60 overflow-y-auto">
+                                  {ticket.responses && ticket.responses.length > 0 ? (
+                                    (ticket.responses as any[]).map((response, idx) => (
+                                      <div key={idx} className="p-3 bg-gray-800 rounded-lg">
+                                        <div className="flex items-center justify-between mb-2">
+                                          <span className="text-sm font-medium text-white">
+                                            {response.sender === "customer" ? "You" : response.sender}
+                                          </span>
+                                          <span className="text-xs text-gray-400">
+                                            {new Date(response.timestamp).toLocaleString()}
+                                          </span>
+                                        </div>
+                                        <p className="text-sm text-gray-300">{response.content}</p>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <p className="text-gray-400 text-sm">No responses yet.</p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="response" className="text-gray-300">
+                                  Add Response
+                                </Label>
+                                <Textarea
+                                  id="response"
+                                  placeholder="Type your response here..."
+                                  value={currentTicketResponse}
+                                  onChange={(e) => setCurrentTicketResponse(e.target.value)}
+                                  className="bg-gray-800 border-gray-700 text-white"
+                                />
+                              </div>
+                              <div className="flex space-x-2">
+                                <Button
+                                  onClick={() => handleAddTicketResponse(ticket.id)}
+                                  disabled={isSendingResponse}
+                                  className="bg-orange-500 hover:bg-orange-600"
+                                >
+                                  {isSendingResponse ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Send className="mr-2 h-4 w-4" />
+                                      Send Response
+                                    </>
+                                  )}
+                                </Button>
+                                <Button variant="outline" className="border-gray-700 bg-transparent">
+                                  <Paperclip className="mr-2 h-4 w-4" />
+                                  Attach File
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                <Info className="h-8 w-8 mb-2" />
+                <p>No support tickets found.</p>
+              </div>
             ))}
-          </div>
         </TabsContent>
 
         <TabsContent value="chat" className="space-y-4">
@@ -393,7 +472,7 @@ export default function SupportPage() {
                   <Label htmlFor="category" className="text-gray-300">
                     Category
                   </Label>
-                  <Select>
+                  <Select value={newTicketCategory} onValueChange={setNewTicketCategory}>
                     <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -409,7 +488,7 @@ export default function SupportPage() {
                   <Label htmlFor="priority" className="text-gray-300">
                     Priority
                   </Label>
-                  <Select>
+                  <Select value={newTicketPriority} onValueChange={setNewTicketPriority}>
                     <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
@@ -428,6 +507,8 @@ export default function SupportPage() {
                 </Label>
                 <Input
                   id="title"
+                  value={newTicketTitle}
+                  onChange={(e) => setNewTicketTitle(e.target.value)}
                   placeholder="Brief description of your issue"
                   className="bg-gray-800 border-gray-700 text-white"
                 />
@@ -438,6 +519,8 @@ export default function SupportPage() {
                 </Label>
                 <Textarea
                   id="description"
+                  value={newTicketDescription}
+                  onChange={(e) => setNewTicketDescription(e.target.value)}
                   placeholder="Please provide detailed information about your issue, including steps to reproduce if applicable..."
                   className="bg-gray-800 border-gray-700 text-white min-h-32"
                 />
@@ -453,7 +536,19 @@ export default function SupportPage() {
                 </div>
               </div>
               <div className="flex space-x-2">
-                <Button className="bg-orange-500 hover:bg-orange-600">Submit Ticket</Button>
+                <Button
+                  onClick={handleCreateTicket}
+                  disabled={isCreatingTicket}
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  {isCreatingTicket ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+                    </>
+                  ) : (
+                    "Submit Ticket"
+                  )}
+                </Button>
                 <Button variant="outline" className="border-gray-700 bg-transparent">
                   Save as Draft
                 </Button>
