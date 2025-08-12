@@ -38,6 +38,7 @@ export default function Login() {
 
     try {
       const body = { email, password };
+      console.log(body);
       const response = await axios.post('/api/login', body);
 
       if (response.data) {

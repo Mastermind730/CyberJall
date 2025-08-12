@@ -1,72 +1,90 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prismadb";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+// app/api/login/route.ts
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prismadb';
+import bcrypt from 'bcryptjs';
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const { email, password } = body;
-
+    // 1. Parse request body
+    const { email, password } = await request.json();
+    
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        work_email: email,
-      },
-    });
+    // 2. Find user with error handling for schema mismatches
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { work_email: email },
+        select: {
+          id: true,
+          work_email: true,
+          company_name: true,
+          contact: true,
+          password: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return NextResponse.json(
+        { error: 'Failed to query user data' },
+        { status: 500 }
+      );
+    }
 
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid credentials" }, // Generic message for security
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    // 3. Verify password with error handling
+    let passwordMatch;
+    try {
+      passwordMatch = await bcrypt.compare(password, user.password);
+    } catch (hashError) {
+      console.error('Password comparison error:', hashError);
       return NextResponse.json(
-        { error: "Invalid credentials" }, // Generic message for security
+        { error: 'Authentication error' },
+        { status: 500 }
+      );
+    }
+
+    if (!passwordMatch) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.work_email,
-        role: user.role 
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: "4h" }
-    );
-
-    // Return user data without sensitive information
+    // 4. Prepare response data (explicitly selecting fields)
     const userData = {
       id: user.id,
       email: user.work_email,
       companyName: user.company_name,
+      contact: user.contact,
       role: user.role,
-      contact: user.contact
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
     };
 
-    return NextResponse.json(
-      { 
-        token, 
-        user: userData 
-      }, 
-      { status: 200 }
-    );
+    return NextResponse.json({
+      success: true,
+      user: userData
+    });
 
-  } catch (error: unknown) {
-    console.error("Login error:", error);
+  } catch (error) {
+    console.error('Login error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

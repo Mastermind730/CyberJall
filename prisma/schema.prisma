@@ -108,8 +108,8 @@ model User {
   tickets          SupportTicket[]
   messages         Message[]
   cyberHealthScore CyberHealthScore?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  createdAt        DateTime?         @default(now())  // Made optional
+  updatedAt        DateTime?         @updatedAt       // Made optional
 }
 
 model Profile {
