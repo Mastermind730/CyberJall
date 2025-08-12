@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { NextPage } from 'next';
 import { Hero } from './components/Hero';
 import { AboutUs } from './components/sections/AboutUs';
@@ -17,6 +18,7 @@ import ApproachSection from './components/sections/ApproachSection';
 import { RequirementSubmission } from './components/sections/OnBoarding';
 import { InsightsSection } from './components/sections/CyberInsights';
 import { ComparisonSection } from './components/sections/Comparison';
+import CyberJallPlatform from './components/sections/ApproachSection';
 
 const Home: NextPage = () => {
   return (
@@ -28,9 +30,9 @@ const Home: NextPage = () => {
       <InsightsSection/>
       <ComparisonSection/>
       <SmartestChoice />
-      <CyberJallBanner />
-      <ProblemSection />
-      <ApproachSection />
+      {/* <CyberJallBanner /> */}
+      {/* <ProblemSection /> */}
+      <CyberJallPlatform />
       {/* <WhatWeOffer /> */}
       {/* <Scope /> */}
       {/* <HowItWorks /> */}
