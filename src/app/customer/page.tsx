@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
@@ -16,12 +17,146 @@ import {
   Calendar,
   Loader2,
 } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { useDashboardStats } from "./hooks/useDashboardStats"
+import { useEffect, useState } from "react"
+
+// Define types for our data structures
+type Package = {
+  id: number
+  name: string
+  status: 'active' | 'upcoming' | 'completed'
+  provider?: {
+    company_name: string
+  }
+  updatedAt: string
+  createdAt?: string
+}
+
+type Message = {
+  id: number
+  package: {
+    name: string
+  }
+  createdAt: string
+}
+
+type CyberHealth = {
+  score: number
+  status?: string
+  lastScan?: string
+}
+
+type Packages = {
+  active: number
+  upcoming: number
+  completed: number
+}
+
+type Tickets = {
+  open: number
+  resolved: number
+}
+
+type Invoices = {
+  unpaidAmount: number
+  overdue: number
+}
+
+type RecentActivity = {
+  packages: Package[]
+  messages: Message[]
+}
+
+type DashboardStats = {
+  cyberHealth: CyberHealth
+  packages: Packages
+  tickets: Tickets
+  invoices: Invoices
+  recentActivity: RecentActivity
+}
+
+// Dummy data implementation with proper typing
+const useDashboardStats = () => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+
+  useEffect(() => {
+    setLoading(true)
+    // Simulate API call delay
+    const timer = setTimeout(() => {
+      setStats({
+        cyberHealth: {
+          score: 78,
+          status: "good",
+          lastScan: new Date().toISOString()
+        },
+        packages: {
+          active: 3,
+          upcoming: 1,
+          completed: 5
+        },
+        tickets: {
+          open: 2,
+          resolved: 15
+        },
+        invoices: {
+          unpaidAmount: 1250,
+          overdue: 1
+        },
+        recentActivity: {
+          packages: [
+            {
+              id: 1,
+              name: "Vulnerability Assessment",
+              status: "active",
+              provider: { company_name: "SecureCorp" },
+              updatedAt: new Date(Date.now() - 86400000).toISOString()
+            },
+            {
+              id: 2,
+              name: "Penetration Testing",
+              status: "upcoming",
+              provider: { company_name: "CyberShield" },
+              updatedAt: new Date(Date.now() - 172800000).toISOString()
+            },
+            {
+              id: 3,
+              name: "Security Awareness Training",
+              status: "completed",
+              provider: { company_name: "SafeNet" },
+              updatedAt: new Date(Date.now() - 259200000).toISOString()
+            }
+          ],
+          messages: [
+            {
+              id: 1,
+              package: { name: "Vulnerability Assessment" },
+              createdAt: new Date(Date.now() - 3600000).toISOString()
+            }
+          ]
+        }
+      })
+      setLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  return { stats, loading, error }
+}
 
 export default function CustomerDashboard() {
-  const { data: session } = useSession()
   const { stats, loading, error } = useDashboardStats()
+  
+  // Get user name from localStorage or use default
+  const [userName, setUserName] = useState("Customer")
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedName = localStorage.getItem('userName') || "Customer"
+      setUserName(storedName)
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -37,9 +172,6 @@ export default function CustomerDashboard() {
     )
   }
 
-  const userName = session?.user?.name || "Customer"
-  // const userCompanyName = session?.user?.companyName || "Your Company"
-
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -47,7 +179,6 @@ export default function CustomerDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">Welcome back, {userName}</h2>
-            {/* <p className="text-gray-300">{userCompanyName} • Last login: Just now</p> */}
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-orange-500">{stats?.cyberHealth.score || 0}</div>
@@ -103,7 +234,7 @@ export default function CustomerDashboard() {
             <FileText className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">${stats?.invoices.unpaidAmount.toLocaleString() || 0}</div>
+            <div className="text-2xl font-bold text-white">${stats?.invoices.unpaidAmount?.toLocaleString() || 0}</div>
             <p className="text-xs text-red-400">
               {stats?.invoices.unpaidAmount && stats.invoices.unpaidAmount > 0 ? "Payment due" : "No outstanding"}
             </p>
