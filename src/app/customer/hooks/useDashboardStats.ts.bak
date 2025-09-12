@@ -2,15 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-type DashboardStatsHook = {
-  stats: DashboardStats | null;
-  loading: boolean;
-  error: string | null;
-  user: User | null;
-  company: Company | null;
-  refetch: () => Promise<void>;
-};
-
 interface User {
   id: string;
   work_email: string;
@@ -97,6 +88,15 @@ interface DashboardStats {
   };
 }
 
+type DashboardStatsHook = {
+  stats: DashboardStats | null;
+  loading: boolean;
+  error: string | null;
+  user: User | null;
+  company: Company | null;
+  refetch: () => Promise<void>;
+}
+
 export function useDashboardStats(): DashboardStatsHook {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,13 +107,15 @@ export function useDashboardStats(): DashboardStatsHook {
   const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
+      if (!user?.id) return;
+
       const [statsResponse, companyResponse] = await Promise.all([
         fetch("/api/customer/dashboard/stats", {
           headers: {
             "Content-Type": "application/json",
           },
         }),
-        user?.role === "provider"
+        user.role === "provider"
           ? fetch(`/api/company/${user.id}`, {
               headers: {
                 "Content-Type": "application/json",

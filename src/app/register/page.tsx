@@ -86,7 +86,11 @@ const Page = () => {
         const response = await axios.post("/api/register", formData);
 
         if (response.data) {
-          toast.success("Registration successful! Redirecting to login...", {
+          toast.success(
+            formData.userType === "provider"
+              ? "Registration successful! Please complete your company profile..."
+              : "Registration successful! Redirecting to login...", 
+            {
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: false,
@@ -95,9 +99,22 @@ const Page = () => {
             draggable: true,
           });
 
-          setTimeout(() => {
-            router.push("/login");
-          }, 3000);
+          // Store user data in localStorage for future use
+          localStorage.setItem("user", JSON.stringify({
+            ...response.data,
+            role: formData.userType
+          }));
+
+          // If user is a provider, redirect to company details form
+          if (formData.userType === "provider") {
+            setTimeout(() => {
+              router.push("/createCompany");
+            }, 3000);
+          } else {
+            setTimeout(() => {
+              router.push("/login");
+            }, 3000);
+          }
         }
       } catch (error: any) {
         console.error("Registration failed:", error);
