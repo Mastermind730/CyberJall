@@ -1,21 +1,11 @@
 "use client"
 import Link from "next/link"
-import {
-  Navbar,
-  NavBody,
-  NavItems,
-  MobileNav,
-  NavbarLogo,
-  NavbarButton,
-  MobileNavHeader,
-  MobileNavToggle,
-  MobileNavMenu,
-} from "./ui/resizable-navbar"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 export default function NavbarNew() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -68,7 +58,7 @@ export default function NavbarNew() {
         },
       ],
     },
-        {
+    {
       name: "MarketPlace",
       link: "/ourPartners",
     },
@@ -160,135 +150,177 @@ export default function NavbarNew() {
     },
   ]
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
   return (
-    <div className="relative w-full">
-      <Navbar>
-        {/* Desktop Navigation */}
-        <NavBody>
-          <NavbarLogo />
-          <NavItems items={navItems} />
-         <div className="flex items-center gap-4">
-  {isLoggedIn ? (
-    <NavbarButton variant="secondary" onClick={handleLogout}>
-      Logout
-    </NavbarButton>
-  ) : (
-    <NavbarButton 
-      variant="secondary" 
-      onClick={() => router.push('/login')}
-    >
-      Login
-    </NavbarButton>
-  )}
-  <NavbarButton 
-    variant="primary" 
-    onClick={() => router.push('/contact_us')}
-  >
-    Contact Us
-  </NavbarButton>
-</div>
-        </NavBody>
+    <div className="relative w-full bg-white shadow-sm dark:bg-gray-900">
+      {/* Desktop Navigation */}
+      <div className="hidden lg:flex items-center justify-between px-6 py-4">
+        <div className="flex items-center">
+          <Link href="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+            CyberJall
+          </Link>
+        </div>
+        
+        <div className="flex items-center space-x-8">
+          {navItems.map((item, index) => (
+            <div key={index} className="relative group">
+              <Link 
+                href={item.link} 
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors"
+              >
+                {item.name}
+              </Link>
+              
+              {item.hasDropdown && item.dropdownItems && (
+                <div className="absolute left-0 mt-2 w-96 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="grid grid-cols-3 gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
+                    {item.dropdownItems.map((category, catIndex) => (
+                      <div key={catIndex} className="space-y-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                          {category.category}
+                        </h4>
+                        <div className="space-y-1">
+                          {category.items.map((dropdownItem, ddIndex) => (
+                            <Link
+                              key={ddIndex}
+                              href={dropdownItem.link}
+                              className="block p-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md transition-colors"
+                            >
+                              <div className="font-medium">{dropdownItem.name}</div>
+                              <div className="text-gray-500 dark:text-gray-400 mt-1">
+                                {dropdownItem.description}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        <div className="flex items-center gap-4">
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push('/login')}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              Login
+            </button>
+          )}
+          <button
+            onClick={() => router.push('/contact_us')}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Contact Us
+          </button>
+        </div>
+      </div>
 
-        {/* Mobile Navigation */}
-        <MobileNav>
-          <MobileNavHeader>
-            <NavbarLogo />
-            <MobileNavToggle isOpen={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
-          </MobileNavHeader>
+      {/* Mobile Navigation */}
+      <div className="lg:hidden flex items-center justify-between p-4">
+        <Link href="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+          CyberJall
+        </Link>
+        
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {isMobileMenuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+      </div>
 
-          <MobileNavMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)}>
-            {navItems.map((item, idx) => (
-              <MobileNavItem key={`mobile-link-${idx}`} item={item} onClose={() => setIsMobileMenuOpen(false)} />
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-inner">
+          <div className="px-4 py-4 space-y-4">
+            {navItems.map((item, index) => (
+              <div key={index}>
+                <Link 
+                  href={item.link} 
+                  className="block py-2 text-gray-700 dark:text-gray-300 font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+                
+                {item.hasDropdown && item.dropdownItems && (
+                  <div className="pl-4 mt-2 space-y-4 border-l border-gray-200 dark:border-gray-700">
+                    {item.dropdownItems.map((category, catIndex) => (
+                      <div key={catIndex} className="space-y-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                          {category.category}
+                        </h4>
+                        <div className="space-y-2">
+                          {category.items.map((dropdownItem, ddIndex) => (
+                            <Link
+                              key={ddIndex}
+                              href={dropdownItem.link}
+                              className="block p-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <div className="font-medium">{dropdownItem.name}</div>
+                              <div className="text-gray-500 dark:text-gray-400 mt-1">
+                                {dropdownItem.description}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
-            <div className="flex w-full flex-col gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+            
+            <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
               {isLoggedIn ? (
-                <NavbarButton
+                <button
                   onClick={handleLogout}
-                  variant="secondary"
-                  className="w-full justify-center"
+                  className="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   Logout
-                </NavbarButton>
+                </button>
               ) : (
-                <Link href="/login" className="w-full">
-                  <NavbarButton
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    variant="secondary"
-                    className="w-full justify-center"
-                  >
-                    Login
-                  </NavbarButton>
-                </Link>
-              )}
-              <Link href="/contact_us" className="w-full">
-                <NavbarButton
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  variant="primary"
-                  className="w-full justify-center"
+                <button
+                  onClick={() => {
+                    router.push('/login')
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Contact Us
-                </NavbarButton>
-              </Link>
+                  Login
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  router.push('/contact_us')
+                  setIsMobileMenuOpen(false)
+                }}
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Contact Us
+              </button>
             </div>
-          </MobileNavMenu>
-        </MobileNav>
-      </Navbar>
+          </div>
+        </div>
+      )}
     </div>
   )
-}
-
-interface NavItem {
-  name: string
-  link: string
-  hasDropdown?: boolean
-  dropdownItems?: {
-    category: string
-    items: {
-      name: string
-      link: string
-      description: string
-    }[]
-  }[]
-}
-
-interface MobileNavItemProps {
-  item: NavItem
-  onClose: () => void
-}
-
-const MobileNavItem = ({ item, onClose }: MobileNavItemProps) => {
-  const handleClick = () => {
-    onClose()
-  }
-
-  if (item.hasDropdown && item.dropdownItems) {
-    return (
-      <div>
-        <span className="block">{item.name}</span>
-        {item.dropdownItems.map((category, index) => (
-          <div key={index}>
-            <h6 className="text-sm font-bold">{category.category}</h6>
-            {category.items.map((dropdownItem, i) => (
-              <Link
-                key={i}
-                href={dropdownItem.link}
-                onClick={handleClick}
-                className="relative text-neutral-600 dark:text-neutral-300"
-              >
-                <span className="block">{dropdownItem.name}</span>
-              </Link>
-            ))}
-          </div>
-        ))}
-      </div>
-    )
-  } else {
-    return (
-      <Link href={item.link} onClick={handleClick} className="relative text-neutral-600 dark:text-neutral-300">
-        <span className="block">{item.name}</span>
-      </Link>
-    )
-  }
 }
