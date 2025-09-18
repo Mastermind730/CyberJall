@@ -2,12 +2,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prismadb';
 import bcrypt from 'bcryptjs';
+import * as jose from 'jose';
+import { serialize } from 'cookie';
+
+// Generate a secure secret key and store it in your .env file
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function POST(request: Request) {
   try {
-    // 1. Parse request body
     const { email, password } = await request.json();
-    
+
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -15,7 +19,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Find user with error handling for schema mismatches
     let user;
     try {
       user = await prisma.user.findUnique({
@@ -46,7 +49,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Verify password with error handling
     let passwordMatch;
     try {
       passwordMatch = await bcrypt.compare(password, user.password);
@@ -65,21 +67,39 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Prepare response data (explicitly selecting fields)
-    const userData = {
-      id: user.id,
-      email: user.work_email,
-      companyName: user.company_name,
-      contact: user.contact,
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    };
+    // 🔐 Generate JWT token
+    const token = await new jose.SignJWT({ id: user.id, email: user.work_email, role: user.role })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('2h') // Token expires in 2 hours
+      .setIssuedAt()
+      .setJti(crypto.randomUUID()) // Unique JWT ID
+      .sign(secret);
 
-    return NextResponse.json({
-      success: true,
-      user: userData
+    // 🍪 Set the JWT as an HTTP-only cookie
+    const serializedCookie = serialize('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 2, // 2 hours
+      path: '/',
     });
+
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.work_email,
+        companyName: user.company_name,
+        contact: user.contact,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+
+    response.headers.set('Set-Cookie', serializedCookie);
+
+    return response;
 
   } catch (error) {
     console.error('Login error:', error);

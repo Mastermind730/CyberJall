@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 type DashboardStatsHook = {
   stats: DashboardStats | null;
@@ -103,49 +103,70 @@ export function useDashboardStats(): DashboardStatsHook {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
+  
+  const isFetchingRef = useRef(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearPollingInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
 
   const fetchStats = useCallback(async () => {
+    if (isFetchingRef.current || !user?.id) return;
+
     try {
+      isFetchingRef.current = true;
       setLoading(true);
+      setError(null);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const [statsResponse, companyResponse] = await Promise.all([
         fetch("/api/customer/dashboard/stats", {
           headers: {
             "Content-Type": "application/json",
           },
+          signal: controller.signal,
         }),
-        user?.role === "provider"
+        user?.role === "provider" 
           ? fetch(`/api/company/${user.id}`, {
               headers: {
                 "Content-Type": "application/json",
               },
+              signal: controller.signal,
             })
           : Promise.resolve(null),
       ]);
 
+      clearTimeout(timeoutId);
+
       if (!statsResponse.ok) {
-        throw new Error("Failed to fetch dashboard stats");
+        throw new Error(`Failed to fetch dashboard stats: ${statsResponse.status}`);
       }
 
       const statsData = await statsResponse.json();
       setStats(statsData.stats);
 
-      if (companyResponse) {
-        if (companyResponse.ok) {
-          const companyData = await companyResponse.json();
-          setCompany(companyData);
-        } else {
-          console.error("Failed to fetch company data");
-        }
+      if (companyResponse && companyResponse.ok) {
+        const companyData = await companyResponse.json();
+        setCompany(companyData);
       }
     } catch (err) {
-      console.error("Error fetching dashboard data:", err);
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if ((err as Error).name !== 'AbortError') {
+        console.error("Error fetching dashboard data:", err);
+        setError(err instanceof Error ? err.message : "An error occurred");
+      }
     } finally {
+      isFetchingRef.current = false;
       setLoading(false);
     }
-  }, [user]);
+  }, [user?.id, user?.role]);
 
-  // Get user data from local storage
+  // Get user data from local storage - only once
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -154,25 +175,47 @@ export function useDashboardStats(): DashboardStatsHook {
         setUser(parsedUser);
       } catch (error) {
         console.error("Error parsing user data:", error);
+        setError("Failed to load user data");
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  // Fetch initial dashboard stats
+  // Fetch stats when user changes
   useEffect(() => {
-    if (!user?.id) return;
-    fetchStats();
+    if (user?.id) {
+      fetchStats();
+    }
   }, [user?.id, fetchStats]);
 
-  // Setup real-time updates (websocket or polling)
+  // Setup polling only when user exists and not in development
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      clearPollingInterval();
+      return;
+    }
 
-    // Poll for updates every 30 seconds
-    const interval = setInterval(fetchStats, 30000);
+    // Don't set up polling in development to avoid multiple requests
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
 
-    return () => clearInterval(interval);
-  }, [user?.id, fetchStats]);
+    clearPollingInterval();
+    intervalRef.current = setInterval(fetchStats, 30000);
+
+    return () => {
+      clearPollingInterval();
+    };
+  }, [user?.id, fetchStats, clearPollingInterval]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearPollingInterval();
+    };
+  }, [clearPollingInterval]);
 
   return {
     stats,
