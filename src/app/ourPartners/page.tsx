@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   FiSearch, 
   FiChevronDown, 
@@ -21,8 +22,14 @@ import {
   FiLayers,
   FiAward,
   FiBarChart2,
-  FiTrendingUp
+  FiTrendingUp,
+
+  FiHeart,
+  FiTarget,
+  FiDollarSign,
+  FiMessageCircle
 } from 'react-icons/fi';
+import { FaBrain } from "react-icons/fa6";
 
 interface Partner {
   id: string;
@@ -128,6 +135,7 @@ const pricingModelOptions = [
 ];
 
 export default function Partners() {
+  const router = useRouter();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,6 +154,60 @@ export default function Partners() {
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [isClient, setIsClient] = useState(false);
+
+  // Features data
+  const features = [
+    {
+      id: 1,
+      title: "AI-Powered Service Recommendation",
+      description: "Get personalized cybersecurity recommendations based on your business needs",
+      icon: FaBrain,
+      color: "text-blue-400",
+      bgColor: "bg-blue-900/20",
+      hoverBgColor: "hover:bg-blue-900/30",
+      action: () => console.log("AI Recommendation clicked")
+    },
+    {
+      id: 2,
+      title: "Cyber Health Score",
+      description: "Assess your organization's cybersecurity posture with our comprehensive scoring system",
+      icon: FiHeart,
+      color: "text-red-400",
+      bgColor: "bg-red-900/20",
+      hoverBgColor: "hover:bg-red-900/30",
+      action: () => console.log("Cyber Health Score clicked")
+    },
+    {
+      id: 3,
+      title: "Smart Compare",
+      description: "Compare cybersecurity providers side-by-side to make informed decisions",
+      icon: FiTarget,
+      color: "text-green-400",
+      bgColor: "bg-green-900/20",
+      hoverBgColor: "hover:bg-green-900/30",
+      action: () => setShowComparison(true)
+    },
+    {
+      id: 4,
+      title: "CyberBid",
+      description: "Create competitive bids and get quotes from multiple security providers",
+      icon: FiDollarSign,
+      color: "text-orange-400",
+      bgColor: "bg-orange-900/20",
+      hoverBgColor: "hover:bg-orange-900/30",
+      action: () => router.push("/bid/create")
+    },
+    {
+      id: 5,
+      title: "Free Consultation",
+      description: "Connect with cybersecurity experts for personalized advice and guidance",
+      icon: FiMessageCircle,
+      color: "text-purple-400",
+      bgColor: "bg-purple-900/20",
+      hoverBgColor: "hover:bg-purple-900/30",
+      action: () => router.push("/consultation")
+    }
+  ];
 
   useEffect(() => {
     setIsClient(true);
@@ -313,7 +375,60 @@ export default function Partners() {
         </div>
 
         {/* Main Grid */}
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Features Section - Left Side */}
+          <div className="lg:w-80 flex-shrink-0">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-700 sticky top-4">
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+                <FiShield className="mr-3 text-blue-400" />
+                CyberJall Features
+              </h2>
+              <div className="space-y-4">
+                {features.map((feature) => {
+                  const IconComponent = feature.icon;
+                  return (
+                    <button
+                      key={feature.id}
+                      onClick={feature.action}
+                      className={`w-full text-left p-4 rounded-lg border border-gray-600 ${feature.bgColor} ${feature.hoverBgColor} hover:border-gray-500 transition-all duration-200 group`}
+                    >
+                      <div className="flex items-start">
+                        <div className={`flex-shrink-0 p-2 rounded-md ${feature.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                          <IconComponent className={`h-6 w-6 ${feature.color}`} />
+                        </div>
+                        <div className="ml-3 flex-1">
+                          <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-blue-300 transition-colors duration-200">
+                            {feature.title}
+                          </h3>
+                          <p className="text-xs text-gray-400 leading-relaxed">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Quick Stats */}
+              <div className="mt-8 pt-6 border-t border-gray-700">
+                <h3 className="text-sm font-semibold text-white mb-4">Platform Stats</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-400">{partners.length}+</div>
+                    <div className="text-xs text-gray-400">Providers</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-400">500+</div>
+                    <div className="text-xs text-gray-400">Projects</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters and Content */}
+          <div className="flex flex-col md:flex-row gap-6 flex-1">
           {/* Sidebar Filters - Desktop */}
           <div className="hidden md:block w-64 flex-shrink-0">
             <div className="bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-700 sticky top-4">
@@ -1211,6 +1326,8 @@ export default function Partners() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+        </div>
+      </div>
+    // </div>
   );
 }

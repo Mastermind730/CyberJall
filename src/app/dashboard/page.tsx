@@ -296,7 +296,7 @@ function StatCard({ title, value, icon, subtitle, trend = "neutral" }: {
 }
 
 // Component for recent packages
-function RecentPackagesCard({ packages }: { packages?: Package[] }) {
+function RecentPackagesCard({ packages }: { packages?: typeof Package[] }) {
   return (
     <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
