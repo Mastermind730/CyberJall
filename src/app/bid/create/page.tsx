@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CldUploadButton } from 'next-cloudinary';
 import { 
   FiArrowLeft, 
   FiUpload, 
@@ -9,12 +10,34 @@ import {
   FiCheck,
   FiFileText,
   FiShield,
-  FiClock
+  FiClock,
+  FiX,
+  FiFile
 } from 'react-icons/fi';
+
+interface UploadedFile {
+  name: string;
+  url: string;
+  size: number;
+  type: string;
+  publicId: string;
+}
+
+interface CloudinaryUploadResult {
+  info: {
+    secure_url: string;
+    public_id: string;
+    original_filename: string;
+    bytes: number;
+    format: string;
+    resource_type: string;
+  };
+}
 
 export default function CreateBidPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     companyName: '',
     industry: '',
@@ -29,7 +52,7 @@ export default function CreateBidPage() {
     complianceGoals: [] as string[],
     budget: '',
     additionalNotes: '',
-    documents: [] as string[],
+    documents: [] as UploadedFile[],
   });
 
   const serviceOptions = [
@@ -66,24 +89,75 @@ export default function CreateBidPage() {
     });
   };
 
+  const handleUploadSuccess = (result: CloudinaryUploadResult) => {
+    const uploadedFile: UploadedFile = {
+      name: result.info.original_filename + '.' + result.info.format,
+      url: result.info.secure_url,
+      size: result.info.bytes,
+      type: `${result.info.resource_type}/${result.info.format}`,
+      publicId: result.info.public_id
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      documents: [...prev.documents, uploadedFile]
+    }));
+    
+    setUploading(false);
+  };
+
+  const handleUploadError = (error: any) => {
+    console.error('Upload error:', error);
+    alert('Error uploading file. Please try again.');
+    setUploading(false);
+  };
+
+  const removeDocument = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: prev.documents.filter((_, i) => i !== index)
+    }));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const submitData = {
+        ...formData,
+        documents: formData.documents.map(doc => ({
+          name: doc.name,
+          url: doc.url,
+          size: doc.size,
+          type: doc.type,
+          publicId: doc.publicId
+        }))
+      };
+
       const response = await fetch('/api/bids', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
         router.push('/bid/success');
       } else {
         console.error('Failed to submit bid');
+        alert('Failed to submit bid. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting bid:', error);
+      alert('Error submitting bid. Please try again.');
     }
   };
 
@@ -372,13 +446,65 @@ export default function CreateBidPage() {
                   <label className="block text-sm font-medium mb-1">
                     Supporting Documents
                   </label>
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors">
+                  
+                  <CldUploadButton
+                    uploadPreset={"Bid_document"}
+                    options={{
+                      multiple: true,
+                      maxFiles: 3,
+                      maxFileSize: 5000000, // 5MB
+                      // resourceType: "auto",
+                      // folder: "bid-documents",
+                      // allowedFormats: ["pdf", "doc", "docx", "png", "jpg", "jpeg"],
+                      clientAllowedFormats: ["pdf", "doc", "docx", "png", "jpg", "jpeg"]
+                    }}
+                    onUpload={(result) => {
+                      setUploading(false);
+                      handleUploadSuccess(result as CloudinaryUploadResult);
+                    }}
+                    onError={handleUploadError}
+                    onOpen={() => setUploading(true)}
+                    className={`flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <FiUpload className="w-8 h-8 mb-3 text-gray-400" />
-                      <p className="text-sm text-gray-400">Upload files (PDF, DOC, PNG)</p>
+                      {uploading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-3"></div>
+                          <p className="text-sm text-gray-400">Uploading...</p>
+                        </>
+                      ) : (
+                        <>
+                          <FiUpload className="w-8 h-8 mb-3 text-gray-400" />
+                          <p className="text-sm text-gray-400">Upload files (PDF, DOC, PNG, JPG)</p>
+                          <p className="text-xs text-gray-500">Max 10MB per file</p>
+                        </>
+                      )}
                     </div>
-                    <input type="file" className="hidden" multiple />
-                  </label>
+                  </CldUploadButton>
+                  
+                  {/* Display uploaded files */}
+                  {formData.documents.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      {formData.documents.map((doc, index) => (
+                        <div key={index} className="flex items-center justify-between bg-gray-600 p-2 rounded">
+                          <div className="flex items-center">
+                            <FiFile className="text-orange-400 mr-2" />
+                            <div>
+                              <p className="text-sm font-medium truncate max-w-48">{doc.name}</p>
+                              <p className="text-xs text-gray-400">{formatFileSize(doc.size)}</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeDocument(index)}
+                            className="text-red-400 hover:text-red-300 p-1"
+                          >
+                            <FiX size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -506,6 +632,21 @@ export default function CreateBidPage() {
                       </p>
                     </div>
                   </div>
+                  
+                  {formData.documents.length > 0 && (
+                    <div>
+                      <p className="text-sm text-gray-400 mb-2">Uploaded Documents</p>
+                      <div className="space-y-1">
+                        {formData.documents.map((doc, index) => (
+                          <div key={index} className="flex items-center text-sm">
+                            <FiFile className="text-orange-400 mr-2" />
+                            <span className="truncate">{doc.name}</span>
+                            <span className="text-gray-400 ml-2">({formatFileSize(doc.size)})</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   <div>
                     <p className="text-sm text-gray-400">Additional Notes</p>

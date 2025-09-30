@@ -24,7 +24,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useDashboardStats } from "../customer/hooks/useDashboardStats";
-
+import { Message } from "@/lib/types";
 export default function Dashboard() {
   const { stats, loading, error, user, company } = useDashboardStats();
 
@@ -294,9 +294,18 @@ function StatCard({ title, value, icon, subtitle, trend = "neutral" }: {
     </Card>
   );
 }
+interface PackageType {
+  id: string;
+  name: string;
+  status: "active" | "upcoming" | "completed";
+  provider?: {
+    company_name: string;
+  };
+  updatedAt: string;
+}
 
 // Component for recent packages
-function RecentPackagesCard({ packages }: { packages?: typeof Package[] }) {
+function RecentPackagesCard({ packages }: { packages?:  PackageType[] }) {
   return (
     <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
@@ -407,7 +416,7 @@ function SecurityInsightsCard({ score = 0 }: { score?: number }) {
 }
 
 // Component for recent activity
-function RecentActivityCard({ packages, messages }: { packages?: Package[]; messages?: Message[] }) {
+function RecentActivityCard({ packages, messages }: { packages?: PackageType[]; messages?: Message[] }) {
   const allActivities = [
     ...(packages?.map(pkg => ({
       type: 'package' as const,
