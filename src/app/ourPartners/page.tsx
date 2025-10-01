@@ -23,7 +23,14 @@ import {
   FiAward,
   FiBarChart2,
   FiTrendingUp,
+  FiClock,
+  FiCheckCircle,
+  FiZap,
+  FiActivity,
+  FiDollarSign,
+  FiMessageCircle,
 } from "react-icons/fi";
+import { IconAddressBook } from "@tabler/icons-react";
 
 interface Partner {
   id: string;
@@ -371,17 +378,40 @@ export default function Partners() {
     return sum / partner.client_reviews.length;
   };
 
+  // Get experience years
+  const getExperienceYears = (partner: Partner) => {
+    const currentYear = new Date().getFullYear();
+    return currentYear - partner.year_founded;
+  };
+
+  // Check if partner is verified (has certifications and reviews)
+  const isVerified = (partner: Partner) => {
+    return (
+      partner.expertise_and_certifications &&
+      partner.expertise_and_certifications.length > 0 &&
+      partner.client_reviews &&
+      partner.client_reviews.length > 0
+    );
+  };
+
+  // Check if partner is premium (highly rated with many reviews)
+  const isPremium = (partner: Partner) => {
+    const rating = getAverageRating(partner);
+    const reviewCount = partner.client_reviews?.length || 0;
+    return rating >= 4.5 && reviewCount >= 10;
+  };
+
   // Only render UI after confirming we're on the client
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-blackex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-blacklative">
+    <div className="min-h-screen bg-black relative">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumbs */}
@@ -476,6 +506,32 @@ export default function Partners() {
                   <button className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50">
                     <span>Enterprise Ready</span>
                     <FiUsers className="text-purple-400" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-2 flex items-center">
+                  <FiZap className="mr-2 text-green-400" />
+                  Quick Actions
+                </h3>
+                <div className="space-y-2">
+                  <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-emerald-900/50 to-green-900/50 text-emerald-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-emerald-800/50 hover:to-green-800/50 transition-all duration-200">
+                    <span>Cyber Health Score</span>
+                    <FiActivity className="text-emerald-400" />
+                  </button>
+                  <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-purple-900/50 to-violet-900/50 text-purple-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-purple-800/50 hover:to-violet-800/50 transition-all duration-200">
+                    <span>Smart Compare</span>
+                    <FiBarChart2 className="text-purple-400" />
+                  </button>
+                  <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-orange-900/50 to-amber-900/50 text-orange-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-orange-800/50 hover:to-amber-800/50 transition-all duration-200">
+                    <span>CyberBid</span>
+                    <FiDollarSign className="text-orange-400" />
+                  </button>
+                  <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-blue-900/50 to-cyan-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-blue-800/50 hover:to-cyan-800/50 transition-all duration-200">
+                    <span>Free Consultation</span>
+                    <FiMessageCircle className="text-blue-400" />
                   </button>
                 </div>
               </div>
@@ -716,73 +772,121 @@ export default function Partners() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
                 {partners.map((partner) => {
                   const averageRating = getAverageRating(partner);
                   const reviewCount = partner.client_reviews?.length || 0;
+                  const experienceYears = getExperienceYears(partner);
+                  const verified = isVerified(partner);
+                  const premium = isPremium(partner);
 
                   return (
-                    <div
+                    <motion.div
                       key={`partner-${partner.id}`}
-                      className={`bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-blue-500/50 relative ${
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      whileHover={{ y: -5, scale: 1.02 }}
+                      className={`group relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-xl border overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${
                         selectedCompanies.includes(partner.id)
-                          ? "ring-2 ring-blue-500"
-                          : ""
+                          ? "ring-2 ring-blue-500 border-blue-500/50"
+                          : premium
+                          ? "border-gradient-to-r from-yellow-400/50 to-orange-500/50 border-yellow-500/30"
+                          : "border-gray-700/50 hover:border-blue-500/30"
                       }`}
                     >
+                      {/* Premium Badge */}
+                      {premium && (
+                        <div className="absolute top-3 left-3 z-20">
+                          <div className="flex items-center bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+                            <FiZap className="w-3 h-3 mr-1" />
+                            PREMIUM
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Verified Badge */}
+                      {verified && !premium && (
+                        <div className="absolute top-3 left-3 z-20">
+                          <div className="flex items-center bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                            <FiCheckCircle className="w-3 h-3 mr-1" />
+                            VERIFIED
+                          </div>
+                        </div>
+                      )}
+
                       {/* Compare checkbox */}
-                      <div className="absolute top-2 right-2 z-10">
-                        <label className="inline-flex items-center">
+                      <div className="absolute top-3 right-3 z-20">
+                        <label className="inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
                             checked={selectedCompanies.includes(partner.id)}
                             onChange={() => toggleCompanySelection(partner.id)}
-                            className="h-5 w-5 text-blue-600 rounded border-gray-600 focus:ring-blue-500 bg-gray-700"
+                            className="h-5 w-5 text-blue-600 rounded border-gray-600 focus:ring-blue-500 bg-gray-700/80 backdrop-blur-sm"
                           />
                         </label>
                       </div>
 
-                      {/* Partner logo and basic info */}
-                      <div className="p-4 border-b border-gray-700">
-                        <div className="flex items-start">
-                          <div className="flex-shrink-0 h-16 w-16 rounded-md bg-gray-700 overflow-hidden border border-gray-600 flex items-center justify-center">
-                            {partner.logo ? (
-                              <Image
-                                width={64}
-                                height={64}
-                                src={partner.logo}
-                                alt={`${partner.company_name} logo`}
-                                className="max-h-full max-w-full object-contain"
-                              />
-                            ) : (
-                              <span className="text-xl font-bold text-gray-400">
-                                {getInitials(partner.company_name)}
-                              </span>
-                            )}
+                      {/* Background Pattern */}
+                      <div className="absolute inset-0 opacity-5">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-500 to-red-500 rounded-full translate-y-12 -translate-x-12"></div>
+                      </div>
+
+                      {/* Header Section */}
+                      <div className="relative p-6 border-b border-gray-700/50">
+                        <div className="flex items-start space-x-4">
+                          <div className="relative flex-shrink-0">
+                            <div className="h-20 w-20 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 overflow-hidden border-2 border-gray-600/50 flex items-center justify-center shadow-lg">
+                              {partner.logo ? (
+                                <Image
+                                  width={80}
+                                  height={80}
+                                  src={partner.logo}
+                                  alt={`${partner.company_name} logo`}
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              ) : (
+                                <span className="text-2xl font-bold text-gray-300">
+                                  {getInitials(partner.company_name)}
+                                </span>
+                              )}
+                            </div>
+                            {/* Online indicator */}
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                            </div>
                           </div>
-                          <div className="ml-4">
-                            <h3 className="text-lg font-medium text-white line-clamp-1">
+
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
                               {partner.company_name}
                             </h3>
-                            <div className="flex items-center mt-1">
-                              <div className="flex items-center">
+
+                            {/* Rating and Reviews */}
+                            <div className="flex items-center mb-2">
+                              <div className="flex items-center mr-3">
                                 {[...Array(5)].map((_, i) => (
                                   <FiStar
                                     key={`star-${partner.id}-${i}`}
                                     className={`h-4 w-4 ${
                                       i < averageRating
                                         ? "text-yellow-400 fill-current"
-                                        : "text-gray-500"
+                                        : "text-gray-600"
                                     }`}
                                   />
                                 ))}
+                                <span className="text-sm font-semibold text-yellow-400 ml-2">
+                                  {averageRating.toFixed(1)}
+                                </span>
                               </div>
-                              <span className="text-xs text-gray-400 ml-1">
-                                ({reviewCount}{" "}
-                                {reviewCount === 1 ? "review" : "reviews"})
+                              <span className="text-xs text-gray-400">
+                                ({reviewCount} reviews)
                               </span>
                             </div>
-                            <div className="mt-1 flex items-center text-sm text-gray-400">
+
+                            {/* Location */}
+                            <div className="flex items-center text-sm text-gray-400">
                               <FiMapPin className="flex-shrink-0 mr-1.5 h-4 w-4" />
                               <span>
                                 {partner.headquarters_city},{" "}
@@ -793,108 +897,152 @@ export default function Partners() {
                         </div>
                       </div>
 
-                      {/* Partner details */}
-                      <div className="p-4">
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="flex items-center">
-                            <FiUsers className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-400">
-                              {partner.team_size} team
-                            </span>
+                      {/* Stats Grid */}
+                      <div className="p-6 flex-1 flex flex-col">
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-xs text-gray-400 mb-1">
+                                  Team Size
+                                </div>
+                                <div className="text-sm font-semibold text-white">
+                                  {partner.team_size}
+                                </div>
+                              </div>
+                              <FiUsers className="h-5 w-5 text-blue-400" />
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            <FiCalendar className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-400">
-                              Est. {partner.year_founded}
-                            </span>
+
+                          <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-xs text-gray-400 mb-1">
+                                  Experience
+                                </div>
+                                <div className="text-sm font-semibold text-white">
+                                  {experienceYears}+ years
+                                </div>
+                              </div>
+                              <FiClock className="h-5 w-5 text-green-400" />
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            <FiLayers className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-400">
-                              {partner.services_offered?.length || 0} services
-                            </span>
+
+                          <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-xs text-gray-400 mb-1">
+                                  Services
+                                </div>
+                                <div className="text-sm font-semibold text-white">
+                                  {partner.services_offered?.length || 0}
+                                </div>
+                              </div>
+                              <FiLayers className="h-5 w-5 text-purple-400" />
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            <FiAward className="flex-shrink-0 mr-2 h-4 w-4 text-gray-500" />
-                            <span className="text-sm text-gray-400">
-                              {partner.expertise_and_certifications?.length ||
-                                0}{" "}
-                              certs
-                            </span>
+
+                          <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-xs text-gray-400 mb-1">
+                                  Certs
+                                </div>
+                                <div className="text-sm font-semibold text-white">
+                                  {partner.expertise_and_certifications
+                                    ?.length || 0}
+                                </div>
+                              </div>
+                              <FiAward className="h-5 w-5 text-orange-400" />
+                            </div>
                           </div>
                         </div>
 
-                        {/* Industries served */}
+                        {/* Industries Section */}
                         <div className="mb-4">
-                          <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+                          <h4 className="text-sm font-semibold text-gray-300 mb-2">
                             Industries
                           </h4>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {partner.industries_served
                               ?.slice(0, 3)
                               .map((industry, i) => (
                                 <span
                                   key={`industry-${partner.id}-${i}`}
-                                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-900/50 text-blue-200"
+                                  className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-900/30 text-blue-300 border border-blue-700/30"
                                 >
                                   {industry}
                                 </span>
                               ))}
-                            {partner.industries_served?.length > 3 && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
-                                +{partner.industries_served.length - 3} more
+                            {(partner.services_offered?.length ?? 0) > 3 && (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-700/50 text-gray-400 border border-gray-600/30">
+                                +{(partner.services_offered?.length ?? 0) - 3}
                               </span>
                             )}
                           </div>
                         </div>
 
-                        {/* Top services */}
-                        <div className="mb-4">
-                          <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                            Top Services
+                        {/* Services Section */}
+                        <div className="mb-6">
+                          <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                            Key Services
                           </h4>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {partner.services_offered
                               ?.slice(0, 3)
                               .map((service, i) => (
                                 <span
                                   key={`service-${partner.id}-${i}`}
-                                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-900/50 text-green-200"
+                                  className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-green-900/30 text-green-300 border border-green-700/30"
                                 >
                                   {service.name}
                                 </span>
                               ))}
-                            {/* {partner.services_offered?.length > 3 && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
-                                +{partner.services_offered.length - 3} more
+                            {(partner.services_offered?.length ?? 0) > 3 && (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-700/50 text-gray-400 border border-gray-600/30">
+                                +{(partner.services_offered?.length ?? 0) - 3}
                               </span>
-                            )} */}
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Action buttons */}
-                      <div className="px-4 py-3 bg-gray-700/50 flex justify-between">
-                        <Link
-                          href={`/company/${partner.id}`}
-                          className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        >
-                          <FiEye className="mr-2 h-4 w-4" />
-                          View
-                        </Link>
-                        {partner.website && (
+                      {/* Action Footer */}
+                      <div className="px-4 py-3 bg-gray-800/30 border-t border-gray-700/50 backdrop-blur-sm mt-auto">
+                        <div className="flex items-center gap-2">
                           <Link
-                            href={partner.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            href={`/company/${partner.id}`}
+                            className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-gray-600 text-xs font-medium rounded-md text-white bg-gray-800/50 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm"
                           >
-                            <FiExternalLink className="mr-2 h-4 w-4" />
-                            Website
+                            <FiEye className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline ml-1">View</span>
                           </Link>
-                        )}
+
+                          <Link
+                            href={`/`}
+                            className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-gray-600 text-xs font-medium rounded-md text-white bg-gray-800/50 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm"
+                          >
+                            <IconAddressBook className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline ml-1">Invite</span>
+                          </Link>
+
+                          {partner.website && (
+                            <Link
+                              href={partner.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                            >
+                              <FiExternalLink className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline ml-1">Site</span>
+                            </Link>
+                          )}
+                        </div>
                       </div>
-                    </div>
+
+                      {/* Hover Effect Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/0 via-transparent to-purple-600/0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -992,6 +1140,53 @@ export default function Partners() {
 
                   {/* Mobile Filters Content */}
                   <div className="mt-4 px-4 flex-1 overflow-y-auto">
+                    {/* Smart Filters */}
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-white mb-2 flex items-center">
+                        <FiTrendingUp className="mr-2 text-blue-400" />
+                        Smart Filters
+                      </h3>
+                      <div className="space-y-2">
+                        <button className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50">
+                          <span>Top Rated</span>
+                          <FiStar className="text-yellow-400" />
+                        </button>
+                        <button className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50">
+                          <span>Fast Response</span>
+                          <FiShield className="text-green-400" />
+                        </button>
+                        <button className="w-full text-left px-3 py-2 bg-blue-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:bg-blue-800/50">
+                          <span>Enterprise Ready</span>
+                          <FiUsers className="text-purple-400" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-white mb-2 flex items-center">
+                        <FiZap className="mr-2 text-green-400" />
+                        Quick Actions
+                      </h3>
+                      <div className="space-y-2">
+                        <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-emerald-900/50 to-green-900/50 text-emerald-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-emerald-800/50 hover:to-green-800/50 transition-all duration-200">
+                          <span>Cyber Health Score</span>
+                          <FiActivity className="text-emerald-400" />
+                        </button>
+                        <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-purple-900/50 to-violet-900/50 text-purple-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-purple-800/50 hover:to-violet-800/50 transition-all duration-200">
+                          <span>Smart Compare</span>
+                          <FiBarChart2 className="text-purple-400" />
+                        </button>
+                        <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-orange-900/50 to-amber-900/50 text-orange-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-orange-800/50 hover:to-amber-800/50 transition-all duration-200">
+                          <span>CyberBid</span>
+                          <FiDollarSign className="text-orange-400" />
+                        </button>
+                        <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-blue-900/50 to-cyan-900/50 text-blue-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-blue-800/50 hover:to-cyan-800/50 transition-all duration-200">
+                          <span>Free Consultation</span>
+                          <FiMessageCircle className="text-blue-400" />
+                        </button>
+                      </div>
+                    </div>
                     {/* Industry Filter Dropdown */}
                     <FilterDropdown
                       title="Industry Focus"
