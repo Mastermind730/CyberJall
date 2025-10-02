@@ -1057,6 +1057,7 @@ function SecurityInsightsCard({ score = 0 }: { score?: number }) {
 }
 
 // Component for recent activity
+// Component for recent activity
 function RecentActivityCard({
   packages,
   messages,
@@ -1072,13 +1073,17 @@ function RecentActivityCard({
       timestamp: pkg.updatedAt,
       status: pkg.status,
     })) || []),
-    ...(messages?.map((msg) => ({
-      type: "message" as const,
-      id: msg.id,
-      title: `New message for ${msg.package?.name || "package"}`,
-      timestamp: msg.createdAt,
-      status: "message" as const,
-    })) || []),
+    ...(messages?.map((msg) => {
+      // Find the package name by matching packageId with packages
+      const packageName = packages?.find(pkg => pkg.id === msg.packageId)?.name || "a package";
+      return {
+        type: "message" as const,
+        id: msg.id,
+        title: `New message for ${packageName}`,
+        timestamp: msg.createdAt,
+        status: "message" as const,
+      };
+    }) || []),
   ]
     .sort(
       (a, b) =>
