@@ -30,6 +30,11 @@ import {
   Users,
   MapPin,
   Zap,
+  Activity,
+  ExternalLink,
+  PlayCircle,
+  CheckCircle2,
+  PauseCircle
 } from "lucide-react";
 import { useDashboardStats } from "../customer/hooks/useDashboardStats";
 import { Message } from "@/lib/types";
@@ -70,15 +75,58 @@ interface BusinessBid {
   }[];
 }
 
+interface ProviderPackage {
+  id: string;
+  name: string;
+  status: 'active' | 'in_progress' | 'completed' | 'upcoming' | 'pending';
+  customer: {
+    id: string;
+    company_name: string;
+    work_email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  startDate?: string;
+  endDate?: string;
+  packageValue?: number;
+  description?: string;
+}
+
+interface ProviderPackagesData {
+  packages: ProviderPackage[];
+  stats: {
+    all: number;
+    ongoing: number;
+    completed: number;
+    upcoming: number;
+  };
+}
+
+interface PackageType {
+  id: string;
+  name: string;
+  status: "active" | "upcoming" | "completed";
+  provider?: {
+    company_name: string;
+  };
+  updatedAt: string;
+}
+
 export default function Dashboard() {
   const { stats, loading, error, user, company } = useDashboardStats();
   const [businessBids, setBusinessBids] = useState<BusinessBid[]>([]);
   const [bidsLoading, setBidsLoading] = useState(false);
+  const [providerPackages, setProviderPackages] = useState<ProviderPackagesData>({
+    packages: [],
+    stats: { all: 0, ongoing: 0, completed: 0, upcoming: 0 }
+  });
+  const [packagesLoading, setPackagesLoading] = useState(false);
 
-  // Fetch business bids for providers
+  // Fetch business bids and provider packages for providers
   useEffect(() => {
     if (user?.role === "provider") {
       fetchBusinessBids();
+      fetchProviderPackages();
     }
   }, [user]);
 
@@ -95,6 +143,23 @@ export default function Dashboard() {
       console.error("Error fetching business bids:", error);
     } finally {
       setBidsLoading(false);
+    }
+  };
+
+  const fetchProviderPackages = async () => {
+    setPackagesLoading(true);
+    try {
+      const response = await fetch(`/api/provider/packages`);
+      if (response.ok) {
+        const data = await response.json();
+        setProviderPackages(data);
+      } else {
+        console.error('Failed to fetch provider packages');
+      }
+    } catch (error) {
+      console.error("Error fetching provider packages:", error);
+    } finally {
+      setPackagesLoading(false);
     }
   };
 
@@ -362,15 +427,24 @@ export default function Dashboard() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentPackagesCard packages={stats?.recentActivity.packages} />
         {user.role === "provider" ? (
-          <BusinessBidsCard
-            bids={businessBids}
-            loading={bidsLoading}
-            onRefresh={fetchBusinessBids}
-          />
+          <>
+            <ProviderPackagesCard 
+              packagesData={providerPackages} 
+              loading={packagesLoading} 
+              onRefresh={fetchProviderPackages}
+            />
+            <BusinessBidsCard
+              bids={businessBids}
+              loading={bidsLoading}
+              onRefresh={fetchBusinessBids}
+            />
+          </>
         ) : (
-          <SecurityInsightsCard score={stats?.cyberHealth.score} />
+          <>
+            <RecentPackagesCard packages={stats?.recentActivity.packages} />
+            <SecurityInsightsCard score={stats?.cyberHealth.score} />
+          </>
         )}
       </div>
 
@@ -423,14 +497,194 @@ function StatCard({
   );
 }
 
-interface PackageType {
-  id: string;
-  name: string;
-  status: "active" | "upcoming" | "completed";
-  provider?: {
-    company_name: string;
+// Component for provider packages
+function ProviderPackagesCard({ 
+  packagesData, 
+  loading, 
+  onRefresh 
+}: { 
+  packagesData: ProviderPackagesData; 
+  loading: boolean; 
+  onRefresh: () => void;
+}) {
+  const [selectedTab, setSelectedTab] = useState<'all' | 'ongoing' | 'completed' | 'upcoming'>('all');
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active':
+      case 'in_progress':
+        return <PlayCircle className="h-4 w-4 text-green-500" />;
+      case 'completed':
+        return <CheckCircle2 className="h-4 w-4 text-blue-500" />;
+      case 'upcoming':
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <PauseCircle className="h-4 w-4 text-gray-500" />;
+    }
   };
-  updatedAt: string;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+      case 'in_progress':
+        return 'bg-green-500/20 text-green-400';
+      case 'completed':
+        return 'bg-blue-500/20 text-blue-400';
+      case 'upcoming':
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400';
+      default:
+        return 'bg-gray-500/20 text-gray-400';
+    }
+  };
+
+  const filteredPackages = packagesData.packages.filter(pkg => {
+    if (selectedTab === 'all') return true;
+    if (selectedTab === 'ongoing') return pkg.status === 'active' || pkg.status === 'in_progress';
+    if (selectedTab === 'completed') return pkg.status === 'completed';
+    if (selectedTab === 'upcoming') return pkg.status === 'upcoming' || pkg.status === 'pending';
+    return true;
+  });
+
+  return (
+    <Card className="bg-gray-900 border-gray-800">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-white flex items-center">
+              <Package className="mr-2 h-5 w-5 text-orange-500" />
+              My Packages
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Manage your active client engagements
+            </CardDescription>
+          </div>
+          <Button
+            onClick={onRefresh}
+            size="sm"
+            variant="outline"
+            className="border-gray-700 text-gray-300 hover:bg-gray-800"
+          >
+            Refresh
+          </Button>
+        </div>
+      </CardHeader>
+      
+      {/* Package Stats */}
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-4 gap-2">
+          <button
+            onClick={() => setSelectedTab('all')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'all' 
+                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.all}</div>
+            <div className="text-xs">All</div>
+          </button>
+          <button
+            onClick={() => setSelectedTab('ongoing')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'ongoing' 
+                ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.ongoing}</div>
+            <div className="text-xs">Ongoing</div>
+          </button>
+          <button
+            onClick={() => setSelectedTab('completed')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'completed' 
+                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.completed}</div>
+            <div className="text-xs">Completed</div>
+          </button>
+          <button
+            onClick={() => setSelectedTab('upcoming')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'upcoming' 
+                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.upcoming}</div>
+            <div className="text-xs">Upcoming</div>
+          </button>
+        </div>
+
+        {/* Packages List */}
+        <div className="space-y-3 max-h-80 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
+            </div>
+          ) : filteredPackages.length > 0 ? (
+            filteredPackages.slice(0, 6).map((pkg) => (
+              <div
+                key={pkg.id}
+                className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors group"
+              >
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <div className="flex-shrink-0">
+                    {getStatusIcon(pkg.status)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white truncate">
+                      {pkg.name}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {pkg.customer.company_name}
+                    </p>
+                    {pkg.packageValue && (
+                      <p className="text-xs text-green-400">
+                        ${pkg.packageValue.toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge className={`text-xs ${getStatusColor(pkg.status)}`}>
+                    {pkg.status.replace('_', ' ')}
+                  </Badge>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400 text-center py-8">
+              No packages found for &quot;{selectedTab}&quot;
+            </p>
+          )}
+        </div>
+
+        {filteredPackages.length > 6 && (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+            >
+              View All Packages
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 // Component for business bids (providers only)
@@ -553,7 +807,7 @@ function BusinessBidsCard({
             openBids.slice(0, 5).map((bid) => (
               <div
                 key={bid.id}
-                className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+                className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors group"
               >
                 <div className="flex items-center space-x-3 min-w-0 flex-1">
                   <div className="flex-shrink-0">
