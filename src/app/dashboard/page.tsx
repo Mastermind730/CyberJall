@@ -30,27 +30,14 @@ import {
   Users,
   MapPin,
   Zap,
+  ExternalLink,
+  PlayCircle,
+  CheckCircle2,
+  PauseCircle
 } from "lucide-react";
 import { useDashboardStats } from "../customer/hooks/useDashboardStats";
 import { Message } from "@/lib/types";
 import { useState, useEffect } from "react";
-
-interface Document {
-  name: string;
-  url: string;
-  size: number;
-  type: string;
-}
-
-interface BidResponse {
-  id: string;
-  providerId: string;
-  providerName: string;
-  proposal: string;
-  estimatedCost: string;
-  timeline: string;
-  createdAt: string;
-}
 
 interface BusinessBid {
   id: string;
@@ -67,11 +54,61 @@ interface BusinessBid {
   complianceGoals: string[];
   budget?: string;
   additionalNotes?: string;
-  documents: Document[];
+  documents: {
+    name: string;
+    url: string;
+    size: number;
+    type: string;
+  }[];
   status: "approved" | "pending_review" | "closed";
   createdAt: string;
   updatedAt: string;
-  responses?: BidResponse[];
+  responses?: {
+    id: string;
+    providerId: string;
+    providerName: string;
+    proposal: string;
+    estimatedCost: string;
+    timeline: string;
+    createdAt: string;
+  }[];
+}
+
+interface ProviderPackage {
+  id: string;
+  name: string;
+  status: 'active' | 'in_progress' | 'completed' | 'upcoming' | 'pending';
+  customer: {
+    id: string;
+    company_name: string;
+    work_email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  startDate?: string;
+  endDate?: string;
+  packageValue?: number;
+  description?: string;
+}
+
+interface ProviderPackagesData {
+  packages: ProviderPackage[];
+  stats: {
+    all: number;
+    ongoing: number;
+    completed: number;
+    upcoming: number;
+  };
+}
+
+interface PackageType {
+  id: string;
+  name: string;
+  status: "active" | "upcoming" | "completed";
+  provider?: {
+    company_name: string;
+  };
+  updatedAt: string;
 }
 
 interface User {
@@ -93,19 +130,9 @@ interface Company {
   headquarters_country?: string;
   team_size?: string;
   website?: string;
-  industries_served: string[];
-  geographic_coverage: string[];
-  target_business_size: string[];
-}
-
-interface PackageType {
-  id: string;
-  name: string;
-  status: "active" | "upcoming" | "completed";
-  provider?: {
-    company_name: string;
-  };
-  updatedAt: string;
+  industries_served?: string[];
+  geographic_coverage?: string[];
+  target_business_size?: string[];
 }
 
 interface Stats {
@@ -130,21 +157,29 @@ interface Stats {
   };
 }
 
+interface DashboardStats {
+  stats: Stats | null;
+  loading: boolean;
+  error: string | null;
+  user: User | null;
+  company: Company | null;
+}
+
 export default function Dashboard() {
-  const { stats, loading, error, user, company } = useDashboardStats() as {
-    stats: Stats | null;
-    loading: boolean;
-    error: string | null;
-    user: User | null;
-    company: Company | null;
-  };
+  const { stats, loading, error, user, company } = useDashboardStats() as DashboardStats;
   const [businessBids, setBusinessBids] = useState<BusinessBid[]>([]);
   const [bidsLoading, setBidsLoading] = useState(false);
+  const [providerPackages, setProviderPackages] = useState<ProviderPackagesData>({
+    packages: [],
+    stats: { all: 0, ongoing: 0, completed: 0, upcoming: 0 }
+  });
+  const [packagesLoading, setPackagesLoading] = useState(false);
 
-  // Fetch business bids for providers
+  // Fetch business bids and provider packages for providers
   useEffect(() => {
     if (user?.role === "provider") {
       fetchBusinessBids();
+      fetchProviderPackages();
     }
   }, [user]);
 
@@ -161,6 +196,23 @@ export default function Dashboard() {
       console.error("Error fetching business bids:", error);
     } finally {
       setBidsLoading(false);
+    }
+  };
+
+  const fetchProviderPackages = async () => {
+    setPackagesLoading(true);
+    try {
+      const response = await fetch(`/api/provider/packages`);
+      if (response.ok) {
+        const data = await response.json();
+        setProviderPackages(data);
+      } else {
+        console.error('Failed to fetch provider packages');
+      }
+    } catch (error) {
+      console.error("Error fetching provider packages:", error);
+    } finally {
+      setPackagesLoading(false);
     }
   };
 
@@ -183,7 +235,7 @@ export default function Dashboard() {
           <p className="text-red-500 text-lg mb-4">{error}</p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-orange-500 hover:bg-orange-600 text-white border-0"
+            className="bg-orange-500 hover:bg-orange-600"
           >
             Try Again
           </Button>
@@ -202,7 +254,7 @@ export default function Dashboard() {
           </p>
           <Button
             onClick={() => (window.location.href = "/login")}
-            className="bg-orange-500 hover:bg-orange-600 text-white border-0"
+            className="bg-orange-500 hover:bg-orange-600"
           >
             Go to Login
           </Button>
@@ -214,7 +266,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-black p-4 md:p-6 lg:p-8 space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-6 backdrop-blur-sm">
+      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-bold text-white mb-2">
@@ -239,18 +291,17 @@ export default function Dashboard() {
 
       {/* Company Information Section (Only for providers) */}
       {user.role === "provider" && company && (
-        <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+        <Card className="bg-gray-900 border-gray-800">
           <CardHeader>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               {company.logo && (
-                <div className="relative w-16 h-16">
-                  <Image
-                    src={company.logo}
-                    alt="Company Logo"
-                    fill
-                    className="object-contain rounded-lg"
-                  />
-                </div>
+                <Image
+                  src={company.logo}
+                  alt="Company Logo"
+                  width={64}
+                  height={64}
+                  className="object-contain rounded-lg"
+                />
               )}
               <div className="text-center sm:text-left">
                 <CardTitle className="text-xl text-white">
@@ -280,14 +331,14 @@ export default function Dashboard() {
                       href={company.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-orange-500 hover:text-orange-400 text-sm transition-colors"
+                      className="text-orange-500 hover:text-orange-400 text-sm"
                     >
                       Visit Website
                     </a>
                   )}
                 </div>
               </div>
-              {company.industries_served?.length > 0 && (
+              {company.industries_served && company.industries_served.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-400 mb-2">
                     Industries Served
@@ -299,7 +350,7 @@ export default function Dashboard() {
                         <Badge
                           key={index}
                           variant="secondary"
-                          className="bg-gray-800 text-white text-xs border-0"
+                          className="bg-gray-800 text-white text-xs"
                         >
                           {industry}
                         </Badge>
@@ -307,7 +358,7 @@ export default function Dashboard() {
                     {company.industries_served.length > 4 && (
                       <Badge
                         variant="secondary"
-                        className="bg-gray-800 text-white text-xs border-0"
+                        className="bg-gray-800 text-white text-xs"
                       >
                         +{company.industries_served.length - 4} more
                       </Badge>
@@ -317,7 +368,7 @@ export default function Dashboard() {
               )}
             </div>
             <div className="space-y-4">
-              {company.geographic_coverage?.length > 0 && (
+              {company.geographic_coverage && company.geographic_coverage.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-400 mb-2">
                     Coverage
@@ -329,7 +380,7 @@ export default function Dashboard() {
                         <Badge
                           key={index}
                           variant="secondary"
-                          className="bg-gray-800 text-white text-xs border-0"
+                          className="bg-gray-800 text-white text-xs"
                         >
                           {region}
                         </Badge>
@@ -337,7 +388,7 @@ export default function Dashboard() {
                     {company.geographic_coverage.length > 3 && (
                       <Badge
                         variant="secondary"
-                        className="bg-gray-800 text-white text-xs border-0"
+                        className="bg-gray-800 text-white text-xs"
                       >
                         +{company.geographic_coverage.length - 3} more
                       </Badge>
@@ -345,7 +396,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
-              {company.target_business_size?.length > 0 && (
+              {company.target_business_size && company.target_business_size.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-400 mb-2">
                     Target Business Size
@@ -355,7 +406,7 @@ export default function Dashboard() {
                       <Badge
                         key={index}
                         variant="secondary"
-                        className="bg-gray-800 text-white text-xs border-0"
+                        className="bg-gray-800 text-white text-xs"
                       >
                         {size}
                       </Badge>
@@ -429,15 +480,24 @@ export default function Dashboard() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentPackagesCard packages={stats?.recentActivity.packages} />
         {user.role === "provider" ? (
-          <BusinessBidsCard
-            bids={businessBids}
-            loading={bidsLoading}
-            onRefresh={fetchBusinessBids}
-          />
+          <>
+            <ProviderPackagesCard 
+              packagesData={providerPackages} 
+              loading={packagesLoading} 
+              onRefresh={fetchProviderPackages}
+            />
+            <BusinessBidsCard
+              bids={businessBids}
+              loading={bidsLoading}
+              onRefresh={fetchBusinessBids}
+            />
+          </>
         ) : (
-          <SecurityInsightsCard score={stats?.cyberHealth.score} />
+          <>
+            <RecentPackagesCard packages={stats?.recentActivity.packages} />
+            <SecurityInsightsCard score={stats?.cyberHealth.score} />
+          </>
         )}
       </div>
 
@@ -475,7 +535,7 @@ function StatCard({
       : "text-gray-400";
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm hover:border-gray-600 transition-all duration-300 hover:scale-105">
+    <Card className="bg-gray-900 border-gray-800 hover:border-gray-700 transition-colors">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <CardTitle className="text-sm font-medium text-gray-300">
           {title}
@@ -485,6 +545,196 @@ function StatCard({
       <CardContent>
         <div className="text-2xl font-bold text-white">{value}</div>
         <p className={`text-xs ${trendColor} mt-1`}>{subtitle}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Component for provider packages
+function ProviderPackagesCard({ 
+  packagesData, 
+  loading, 
+  onRefresh 
+}: { 
+  packagesData: ProviderPackagesData; 
+  loading: boolean; 
+  onRefresh: () => void;
+}) {
+  const [selectedTab, setSelectedTab] = useState<'all' | 'ongoing' | 'completed' | 'upcoming'>('all');
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active':
+      case 'in_progress':
+        return <PlayCircle className="h-4 w-4 text-green-500" />;
+      case 'completed':
+        return <CheckCircle2 className="h-4 w-4 text-blue-500" />;
+      case 'upcoming':
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <PauseCircle className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+      case 'in_progress':
+        return 'bg-green-500/20 text-green-400';
+      case 'completed':
+        return 'bg-blue-500/20 text-blue-400';
+      case 'upcoming':
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400';
+      default:
+        return 'bg-gray-500/20 text-gray-400';
+    }
+  };
+
+  const filteredPackages = packagesData.packages.filter(pkg => {
+    if (selectedTab === 'all') return true;
+    if (selectedTab === 'ongoing') return pkg.status === 'active' || pkg.status === 'in_progress';
+    if (selectedTab === 'completed') return pkg.status === 'completed';
+    if (selectedTab === 'upcoming') return pkg.status === 'upcoming' || pkg.status === 'pending';
+    return true;
+  });
+
+  return (
+    <Card className="bg-gray-900 border-gray-800">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-white flex items-center">
+              <Package className="mr-2 h-5 w-5 text-orange-500" />
+              My Packages
+            </CardTitle>
+            <CardDescription className="text-gray-400">
+              Manage your active client engagements
+            </CardDescription>
+          </div>
+          <Button
+            onClick={onRefresh}
+            size="sm"
+            variant="outline"
+            className="border-gray-700 text-gray-300 hover:bg-gray-800"
+          >
+            Refresh
+          </Button>
+        </div>
+      </CardHeader>
+      
+      {/* Package Stats */}
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-4 gap-2">
+          <button
+            onClick={() => setSelectedTab('all')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'all' 
+                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.all}</div>
+            <div className="text-xs">All</div>
+          </button>
+          <button
+            onClick={() => setSelectedTab('ongoing')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'ongoing' 
+                ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.ongoing}</div>
+            <div className="text-xs">Ongoing</div>
+          </button>
+          <button
+            onClick={() => setSelectedTab('completed')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'completed' 
+                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.completed}</div>
+            <div className="text-xs">Completed</div>
+          </button>
+          <button
+            onClick={() => setSelectedTab('upcoming')}
+            className={`p-3 rounded-lg text-center transition-colors ${
+              selectedTab === 'upcoming' 
+                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <div className="text-lg font-bold">{packagesData.stats.upcoming}</div>
+            <div className="text-xs">Upcoming</div>
+          </button>
+        </div>
+
+        {/* Packages List */}
+        <div className="space-y-3 max-h-80 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
+            </div>
+          ) : filteredPackages.length > 0 ? (
+            filteredPackages.slice(0, 6).map((pkg) => (
+              <div
+                key={pkg.id}
+                className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors group"
+              >
+                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                  <div className="flex-shrink-0">
+                    {getStatusIcon(pkg.status)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white truncate">
+                      {pkg.name}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {pkg.customer.company_name}
+                    </p>
+                    {pkg.packageValue && (
+                      <p className="text-xs text-green-400">
+                        ${pkg.packageValue.toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge className={`text-xs ${getStatusColor(pkg.status)}`}>
+                    {pkg.status.replace('_', ' ')}
+                  </Badge>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400 text-center py-8">
+              No packages found for &quot;{selectedTab}&quot;
+            </p>
+          )}
+        </div>
+
+        {filteredPackages.length > 6 && (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+            >
+              View All Packages
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -515,11 +765,11 @@ function BusinessBidsCard({
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case "critical":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
+        return "bg-red-500/20 text-red-400";
       case "urgent":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+        return "bg-yellow-500/20 text-yellow-400";
       default:
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+        return "bg-blue-500/20 text-blue-400";
     }
   };
 
@@ -579,7 +829,7 @@ function BusinessBidsCard({
 
   return (
     <>
-      <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -595,7 +845,7 @@ function BusinessBidsCard({
               onClick={onRefresh}
               size="sm"
               variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
             >
               Refresh
             </Button>
@@ -610,7 +860,7 @@ function BusinessBidsCard({
             openBids.slice(0, 5).map((bid) => (
               <div
                 key={bid.id}
-                className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600"
+                className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors group"
               >
                 <div className="flex items-center space-x-3 min-w-0 flex-1">
                   <div className="flex-shrink-0">
@@ -627,7 +877,7 @@ function BusinessBidsCard({
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge
-                        className={`text-xs border ${getUrgencyColor(bid.urgency)}`}
+                        className={`text-xs ${getUrgencyColor(bid.urgency)}`}
                       >
                         {bid.urgency}
                       </Badge>
@@ -642,7 +892,7 @@ function BusinessBidsCard({
                 <Button
                   size="sm"
                   onClick={() => handleViewBid(bid)}
-                  className="bg-orange-500 hover:bg-orange-600 text-white border-0"
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   <Eye className="h-3 w-3 mr-1" />
                   View
@@ -659,8 +909,8 @@ function BusinessBidsCard({
 
       {/* Bid Detail Modal */}
       {showResponseModal && selectedBid && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-gray-900 border border-gray-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-white">
@@ -670,7 +920,7 @@ function BusinessBidsCard({
                   onClick={() => setShowResponseModal(false)}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-400 hover:text-white hover:bg-gray-800"
+                  className="text-gray-400 hover:text-white"
                 >
                   ✕
                 </Button>
@@ -679,7 +929,7 @@ function BusinessBidsCard({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Bid Details */}
                 <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <div className="bg-gray-800 rounded-lg p-4">
                     <h3 className="text-lg font-medium text-white mb-3">
                       Company Information
                     </h3>
@@ -709,7 +959,7 @@ function BusinessBidsCard({
                         <Zap className="h-4 w-4 text-gray-400 mr-2" />
                         <span className="text-gray-400">Urgency:</span>
                         <Badge
-                          className={`ml-2 border ${getUrgencyColor(
+                          className={`ml-2 ${getUrgencyColor(
                             selectedBid.urgency
                           )}`}
                         >
@@ -728,7 +978,7 @@ function BusinessBidsCard({
                     </div>
                   </div>
 
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <div className="bg-gray-800 rounded-lg p-4">
                     <h3 className="text-lg font-medium text-white mb-3">
                       Required Services
                     </h3>
@@ -737,7 +987,7 @@ function BusinessBidsCard({
                         <Badge
                           key={index}
                           variant="secondary"
-                          className="bg-gray-700 text-white border-0"
+                          className="bg-gray-700 text-white"
                         >
                           {service}
                         </Badge>
@@ -746,7 +996,7 @@ function BusinessBidsCard({
                   </div>
 
                   {selectedBid.complianceGoals.length > 0 && (
-                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div className="bg-gray-800 rounded-lg p-4">
                       <h3 className="text-lg font-medium text-white mb-3">
                         Compliance Requirements
                       </h3>
@@ -755,7 +1005,7 @@ function BusinessBidsCard({
                           <Badge
                             key={index}
                             variant="secondary"
-                            className="bg-gray-700 text-white border-0"
+                            className="bg-gray-700 text-white"
                           >
                             {goal}
                           </Badge>
@@ -764,7 +1014,7 @@ function BusinessBidsCard({
                     </div>
                   )}
 
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <div className="bg-gray-800 rounded-lg p-4">
                     <h3 className="text-lg font-medium text-white mb-3">
                       Project Description
                     </h3>
@@ -784,7 +1034,7 @@ function BusinessBidsCard({
                   </div>
 
                   {selectedBid.documents.length > 0 && (
-                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div className="bg-gray-800 rounded-lg p-4">
                       <h3 className="text-lg font-medium text-white mb-3">
                         Documents
                       </h3>
@@ -792,7 +1042,7 @@ function BusinessBidsCard({
                         {selectedBid.documents.map((doc, index) => (
                           <div
                             key={index}
-                            className="flex items-center justify-between bg-gray-700/50 p-2 rounded border border-gray-600"
+                            className="flex items-center justify-between bg-gray-700 p-2 rounded"
                           >
                             <div className="flex items-center">
                               <FileText className="h-4 w-4 text-gray-400 mr-2" />
@@ -807,7 +1057,7 @@ function BusinessBidsCard({
                               size="sm"
                               variant="ghost"
                               onClick={() => window.open(doc.url, "_blank")}
-                              className="text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
+                              className="text-orange-400 hover:text-orange-300"
                             >
                               View
                             </Button>
@@ -820,7 +1070,7 @@ function BusinessBidsCard({
 
                 {/* Response Form */}
                 <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <div className="bg-gray-800 rounded-lg p-4">
                     <h3 className="text-lg font-medium text-white mb-4">
                       Submit Your Response
                     </h3>
@@ -839,7 +1089,7 @@ function BusinessBidsCard({
                             })
                           }
                           placeholder="Describe your approach, methodology, and what makes your solution unique..."
-                          className="w-full h-24 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                          className="w-full h-24 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500"
                           required
                         />
                       </div>
@@ -859,7 +1109,7 @@ function BusinessBidsCard({
                               })
                             }
                             placeholder="50000"
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500"
                             required
                           />
                         </div>
@@ -878,7 +1128,7 @@ function BusinessBidsCard({
                               })
                             }
                             placeholder="4-6 weeks"
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500"
                             required
                           />
                         </div>
@@ -897,7 +1147,7 @@ function BusinessBidsCard({
                             })
                           }
                           placeholder="Any additional information, terms, or conditions..."
-                          className="w-full h-20 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                          className="w-full h-20 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500"
                         />
                       </div>
 
@@ -905,14 +1155,14 @@ function BusinessBidsCard({
                         <Button
                           onClick={() => setShowResponseModal(false)}
                           variant="outline"
-                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                          className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
                         >
                           Cancel
                         </Button>
                         <Button
                           onClick={handleSubmitResponse}
                           disabled={submitting}
-                          className="flex-1 bg-orange-500 hover:bg-orange-600 text-white border-0"
+                          className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
                         >
                           {submitting ? (
                             <>
@@ -942,7 +1192,7 @@ function BusinessBidsCard({
 // Component for recent packages
 function RecentPackagesCard({ packages }: { packages?: PackageType[] }) {
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+    <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
           <Package className="mr-2 h-5 w-5 text-orange-500" />
@@ -957,7 +1207,7 @@ function RecentPackagesCard({ packages }: { packages?: PackageType[] }) {
           packages.slice(0, 5).map((pkg) => (
             <div
               key={pkg.id}
-              className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg hover:bg-gray-750 transition-all duration-200 border border-gray-700 hover:border-gray-600"
+              className="flex items-center justify-between p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
             >
               <div className="flex items-center space-x-3 min-w-0">
                 <div
@@ -980,7 +1230,7 @@ function RecentPackagesCard({ packages }: { packages?: PackageType[] }) {
               </div>
               <Badge
                 variant="secondary"
-                className={`flex-shrink-0 border-0 ${
+                className={`flex-shrink-0 ${
                   pkg.status === "active"
                     ? "bg-green-500/20 text-green-400"
                     : pkg.status === "upcoming"
@@ -1004,10 +1254,10 @@ function RecentPackagesCard({ packages }: { packages?: PackageType[] }) {
 
 // Component for security insights
 function SecurityInsightsCard({ score = 0 }: { score?: number }) {
-  const status = score >= 80 ? "excellent" : score >= 60 ? "good" : "poor";
+  const status = score >= 80 ? "excellent" : score > 60 ? "good" : "poor";
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+    <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
           <TrendingUp className="mr-2 h-5 w-5 text-orange-500" />
@@ -1020,7 +1270,7 @@ function SecurityInsightsCard({ score = 0 }: { score?: number }) {
             <span className="text-gray-300">Overall Security Score</span>
             <span className="text-white">{score}%</span>
           </div>
-          <Progress value={score} className="h-2 bg-gray-700 [&>div]:bg-orange-500" />
+          <Progress value={score} className="h-2 bg-gray-700" />
         </div>
 
         <div className="space-y-2">
@@ -1048,7 +1298,7 @@ function SecurityInsightsCard({ score = 0 }: { score?: number }) {
           )}
         </div>
 
-        <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white border-0 transition-all">
+        <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
           View Detailed Report
         </Button>
       </CardContent>
@@ -1056,7 +1306,6 @@ function SecurityInsightsCard({ score = 0 }: { score?: number }) {
   );
 }
 
-// Component for recent activity
 // Component for recent activity
 function RecentActivityCard({
   packages,
@@ -1073,17 +1322,13 @@ function RecentActivityCard({
       timestamp: pkg.updatedAt,
       status: pkg.status,
     })) || []),
-    ...(messages?.map((msg) => {
-      // Find the package name by matching packageId with packages
-      const packageName = packages?.find(pkg => pkg.id === msg.packageId)?.name || "a package";
-      return {
-        type: "message" as const,
-        id: msg.id,
-        title: `New message for ${packageName}`,
-        timestamp: msg.createdAt,
-        status: "message" as const,
-      };
-    }) || []),
+    ...(messages?.map((msg) => ({
+      type: "message" as const,
+      id: msg.id,
+      title: `New message for ${msg.packageId}`,
+      timestamp: msg.createdAt,
+      status: "message" as const,
+    })) || []),
   ]
     .sort(
       (a, b) =>
@@ -1092,7 +1337,7 @@ function RecentActivityCard({
     .slice(0, 5);
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+    <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
           <Clock className="mr-2 h-5 w-5 text-orange-500" />
@@ -1104,7 +1349,7 @@ function RecentActivityCard({
           allActivities.map((activity) => (
             <div
               key={`${activity.type}-${activity.id}`}
-              className="flex items-start space-x-3 text-sm p-2 rounded-lg hover:bg-gray-800/50 transition-colors"
+              className="flex items-start space-x-3 text-sm"
             >
               <div
                 className={`w-2 h-2 mt-2 flex-shrink-0 rounded-full ${
@@ -1137,7 +1382,7 @@ function RecentActivityCard({
 // Component for upcoming events
 function UpcomingEventsCard() {
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+    <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
           <Calendar className="mr-2 h-5 w-5 text-orange-500" />
