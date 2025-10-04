@@ -31,6 +31,7 @@ import {
   FiMessageCircle,
 } from "react-icons/fi";
 import { IconAddressBook } from "@tabler/icons-react";
+import InviteModal from "../components/InviteModal";
 
 interface Partner {
   id: string;
@@ -270,6 +271,21 @@ export default function Partners() {
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [isClient, setIsClient] = useState(false);
+
+   // --- Invite Modal State ---
+  const [inviteModal, setInviteModal] = useState<{
+    open: boolean;
+    partner: Partner | null;
+  }>({ open: false, partner: null });
+
+  // Invite Modal handlers
+  const handleInviteClick = (partner: Partner) => {
+    setInviteModal({ open: true, partner });
+  };
+  const handleInviteSuccess = () => {
+    setInviteModal({ open: false, partner: null });
+  };
+
 
   useEffect(() => {
     setIsClient(true);
@@ -1018,13 +1034,13 @@ export default function Partners() {
                             <span className="hidden sm:inline ml-1">View</span>
                           </Link>
 
-                          <Link
-                            href={`/`}
+                          <Button
+                            onClick={()=>handleInviteClick()}
                             className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-gray-600 text-xs font-medium rounded-md text-white bg-gray-800/50 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm"
                           >
                             <IconAddressBook className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline ml-1">Invite</span>
-                          </Link>
+                          </Button>
 
                           {partner.website && (
                             <Link
@@ -1108,6 +1124,14 @@ export default function Partners() {
           </div>
         </div>
       </div>
+
+      {/* Invite Modal */}
+      <InviteModal
+        isOpen={inviteModal.open}
+        onClose={() => setInviteModal({ open: false, partner: null })}
+        partner={inviteModal.partner}
+        onSuccess={handleInviteSuccess}
+      />
 
       {/* Mobile Filters */}
       <AnimatePresence>
