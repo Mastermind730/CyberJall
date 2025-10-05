@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import NavbarNew from '@/app/components/Navbar';
-import Footer from '@/app/components/Footer';
+import { usePathname } from "next/navigation";
+import NavbarNew from "@/app/components/Navbar";
+import Footer from "@/app/components/Footer";
 
-export default function LayoutContent({ children }: { children: React.ReactNode }) {
+export default function LayoutContent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const isCustomerRoute = pathname?.startsWith('/customer');
+  const isCustomerRoute = pathname?.startsWith("/customer");
 
   return (
     <>

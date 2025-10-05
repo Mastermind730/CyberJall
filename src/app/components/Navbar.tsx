@@ -1,61 +1,46 @@
-"use client"
-import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth" // Adjust import path as needed
-
-interface User {
-  name?: string
-  email?: string
-  company_name?: string
-  work_email?: string
-  avatarUrl?: string
-  role?: string
-  id?: string
-}
+"use client";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import Image from "next/image";
 
 export default function NavbarNew() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false)
-  const router = useRouter()
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   // Use the useAuth hook
-  const { user, loading } = useAuth()
-  const isLoggedIn = !!user
+  const { user, loading, logout } = useAuth();
+  const isLoggedIn = !!user;
+
+  console.log("user",user);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (showProfileDropdown && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowProfileDropdown(false)
+      if (
+        showProfileDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowProfileDropdown(false);
       }
     }
     if (showProfileDropdown) {
-      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [showProfileDropdown])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   const handleLogout = async () => {
-    try {
-      // Call logout API
-      await fetch('/api/logout', {
-        method: 'POST',
-      })
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      // Clear client-side state
-      setShowProfileDropdown(false)
-      setIsMobileMenuOpen(false)
-      
-      // Force reload to clear any cached state
-      window.location.href = '/login'
-    }
-  }
+    setShowProfileDropdown(false);
+    setIsMobileMenuOpen(false);
+    await logout();
+  };
 
   const navItems = [
     {
@@ -140,28 +125,76 @@ export default function NavbarNew() {
         {
           category: "Compliance Standards",
           items: [
-            { name: "ISO 27001", link: "/services/compliance", description: "Information security management certification" },
-            { name: "HIPAA", link: "/services/compliance", description: "Healthcare data protection compliance" },
-            { name: "SOC 2", link: "/services/compliance", description: "Service organization control compliance" },
-            { name: "GDPR", link: "/services/compliance", description: "General data protection regulation" },
+            {
+              name: "ISO 27001",
+              link: "/services/compliance",
+              description: "Information security management certification",
+            },
+            {
+              name: "HIPAA",
+              link: "/services/compliance",
+              description: "Healthcare data protection compliance",
+            },
+            {
+              name: "SOC 2",
+              link: "/services/compliance",
+              description: "Service organization control compliance",
+            },
+            {
+              name: "GDPR",
+              link: "/services/compliance",
+              description: "General data protection regulation",
+            },
           ],
         },
         {
           category: "Advanced Threat Defense",
           items: [
-            { name: "XDR ", link: "/service1", description: "Extended Detection & Response" },
-            { name: "AI Extended Detection & Response", link: "/service2", description: "AI Extended Detection & Response" },
-            { name: "ASM", link: "/service3", description: "Attack Surface Management " },
-            { name: " Zero Trust Implementation", link: "/service4", description: " Zero Trust Implementation" },
+            {
+              name: "XDR ",
+              link: "/service1",
+              description: "Extended Detection & Response",
+            },
+            {
+              name: "AI Extended Detection & Response",
+              link: "/service2",
+              description: "AI Extended Detection & Response",
+            },
+            {
+              name: "ASM",
+              link: "/service3",
+              description: "Attack Surface Management ",
+            },
+            {
+              name: " Zero Trust Implementation",
+              link: "/service4",
+              description: " Zero Trust Implementation",
+            },
           ],
         },
-         {
+        {
           category: "Cloud Security Services",
           items: [
-            { name: "CSPM", link: "/cspm", description: "Extended Detection & Response" },
-            { name: " Cloud Data Protection & DLP", link: "/cloudPndDLP", description: "AI Extended Detection & Response" },
-            { name: "Cloud Compliance Mapping", link: "/cloudCompliance", description: "Attack Surface Management " },
-            { name: "DevSecOps Implementation", link: "/devSecOps", description: " Zero Trust Implementation" },
+            {
+              name: "CSPM",
+              link: "/cspm",
+              description: "Extended Detection & Response",
+            },
+            {
+              name: " Cloud Data Protection & DLP",
+              link: "/cloudPndDLP",
+              description: "AI Extended Detection & Response",
+            },
+            {
+              name: "Cloud Compliance Mapping",
+              link: "/cloudCompliance",
+              description: "Attack Surface Management ",
+            },
+            {
+              name: "DevSecOps Implementation",
+              link: "/devSecOps",
+              description: " Zero Trust Implementation",
+            },
           ],
         },
       ],
@@ -179,11 +212,11 @@ export default function NavbarNew() {
               link: "/products/bug_bounty",
               description: "Comprehensive web application security testing",
             },
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
-  ]
+  ];
 
   // Helper for avatar initials
   const getInitials = (name?: string, email?: string) => {
@@ -193,13 +226,13 @@ export default function NavbarNew() {
         .map((w) => w[0])
         .join("")
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2);
     }
     if (email && email.length > 0) {
-      return email[0].toUpperCase()
+      return email[0].toUpperCase();
     }
-    return "U"
-  }
+    return "U";
+  };
 
   // Show loading state
   if (loading) {
@@ -212,7 +245,7 @@ export default function NavbarNew() {
           <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-20 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -220,21 +253,24 @@ export default function NavbarNew() {
       {/* Desktop Navigation */}
       <div className="hidden lg:flex items-center justify-between px-6 py-4">
         <div className="flex items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <Link
+            href="/"
+            className="text-2xl font-bold text-blue-600 dark:text-blue-400"
+          >
             CyberJall
           </Link>
         </div>
-        
+
         <div className="flex items-center space-x-8">
           {navItems.map((item, index) => (
             <div key={index} className="relative group">
-              <Link 
-                href={item.link} 
+              <Link
+                href={item.link}
                 className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors duration-200 font-medium text-sm"
               >
                 {item.name}
               </Link>
-              
+
               {item.hasDropdown && item.dropdownItems && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-96 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <div className="grid grid-cols-3 gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700">
@@ -267,7 +303,7 @@ export default function NavbarNew() {
             </div>
           ))}
         </div>
-        
+
         <div className="flex items-center gap-4">
           {isLoggedIn && user ? (
             <div className="relative" ref={dropdownRef}>
@@ -278,25 +314,37 @@ export default function NavbarNew() {
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ring-white dark:ring-gray-800">
                   {user.avatarUrl ? (
-                    <img
+                    <Image
+                      width={80}
+                      height={80}
                       src={user.avatarUrl}
                       alt="avatar"
                       className="w-full h-full object-cover rounded-full"
                     />
                   ) : (
-                    getInitials(user.name || user.company_name, user.email || user.work_email)
+                    getInitials(
+                      user.name || user.company_name,
+                      user.email || user.work_email
+                    )
                   )}
                 </div>
-                <svg 
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showProfileDropdown ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                    showProfileDropdown ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
-              
+
               {/* Profile Dropdown */}
               {showProfileDropdown && (
                 <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in-80 slide-in-from-top-2">
@@ -311,7 +359,10 @@ export default function NavbarNew() {
                             className="w-full h-full object-cover rounded-full"
                           />
                         ) : (
-                          getInitials(user.name || user.company_name, user.email || user.work_email)
+                          getInitials(
+                            user.name || user.company_name,
+                            user.email || user.work_email
+                          )
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -323,7 +374,8 @@ export default function NavbarNew() {
                         </div>
                         {user.role && (
                           <div className="text-blue-200 text-xs font-medium mt-0.5">
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            {user.role.charAt(0).toUpperCase() +
+                              user.role.slice(1)}
                           </div>
                         )}
                       </div>
@@ -339,30 +391,54 @@ export default function NavbarNew() {
                         onClick={() => setShowProfileDropdown(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                          <svg
+                            className="w-4 h-4 text-green-600 dark:text-green-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            />
                           </svg>
                         </div>
                         <div>
                           <div className="font-medium">Dashboard</div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">View your dashboard</div>
+                          <div className="text-gray-500 dark:text-gray-400 text-xs">
+                            View your dashboard
+                          </div>
                         </div>
                       </Link>
 
                       <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                      
+
                       <button
                         onClick={handleLogout}
                         className="flex items-center space-x-3 w-full px-3 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150 group"
                       >
                         <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          <svg
+                            className="w-4 h-4 text-red-600 dark:text-red-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            />
                           </svg>
                         </div>
                         <div>
                           <div className="font-medium">Sign out</div>
-                          <div className="text-red-500 dark:text-red-400 text-xs">Log out of your account</div>
+                          <div className="text-red-500 dark:text-red-400 text-xs">
+                            Log out of your account
+                          </div>
                         </div>
                       </button>
                     </div>
@@ -372,14 +448,14 @@ export default function NavbarNew() {
             </div>
           ) : (
             <button
-              onClick={() => router.push('/login')}
+              onClick={() => router.push("/login")}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 border border-gray-300 dark:border-gray-600"
             >
               Login
             </button>
           )}
           <button
-            onClick={() => router.push('/contact_us')}
+            onClick={() => router.push("/contact_us")}
             className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Contact Us
@@ -389,10 +465,13 @@ export default function NavbarNew() {
 
       {/* Mobile Navigation */}
       <div className="lg:hidden flex items-center justify-between p-4">
-        <Link href="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+        <Link
+          href="/"
+          className="text-xl font-bold text-blue-600 dark:text-blue-400"
+        >
           CyberJall
         </Link>
-        
+
         <div className="flex items-center gap-2">
           {isLoggedIn && user && (
             <div className="relative" ref={dropdownRef}>
@@ -407,7 +486,10 @@ export default function NavbarNew() {
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
-                  getInitials(user.name || user.company_name, user.email || user.work_email)
+                  getInitials(
+                    user.name || user.company_name,
+                    user.email || user.work_email
+                  )
                 )}
               </button>
 
@@ -425,7 +507,10 @@ export default function NavbarNew() {
                             className="w-full h-full object-cover rounded-full"
                           />
                         ) : (
-                          getInitials(user.name || user.company_name, user.email || user.work_email)
+                          getInitials(
+                            user.name || user.company_name,
+                            user.email || user.work_email
+                          )
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -447,20 +532,40 @@ export default function NavbarNew() {
                         className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
                         onClick={() => setShowProfileDropdown(false)}
                       >
-                        <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        <svg
+                          className="w-4 h-4 text-green-600 dark:text-green-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                          />
                         </svg>
                         <span>Dashboard</span>
                       </Link>
 
                       <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                      
+
                       <button
                         onClick={handleLogout}
                         className="flex items-center space-x-3 w-full px-3 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
                       >
-                        <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        <svg
+                          className="w-4 h-4 text-red-600 dark:text-red-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                          />
                         </svg>
                         <span>Sign out</span>
                       </button>
@@ -470,15 +575,30 @@ export default function NavbarNew() {
               )}
             </div>
           )}
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </svg>
           </button>
@@ -491,14 +611,14 @@ export default function NavbarNew() {
           <div className="px-4 py-4 space-y-4">
             {navItems.map((item, index) => (
               <div key={index}>
-                <Link 
-                  href={item.link} 
+                <Link
+                  href={item.link}
                   className="block py-2 text-gray-700 dark:text-gray-300 font-medium text-sm"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
-                
+
                 {item.hasDropdown && item.dropdownItems && (
                   <div className="pl-4 mt-2 space-y-4 border-l border-gray-200 dark:border-gray-700">
                     {item.dropdownItems.map((category, catIndex) => (
@@ -514,7 +634,9 @@ export default function NavbarNew() {
                               className="block p-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-md transition-colors"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
-                              <div className="font-medium">{dropdownItem.name}</div>
+                              <div className="font-medium">
+                                {dropdownItem.name}
+                              </div>
                               <div className="text-gray-500 dark:text-gray-400 mt-1">
                                 {dropdownItem.description}
                               </div>
@@ -527,13 +649,13 @@ export default function NavbarNew() {
                 )}
               </div>
             ))}
-            
+
             <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
               {!isLoggedIn && (
                 <button
                   onClick={() => {
-                    router.push('/login')
-                    setIsMobileMenuOpen(false)
+                    router.push("/login");
+                    setIsMobileMenuOpen(false);
                   }}
                   className="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
@@ -542,8 +664,8 @@ export default function NavbarNew() {
               )}
               <button
                 onClick={() => {
-                  router.push('/contact_us')
-                  setIsMobileMenuOpen(false)
+                  router.push("/contact_us");
+                  setIsMobileMenuOpen(false);
                 }}
                 className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
               >
@@ -554,5 +676,5 @@ export default function NavbarNew() {
         </div>
       )}
     </div>
-  )
+  );
 }

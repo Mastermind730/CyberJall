@@ -7,6 +7,7 @@ interface User {
   work_email: string;
   name?: string;
   email?: string;
+  avatarUrl?: string;
 }
 
 export function useAuth() {
@@ -16,28 +17,51 @@ export function useAuth() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Get token from cookies
-        const cookies = document.cookie.split(';');
-        const authCookie = cookies.find(cookie => cookie.trim().startsWith('auth_token='));
-        
-        if (!authCookie) {
+        // Make API request to verify authentication
+        // This will automatically include cookies in the request
+        const response = await fetch('/api/debug/auth', {
+          method: 'GET',
+          credentials: 'include', // Important: include cookies in request
+        });
+
+        if (!response.ok) {
           setUser(null);
           setLoading(false);
           return;
         }
 
-        const token = authCookie.split('=')[1].trim();
-        
-        if (!token) {
+        const data = await response.json();
+        console.log('Auth API response:', data);
+
+        if (!data.hasToken) {
           setUser(null);
           setLoading(false);
           return;
         }
-        
-        // Decode JWT token without verification for client-side use
-        // Note: For sensitive data, make an API call to verify the token
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Decoded JWT payload:', payload);
+
+        // Now make a request to get user details using the token
+        const userResponse = await fetch('/api/debug/token', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        console.log(userResponse);
+
+        if (!userResponse.ok) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        const userData = await userResponse.json();
+        console.log('User data response:', userData);
+
+        if (!userData.success || !userData.payload) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        const payload = userData.payload;
         
         // Handle both old and new token formats
         const userId = payload.userId || payload.id;
@@ -49,21 +73,17 @@ export function useAuth() {
           throw new Error('Invalid token structure');
         }
         
-        // For better user experience, we might want to fetch additional user details from API
-        // But for now, we'll use what we have from the token
         setUser({
           id: userId,
           role: userRole,
           work_email: userEmail,
           email: userEmail,
-          // Set a default company name if available in token
           company_name: payload.company_name || undefined,
           name: payload.name || undefined,
+          avatarUrl: payload.avatarUrl || undefined,
         });
       } catch (error) {
         console.error('Auth check failed:', error);
-        // Clear invalid token
-        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=lax';
         setUser(null);
       } finally {
         setLoading(false);
@@ -76,14 +96,18 @@ export function useAuth() {
   const logout = async () => {
     try {
       // Call logout API to clear server-side session
-      await fetch('/api/logout', {
+      const response = await fetch('/api/logout', {
         method: 'POST',
+        credentials: 'include', // Include cookies for logout
       });
+      
+      if (response.ok) {
+        console.log('Logout successful');
+      }
     } catch (error) {
       console.error('Logout API error:', error);
     } finally {
       // Clear client-side state regardless of API call result
-      document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=lax';
       setUser(null);
       
       // Redirect to login or home page

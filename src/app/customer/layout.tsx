@@ -1,14 +1,22 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "../components/ui/button"
-import { User, Package, BarChart3, Settings, HelpCircle, Menu, X, Shield } from "lucide-react"
-
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "../components/ui/button";
+import {
+  User,
+  Package,
+  BarChart3,
+  Settings,
+  HelpCircle,
+  Menu,
+  X,
+  Shield,
+} from "lucide-react";
 
 const navigation = [
   {
@@ -41,26 +49,36 @@ const navigation = [
     icon: HelpCircle,
     description: "Get help and contact support",
   },
-]
+];
 
 export default function CustomerLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="min-h-screen bg-black">
       {/* Mobile sidebar */}
-      <div className={cn("fixed inset-0 z-40 lg:hidden", sidebarOpen ? "block" : "hidden")}>
-        <div className="fixed inset-0 bg-black/80" onClick={() => setSidebarOpen(false)} />
+      <div
+        className={cn(
+          "fixed inset-0 z-40 lg:hidden",
+          sidebarOpen ? "block" : "hidden"
+        )}
+      >
+        <div
+          className="fixed inset-0 bg-black/80"
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="fixed inset-y-0 left-0 w-64 bg-gray-900 border-r border-gray-800">
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
             <div className="flex items-center space-x-2">
               <Shield className="h-6 w-6 text-orange-500" />
-              <span className="text-lg font-semibold text-white">Customer Portal</span>
+              <span className="text-lg font-semibold text-white">
+                Customer Portal
+              </span>
             </div>
             <Button
               variant="ghost"
@@ -73,7 +91,7 @@ export default function CustomerLayout({
           </div>
           <nav className="p-4 space-y-2">
             {navigation.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
@@ -82,14 +100,14 @@ export default function CustomerLayout({
                     "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
                       ? "bg-orange-500/20 text-orange-500 border border-orange-500/30"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800",
+                      : "text-gray-300 hover:text-white hover:bg-gray-800"
                   )}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.name}</span>
                 </Link>
-              )
+              );
             })}
           </nav>
         </div>
@@ -100,11 +118,13 @@ export default function CustomerLayout({
         <div className="flex flex-col h-full bg-gray-900 border-r border-gray-800">
           <div className="flex items-center space-x-2 p-6 border-b border-gray-800">
             <Shield className="h-6 w-6 text-orange-500" />
-            <span className="text-lg font-semibold text-white">Customer Portal</span>
+            <span className="text-lg font-semibold text-white">
+              Customer Portal
+            </span>
           </div>
           <nav className="flex-1 p-4 space-y-2">
             {navigation.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
@@ -113,16 +133,18 @@ export default function CustomerLayout({
                     "flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors group",
                     isActive
                       ? "bg-orange-500/20 text-orange-500 border border-orange-500/30"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800",
+                      : "text-gray-300 hover:text-white hover:bg-gray-800"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
                   <div className="flex-1">
                     <div>{item.name}</div>
-                    <div className="text-xs text-gray-500 group-hover:text-gray-400">{item.description}</div>
+                    <div className="text-xs text-gray-500 group-hover:text-gray-400">
+                      {item.description}
+                    </div>
                   </div>
                 </Link>
-              )
+              );
             })}
           </nav>
         </div>
@@ -146,5 +168,5 @@ export default function CustomerLayout({
         <main className="p-4 lg:p-6">{children}</main>
       </div>
     </div>
-  )
+  );
 }
