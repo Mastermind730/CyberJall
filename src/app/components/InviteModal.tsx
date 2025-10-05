@@ -23,7 +23,7 @@ interface Partner {
 interface InviteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  partner: Partner;
+  partner: Partner |null;
   onSuccess: () => void;
 }
 
