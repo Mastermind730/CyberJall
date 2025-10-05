@@ -33,7 +33,7 @@ import {
   ExternalLink,
   PlayCircle,
   CheckCircle2,
-  PauseCircle
+  PauseCircle,
 } from "lucide-react";
 import { useDashboardStats } from "../customer/hooks/useDashboardStats";
 import { Message } from "@/lib/types";
@@ -77,28 +77,24 @@ interface BusinessBid {
 interface ProviderPackage {
   id: string;
   name: string;
-  status: 'active' | 'in_progress' | 'completed' | 'upcoming' | 'pending';
-  customer: {
-    id: string;
-    company_name: string;
-    work_email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
+  description: string;
+  status: "active" | "completed" | "upcoming" | "cancelled";
   startDate?: string;
   endDate?: string;
-  packageValue?: number;
-  description?: string;
+  userId: string;
+  providerId?: string;
+  services: string[];
+  totalAmount: number;
+  projectCategory?: string;
+  clientCompany?: string;
+  summary?: string;
+  reports: unknown;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface ProviderPackagesData {
   packages: ProviderPackage[];
-  stats: {
-    all: number;
-    ongoing: number;
-    completed: number;
-    upcoming: number;
-  };
 }
 
 interface PackageType {
@@ -166,13 +162,14 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { stats, loading, error, user, company } = useDashboardStats() as DashboardStats;
+  const { stats, loading, error, user, company } =
+    useDashboardStats() as DashboardStats;
   const [businessBids, setBusinessBids] = useState<BusinessBid[]>([]);
   const [bidsLoading, setBidsLoading] = useState(false);
-  const [providerPackages, setProviderPackages] = useState<ProviderPackagesData>({
-    packages: [],
-    stats: { all: 0, ongoing: 0, completed: 0, upcoming: 0 }
-  });
+  const [providerPackages, setProviderPackages] =
+    useState<ProviderPackagesData>({
+      packages: [],
+    });
   const [packagesLoading, setPackagesLoading] = useState(false);
 
   // Fetch business bids and provider packages for providers
@@ -207,7 +204,7 @@ export default function Dashboard() {
         const data = await response.json();
         setProviderPackages(data);
       } else {
-        console.error('Failed to fetch provider packages');
+        console.error("Failed to fetch provider packages");
       }
     } catch (error) {
       console.error("Error fetching provider packages:", error);
@@ -338,82 +335,85 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
-              {company.industries_served && company.industries_served.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">
-                    Industries Served
-                  </h3>
-                  <div className="flex flex-wrap gap-1">
-                    {company.industries_served
-                      .slice(0, 4)
-                      .map((industry, index) => (
+              {company.industries_served &&
+                company.industries_served.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
+                      Industries Served
+                    </h3>
+                    <div className="flex flex-wrap gap-1">
+                      {company.industries_served
+                        .slice(0, 4)
+                        .map((industry, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="bg-gray-800 text-white text-xs"
+                          >
+                            {industry}
+                          </Badge>
+                        ))}
+                      {company.industries_served.length > 4 && (
                         <Badge
-                          key={index}
                           variant="secondary"
                           className="bg-gray-800 text-white text-xs"
                         >
-                          {industry}
+                          +{company.industries_served.length - 4} more
                         </Badge>
-                      ))}
-                    {company.industries_served.length > 4 && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-gray-800 text-white text-xs"
-                      >
-                        +{company.industries_served.length - 4} more
-                      </Badge>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
             <div className="space-y-4">
-              {company.geographic_coverage && company.geographic_coverage.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">
-                    Coverage
-                  </h3>
-                  <div className="flex flex-wrap gap-1">
-                    {company.geographic_coverage
-                      .slice(0, 3)
-                      .map((region, index) => (
+              {company.geographic_coverage &&
+                company.geographic_coverage.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
+                      Coverage
+                    </h3>
+                    <div className="flex flex-wrap gap-1">
+                      {company.geographic_coverage
+                        .slice(0, 3)
+                        .map((region, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="bg-gray-800 text-white text-xs"
+                          >
+                            {region}
+                          </Badge>
+                        ))}
+                      {company.geographic_coverage.length > 3 && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-gray-800 text-white text-xs"
+                        >
+                          +{company.geographic_coverage.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                )}
+              {company.target_business_size &&
+                company.target_business_size.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
+                      Target Business Size
+                    </h3>
+                    <div className="flex flex-wrap gap-1">
+                      {company.target_business_size.map((size, index) => (
                         <Badge
                           key={index}
                           variant="secondary"
                           className="bg-gray-800 text-white text-xs"
                         >
-                          {region}
+                          {size}
                         </Badge>
                       ))}
-                    {company.geographic_coverage.length > 3 && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-gray-800 text-white text-xs"
-                      >
-                        +{company.geographic_coverage.length - 3} more
-                      </Badge>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
-              {company.target_business_size && company.target_business_size.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">
-                    Target Business Size
-                  </h3>
-                  <div className="flex flex-wrap gap-1">
-                    {company.target_business_size.map((size, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="bg-gray-800 text-white text-xs"
-                      >
-                        {size}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
             </div>
           </CardContent>
         </Card>
@@ -482,9 +482,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {user.role === "provider" ? (
           <>
-            <ProviderPackagesCard 
-              packagesData={providerPackages} 
-              loading={packagesLoading} 
+            <ProviderPackagesCard
+              packagesData={providerPackages}
+              loading={packagesLoading}
               onRefresh={fetchProviderPackages}
             />
             <BusinessBidsCard
@@ -551,27 +551,37 @@ function StatCard({
 }
 
 // Component for provider packages
-function ProviderPackagesCard({ 
-  packagesData, 
-  loading, 
-  onRefresh 
-}: { 
-  packagesData: ProviderPackagesData; 
-  loading: boolean; 
+function ProviderPackagesCard({
+  packagesData,
+  loading,
+  onRefresh,
+}: {
+  packagesData: ProviderPackagesData;
+  loading: boolean;
   onRefresh: () => void;
 }) {
-  const [selectedTab, setSelectedTab] = useState<'all' | 'ongoing' | 'completed' | 'upcoming'>('all');
+  const [selectedTab, setSelectedTab] = useState<
+    "all" | "ongoing" | "completed" | "upcoming"
+  >("all");
+
+  // Calculate stats from packages
+  const packageStats = {
+    all: packagesData.packages.length,
+    ongoing: packagesData.packages.filter(pkg => pkg.status === "active").length,
+    completed: packagesData.packages.filter(pkg => pkg.status === "completed").length,
+    upcoming: packagesData.packages.filter(pkg => pkg.status === "upcoming").length,
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
-      case 'in_progress':
+      case "active":
         return <PlayCircle className="h-4 w-4 text-green-500" />;
-      case 'completed':
+      case "completed":
         return <CheckCircle2 className="h-4 w-4 text-blue-500" />;
-      case 'upcoming':
-      case 'pending':
+      case "upcoming":
         return <Clock className="h-4 w-4 text-yellow-500" />;
+      case "cancelled":
+        return <PauseCircle className="h-4 w-4 text-red-500" />;
       default:
         return <PauseCircle className="h-4 w-4 text-gray-500" />;
     }
@@ -579,24 +589,24 @@ function ProviderPackagesCard({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-      case 'in_progress':
-        return 'bg-green-500/20 text-green-400';
-      case 'completed':
-        return 'bg-blue-500/20 text-blue-400';
-      case 'upcoming':
-      case 'pending':
-        return 'bg-yellow-500/20 text-yellow-400';
+      case "active":
+        return "bg-green-500/20 text-green-400";
+      case "completed":
+        return "bg-blue-500/20 text-blue-400";
+      case "upcoming":
+        return "bg-yellow-500/20 text-yellow-400";
+      case "cancelled":
+        return "bg-red-500/20 text-red-400";
       default:
-        return 'bg-gray-500/20 text-gray-400';
+        return "bg-gray-500/20 text-gray-400";
     }
   };
 
-  const filteredPackages = packagesData.packages.filter(pkg => {
-    if (selectedTab === 'all') return true;
-    if (selectedTab === 'ongoing') return pkg.status === 'active' || pkg.status === 'in_progress';
-    if (selectedTab === 'completed') return pkg.status === 'completed';
-    if (selectedTab === 'upcoming') return pkg.status === 'upcoming' || pkg.status === 'pending';
+  const filteredPackages = packagesData.packages.filter((pkg) => {
+    if (selectedTab === "all") return true;
+    if (selectedTab === "ongoing") return pkg.status === "active";
+    if (selectedTab === "completed") return pkg.status === "completed";
+    if (selectedTab === "upcoming") return pkg.status === "upcoming";
     return true;
   });
 
@@ -623,57 +633,61 @@ function ProviderPackagesCard({
           </Button>
         </div>
       </CardHeader>
-      
-      {/* Package Stats */}
+
+        {/* Package Stats */}
       <CardContent className="space-y-4">
         <div className="grid grid-cols-4 gap-2">
           <button
-            onClick={() => setSelectedTab('all')}
+            onClick={() => setSelectedTab("all")}
             className={`p-3 rounded-lg text-center transition-colors ${
-              selectedTab === 'all' 
-                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              selectedTab === "all"
+                ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
             }`}
           >
-            <div className="text-lg font-bold">{packagesData.stats.all}</div>
+            <div className="text-lg font-bold">{packageStats.all}</div>
             <div className="text-xs">All</div>
           </button>
           <button
-            onClick={() => setSelectedTab('ongoing')}
+            onClick={() => setSelectedTab("ongoing")}
             className={`p-3 rounded-lg text-center transition-colors ${
-              selectedTab === 'ongoing' 
-                ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              selectedTab === "ongoing"
+                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
             }`}
           >
-            <div className="text-lg font-bold">{packagesData.stats.ongoing}</div>
+            <div className="text-lg font-bold">
+              {packageStats.ongoing}
+            </div>
             <div className="text-xs">Ongoing</div>
           </button>
           <button
-            onClick={() => setSelectedTab('completed')}
+            onClick={() => setSelectedTab("completed")}
             className={`p-3 rounded-lg text-center transition-colors ${
-              selectedTab === 'completed' 
-                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              selectedTab === "completed"
+                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
             }`}
           >
-            <div className="text-lg font-bold">{packagesData.stats.completed}</div>
+            <div className="text-lg font-bold">
+              {packageStats.completed}
+            </div>
             <div className="text-xs">Completed</div>
           </button>
           <button
-            onClick={() => setSelectedTab('upcoming')}
+            onClick={() => setSelectedTab("upcoming")}
             className={`p-3 rounded-lg text-center transition-colors ${
-              selectedTab === 'upcoming' 
-                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              selectedTab === "upcoming"
+                ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
             }`}
           >
-            <div className="text-lg font-bold">{packagesData.stats.upcoming}</div>
+            <div className="text-lg font-bold">
+              {packageStats.upcoming}
+            </div>
             <div className="text-xs">Upcoming</div>
           </button>
-        </div>
-
-        {/* Packages List */}
+        </div>        {/* Packages List */}
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-8">
@@ -694,18 +708,18 @@ function ProviderPackagesCard({
                       {pkg.name}
                     </p>
                     <p className="text-xs text-gray-400 truncate">
-                      {pkg.customer.company_name}
+                      {pkg.clientCompany || "No client specified"}
                     </p>
-                    {pkg.packageValue && (
+                    {pkg.totalAmount && (
                       <p className="text-xs text-green-400">
-                        ${pkg.packageValue.toLocaleString()}
+                        ${pkg.totalAmount.toLocaleString()}
                       </p>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge className={`text-xs ${getStatusColor(pkg.status)}`}>
-                    {pkg.status.replace('_', ' ')}
+                    {pkg.status.replace("_", " ")}
                   </Badge>
                   <Button
                     size="sm"

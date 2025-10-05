@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { jwtVerify } from 'jose';
 
 interface User {
   id: string;
   role: string;
   company_name?: string;
   work_email: string;
+  name?: string;
+  email?: string;
 }
 
 export function useAuth() {
@@ -25,18 +26,21 @@ export function useAuth() {
         }
 
         const token = authCookie.split('=')[1];
-        const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET || '');
         
-        const { payload } = await jwtVerify(token, secret);
+        // Decode JWT token without verification for client-side use
+        // Note: For sensitive data, make an API call to verify the token
+        const payload = JSON.parse(atob(token.split('.')[1]));
         
         setUser({
-          id: payload.userId as string,
+          id: payload.id as string,
           role: payload.role as string,
-          company_name: payload.company_name as string,
-          work_email: payload.work_email as string,
+          work_email: payload.email as string,
+          email: payload.email as string,
         });
       } catch (error) {
         console.error('Auth check failed:', error);
+        // Clear invalid token
+        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       } finally {
         setLoading(false);
       }

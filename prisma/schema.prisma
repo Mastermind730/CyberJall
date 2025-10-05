@@ -108,6 +108,8 @@ model User {
   tickets          SupportTicket[]
   messages         Message[]
   cyberHealthScore CyberHealthScore?
+  validatedCompanyId String?         @db.ObjectId
+  validatedCompany Validated_Company? @relation(fields: [validatedCompanyId], references: [id])
   createdAt        DateTime?         @default(now())  // Made optional
   updatedAt        DateTime?         @updatedAt       // Made optional
 }
@@ -155,7 +157,6 @@ model Company {
   social_links                 Json
   website                      String
   products                     Json                 @default("{}")
-  packages                     Package[]
   createdAt                    DateTime             @default(now())
   updatedAt                    DateTime             @updatedAt
   PartnerBidResponse           PartnerBidResponse[]
@@ -186,6 +187,8 @@ model Validated_Company {
   social_links                 Json
   website                      String
   products                     Json     @default("{}")
+  users                        User[]
+  packages                     Package[]
   createdAt                    DateTime @default(now())
   updatedAt                    DateTime @updatedAt
 
@@ -215,23 +218,25 @@ model SecurityAssessmentRequest {
 }
 
 model Package {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  status      PackageStatus
-  startDate   DateTime?
-  endDate     DateTime?
-  userId      String        @db.ObjectId
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  providerId  String?       @db.ObjectId
-  provider    Company?      @relation(fields: [providerId], references: [id])
-  services    String[]
-  totalAmount Float
-  reports     Json          @default("[]")
-  summary     String?
-  messages    Message[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String
+  status         PackageStatus
+  startDate      DateTime?
+  endDate        DateTime?
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerId     String?       @db.ObjectId
+  provider       Validated_Company? @relation(fields: [providerId], references: [id])
+  services       String[]
+  totalAmount    Float
+  projectCategory String?      // New field for project category
+  clientCompany  String?       // New field for client company name
+  reports        Json          @default("[]")
+  summary        String?
+  messages       Message[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Message {
