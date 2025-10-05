@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { jwtVerify } from 'jose';
+import { NextRequest } from 'next/server';
 
 interface User {
   id: string;
@@ -33,11 +34,13 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = async (request: NextRequest) => {
       try {
         // Get token directly from cookies like middleware does
-        const token = getCookie('auth_token');
-        
+          const token = request.cookies.get("auth_token")?.value;
+
+        // const token = getCookie('auth_token');
+        console.log(token);
         if (!token) {
           setUser(null);
           setLoading(false);

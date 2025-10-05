@@ -23,8 +23,15 @@ interface Partner {
 interface InviteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  partner: Partner |null;
+  partner: Partner | null;
   onSuccess: () => void;
+}
+
+interface FormData {
+  message: string;
+  serviceTypes: string[];
+  urgency: string;
+  budget: string;
 }
 
 const serviceOptions = [
@@ -56,9 +63,9 @@ export default function InviteModal({
   partner,
   onSuccess,
 }: InviteModalProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     message: "",
-    serviceTypes: [] as string[],
+    serviceTypes: [],
     urgency: "standard",
     budget: "",
   });
@@ -77,6 +84,13 @@ export default function InviteModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Early return if no partner
+    if (!partner) {
+      setError("No partner selected");
+      return;
+    }
+    
     setIsSubmitting(true);
     setError("");
 
@@ -132,6 +146,9 @@ export default function InviteModal({
       .substring(0, 2);
   };
 
+  // Don't render if no partner and modal is closed
+  if (!isOpen) return null;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -158,7 +175,7 @@ export default function InviteModal({
                   Invite Sent Successfully!
                 </h3>
                 <p className="text-gray-400">
-                  Your invitation has been sent to {partner.company_name}. They
+                  Your invitation has been sent to {partner?.company_name}. They
                   will receive a notification and can respond through their
                   dashboard.
                 </p>
@@ -180,32 +197,34 @@ export default function InviteModal({
                 </div>
 
                 {/* Partner Info */}
-                <div className="p-6 border-b border-gray-800">
-                  <div className="flex items-center space-x-4">
-                    <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 overflow-hidden border-2 border-gray-600/50 flex items-center justify-center">
-                      {partner.logo ? (
-                        <img
-                          src={partner.logo}
-                          alt={`${partner.company_name} logo`}
-                          className="max-h-full max-w-full object-contain"
-                        />
-                      ) : (
-                        <span className="text-lg font-bold text-gray-300">
-                          {getInitials(partner.company_name)}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">
-                        {partner.company_name}
-                      </h3>
-                      <p className="text-gray-400">
-                        {partner.headquarters_city},{" "}
-                        {partner.headquarters_country}
-                      </p>
+                {partner && (
+                  <div className="p-6 border-b border-gray-800">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 overflow-hidden border-2 border-gray-600/50 flex items-center justify-center">
+                        {partner.logo ? (
+                          <img
+                            src={partner.logo}
+                            alt={`${partner.company_name} logo`}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-lg font-bold text-gray-300">
+                            {getInitials(partner.company_name)}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-white">
+                          {partner.company_name}
+                        </h3>
+                        <p className="text-gray-400">
+                          {partner.headquarters_city},{" "}
+                          {partner.headquarters_country}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                   {error && (
@@ -320,7 +339,7 @@ export default function InviteModal({
                     </button>
                     <button
                       type="submit"
-                      disabled={isSubmitting || !formData.message.trim()}
+                      disabled={isSubmitting || !formData.message.trim() || !partner}
                       className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                     >
                       {isSubmitting ? (
