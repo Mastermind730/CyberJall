@@ -11,7 +11,7 @@ export default function LayoutContent({ children }: { children: React.ReactNode 
   return (
     <>
       <div className="relative z-10 min-h-screen flex flex-col">
-        {!isCustomerRoute && <NavbarNew />}
+        <NavbarNew />
         <main className="flex-1">{children}</main>
         {!isCustomerRoute && <Footer />}
       </div>

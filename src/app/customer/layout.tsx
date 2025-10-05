@@ -7,15 +7,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "../components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu"
-import { User, Package, BarChart3, Settings, HelpCircle, Menu, X, LogOut, Bell, Shield } from "lucide-react"
+import { User, Package, BarChart3, Settings, HelpCircle, Menu, X, Shield } from "lucide-react"
 
 
 const navigation = [
@@ -62,13 +54,13 @@ export default function CustomerLayout({
   return (
     <div className="min-h-screen bg-black">
       {/* Mobile sidebar */}
-      <div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
+      <div className={cn("fixed inset-0 z-40 lg:hidden", sidebarOpen ? "block" : "hidden")}>
         <div className="fixed inset-0 bg-black/80" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 w-64 bg-gray-900 border-r border-gray-800">
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
             <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-orange-500" />
-              <span className="text-xl font-bold text-white">CyberJall</span>
+              <Shield className="h-6 w-6 text-orange-500" />
+              <span className="text-lg font-semibold text-white">Customer Portal</span>
             </div>
             <Button
               variant="ghost"
@@ -87,7 +79,7 @@ export default function CustomerLayout({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex items-center mt-40 space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
                       ? "bg-orange-500/20 text-orange-500 border border-orange-500/30"
                       : "text-gray-300 hover:text-white hover:bg-gray-800",
@@ -107,8 +99,8 @@ export default function CustomerLayout({
       <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:block">
         <div className="flex flex-col h-full bg-gray-900 border-r border-gray-800">
           <div className="flex items-center space-x-2 p-6 border-b border-gray-800">
-            <Shield className="h-8 w-8 text-orange-500" />
-            <span className="text-xl font-bold text-white">CyberJall</span>
+            <Shield className="h-6 w-6 text-orange-500" />
+            <span className="text-lg font-semibold text-white">Customer Portal</span>
           </div>
           <nav className="flex-1 p-4 space-y-2">
             {navigation.map((item) => {
@@ -138,57 +130,17 @@ export default function CustomerLayout({
 
       {/* Main content */}
       <div className="lg:pl-64">
-        {/* Top header */}
-        <header className="bg-gray-900 border-b border-gray-800 px-4 py-4 lg:px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="lg:hidden text-gray-400 hover:text-white"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div>
-                <h1 className="text-xl font-semibold text-white">Customer Dashboard</h1>
-                <p className="text-sm text-gray-400">Manage your cybersecurity services and insights</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                <Bell className="h-5 w-5" />
-              </Button>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                      <AvatarFallback className="bg-orange-500 text-white">JD</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-gray-900 border-gray-800" align="end">
-                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-gray-800">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-gray-800">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Account Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-800" />
-                  <DropdownMenuItem className="text-red-400 hover:text-red-300 hover:bg-gray-800">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </header>
+        {/* Mobile menu button */}
+        <div className="lg:hidden fixed top-4 left-4 z-30">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
 
         {/* Page content */}
         <main className="p-4 lg:p-6">{children}</main>

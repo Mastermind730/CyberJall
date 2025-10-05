@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth" // Adjust import path as needed
 
 interface User {
   name?: string
@@ -10,31 +11,18 @@ interface User {
   work_email?: string
   avatarUrl?: string
   role?: string
+  id?: string
 }
 
 export default function NavbarNew() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    // Check if user exists in localStorage when component mounts
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
-      setIsLoggedIn(true)
-      try {
-        setUser(JSON.parse(userStr))
-      } catch {
-        setUser(null)
-      }
-    } else {
-      setIsLoggedIn(false)
-      setUser(null)
-    }
-  }, [])
+  
+  // Use the useAuth hook
+  const { user, loading } = useAuth()
+  const isLoggedIn = !!user
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -51,12 +39,22 @@ export default function NavbarNew() {
     }
   }, [showProfileDropdown])
 
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    setIsLoggedIn(false)
-    setShowProfileDropdown(false)
-    router.push('/login')
-    if (isMobileMenuOpen) setIsMobileMenuOpen(false)
+  const handleLogout = async () => {
+    try {
+      // Call logout API
+      await fetch('/api/logout', {
+        method: 'POST',
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      // Clear client-side state
+      setShowProfileDropdown(false)
+      setIsMobileMenuOpen(false)
+      
+      // Force reload to clear any cached state
+      window.location.href = '/login'
+    }
   }
 
   const navItems = [
@@ -203,6 +201,20 @@ export default function NavbarNew() {
     return "U"
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="w-full bg-white shadow-sm border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            CyberJall
+          </div>
+          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-20 rounded"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative w-full bg-white shadow-sm border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
       {/* Desktop Navigation */}
@@ -321,22 +333,6 @@ export default function NavbarNew() {
                   {/* Menu Items */}
                   <div className="p-2 bg-white dark:bg-gray-800">
                     <div className="space-y-1">
-                      {/* <Link
-                        href="/profile"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 group"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <div className="font-medium">Profile Settings</div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">Manage your account</div>
-                        </div>
-                      </Link> */}
-                      
                       <Link
                         href="/dashboard"
                         className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 group"
@@ -353,40 +349,23 @@ export default function NavbarNew() {
                         </div>
                       </Link>
 
-                      {/* <Link
-                        href="/settings"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 group"
-                        onClick={() => setShowProfileDropdown(false)}
+                      <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                      
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-3 w-full px-3 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150 group"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
+                          <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
                         </div>
                         <div>
-                          <div className="font-medium">Settings</div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">Adjust your preferences</div>
+                          <div className="font-medium">Sign out</div>
+                          <div className="text-red-500 dark:text-red-400 text-xs">Log out of your account</div>
                         </div>
-                      </Link> */}
+                      </button>
                     </div>
-
-                    <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center space-x-3 w-full px-3 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150 group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
-                        <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium">Sign out</div>
-                        <div className="text-red-500 dark:text-red-400 text-xs">Log out of your account</div>
-                      </div>
-                    </button>
                   </div>
                 </div>
               )}
@@ -463,17 +442,6 @@ export default function NavbarNew() {
                   {/* Menu Items */}
                   <div className="p-2 bg-white dark:bg-gray-800">
                     <div className="space-y-1">
-                      <Link
-                        href="/profile"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>Profile Settings</span>
-                      </Link>
-                      
                       <Link
                         href="/dashboard"
                         className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
