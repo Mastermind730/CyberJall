@@ -1035,7 +1035,7 @@ export default function Partners() {
                           </Link>
 
                           <button
-                            onClick={()=>handleInviteClick()}
+                            // onClick={()=>handleInviteClick()}
                             className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-gray-600 text-xs font-medium rounded-md text-white bg-gray-800/50 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm"
                           >
                             <IconAddressBook className="h-3.5 w-3.5" />

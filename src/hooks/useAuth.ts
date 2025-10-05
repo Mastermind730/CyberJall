@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { jwtVerify } from 'jose';
 
 interface User {
   id: string;
@@ -10,6 +11,23 @@ interface User {
   avatarUrl?: string;
 }
 
+const secret = new TextEncoder().encode(
+  process.env.NEXT_PUBLIC_JWT_SECRET || "fallback-secret-key"
+);
+
+// Helper function to get cookie value
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const cookieValue = parts.pop()?.split(';').shift();
+    return cookieValue || null;
+  }
+  return null;
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,51 +35,18 @@ export function useAuth() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Make API request to verify authentication
-        // This will automatically include cookies in the request
-        const response = await fetch('/api/debug/auth', {
-          method: 'GET',
-          credentials: 'include', // Important: include cookies in request
-        });
-
-        if (!response.ok) {
+        // Get token directly from cookies like middleware does
+        const token = getCookie('auth_token');
+        
+        if (!token) {
           setUser(null);
           setLoading(false);
           return;
         }
 
-        const data = await response.json();
-        console.log('Auth API response:', data);
-
-        if (!data.hasToken) {
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-
-        // Now make a request to get user details using the token
-        const userResponse = await fetch('/api/debug/token', {
-          method: 'GET',
-          credentials: 'include',
-        });
-        console.log(userResponse);
-
-        if (!userResponse.ok) {
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-
-        const userData = await userResponse.json();
-        console.log('User data response:', userData);
-
-        if (!userData.success || !userData.payload) {
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-
-        const payload = userData.payload;
+        // Verify token and get payload directly
+        const { payload } = await jwtVerify(token, secret);
+        console.log('Token payload:', payload);
         
         // Handle both old and new token formats
         const userId = payload.userId || payload.id;
@@ -70,17 +55,19 @@ export function useAuth() {
         
         if (!userId || !userEmail || !userRole) {
           console.error('Invalid token payload:', payload);
-          throw new Error('Invalid token structure');
+          setUser(null);
+          setLoading(false);
+          return;
         }
         
         setUser({
-          id: userId,
-          role: userRole,
-          work_email: userEmail,
-          email: userEmail,
-          company_name: payload.company_name || undefined,
-          name: payload.name || undefined,
-          avatarUrl: payload.avatarUrl || undefined,
+          id: userId as string,
+          role: userRole as string,
+          work_email: userEmail as string,
+          email: userEmail as string,
+          company_name: payload.company_name as string || undefined,
+          name: payload.name as string || undefined,
+          avatarUrl: payload.avatarUrl as string || undefined,
         });
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -98,7 +85,7 @@ export function useAuth() {
       // Call logout API to clear server-side session
       const response = await fetch('/api/logout', {
         method: 'POST',
-        credentials: 'include', // Include cookies for logout
+        credentials: 'include',
       });
       
       if (response.ok) {
