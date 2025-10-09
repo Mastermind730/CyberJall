@@ -4,9 +4,10 @@ import type React from "react";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "../components/ui/button";
+import { useUser } from "../hooks/useUser";
 import {
   User,
   Package,
@@ -60,23 +61,14 @@ export default function CustomerLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user, logout, isLoading, isAuthenticated } = useUser();
   const pathname = usePathname();
-  const router = useRouter();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Load user data
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        setUser(JSON.parse(userStr));
-      } catch {
-        // Invalid user data, clear it
-        localStorage.removeItem("user");
-      }
-    }
-  }, []);
+  // Debug logging
+  console.log("Customer Layout - User data:", user);
+  console.log("Customer Layout - isLoading:", isLoading);
+  console.log("Customer Layout - isAuthenticated:", isAuthenticated);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -97,20 +89,9 @@ export default function CustomerLayout({
     };
   }, [showUserMenu]);
 
-  // Logout function
+  // Logout function using useUser hook
   const handleLogout = async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "/login";
-    }
+    await logout();
   };
 
   // Helper function to get user initials
@@ -236,7 +217,7 @@ export default function CustomerLayout({
 
           {/* User Menu */}
           <div className="flex items-center gap-x-4 ml-auto">
-            {user && (
+            {isAuthenticated && (
               <div className="relative" ref={userMenuRef}>
                 <Button
                   variant="ghost"
@@ -244,10 +225,13 @@ export default function CustomerLayout({
                   className="flex items-center gap-x-2 text-sm font-medium text-gray-300 hover:text-white"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                    {getInitials(user.name, user.work_email)}
+                    {getInitials(user?.name, user?.work_email || user?.email)}
                   </div>
                   <span className="hidden sm:block">
-                    {user.name || user.work_email?.split('@')[0] || 'Customer'}
+                    {user?.name ||
+                      user?.work_email?.split("@")[0] ||
+                      user?.email?.split("@")[0] ||
+                      "Customer"}
                   </span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
@@ -258,23 +242,26 @@ export default function CustomerLayout({
                     <div className="p-4">
                       <div className="flex items-center gap-x-3 mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-lg font-medium">
-                          {getInitials(user.name, user.work_email)}
+                          {getInitials(
+                            user?.name,
+                            user?.work_email || user?.email
+                          )}
                         </div>
                         <div>
                           <p className="text-white font-medium">
-                            {user.name || 'Customer'}
+                            {user?.name || "Customer"}
                           </p>
                           <p className="text-gray-400 text-sm">
-                            {user.work_email}
+                            {user?.work_email || user?.email}
                           </p>
-                          {user.company_name && (
+                          {user?.company_name && (
                             <p className="text-gray-500 text-xs">
                               {user.company_name}
                             </p>
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="border-t border-gray-700 pt-4 space-y-2">
                         <Link
                           href="/customer/profile"

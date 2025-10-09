@@ -4,9 +4,10 @@ import type React from "react";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "../components/ui/button";
+import { useUser } from "../hooks/useUser";
 import {
   User,
   Package,
@@ -68,23 +69,9 @@ export default function ProviderLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user, logout } = useUser();
   const pathname = usePathname();
-  const router = useRouter();
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  // Load user data
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        setUser(JSON.parse(userStr));
-      } catch {
-        // Invalid user data, clear it
-        localStorage.removeItem("user");
-      }
-    }
-  }, []);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -105,20 +92,9 @@ export default function ProviderLayout({
     };
   }, [showUserMenu]);
 
-  // Logout function
+  // Logout function using useUser hook
   const handleLogout = async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "/login";
-    }
+    await logout();
   };
 
   // Helper function to get user initials
@@ -275,7 +251,7 @@ export default function ProviderLayout({
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-600" />
             </div>
-            
+
             {/* User Menu */}
             <div className="flex items-center gap-x-4 lg:gap-x-6 ml-auto">
               {user && (
@@ -289,7 +265,9 @@ export default function ProviderLayout({
                       {getInitials(user.name, user.work_email)}
                     </div>
                     <span className="hidden sm:block">
-                      {user.name || user.work_email?.split('@')[0] || 'Provider'}
+                      {user.name ||
+                        user.work_email?.split("@")[0] ||
+                        "Provider"}
                     </span>
                     <ChevronDown className="w-4 h-4" />
                   </Button>
@@ -304,7 +282,7 @@ export default function ProviderLayout({
                           </div>
                           <div>
                             <p className="text-white font-medium">
-                              {user.name || 'Provider'}
+                              {user.name || "Provider"}
                             </p>
                             <p className="text-gray-400 text-sm">
                               {user.work_email}
@@ -316,7 +294,7 @@ export default function ProviderLayout({
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="border-t border-gray-700 pt-4 space-y-2">
                           <Link
                             href="/provider/profile"

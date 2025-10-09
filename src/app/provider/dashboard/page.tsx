@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "../../hooks/useUser";
 import {
   Card,
   CardContent,
@@ -74,9 +75,8 @@ interface ProviderPackage {
 
 export default function ProviderDashboard() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
-  const [hasCompany, setHasCompany] = useState(false);
+  const { user, isLoading, hasCompany, companyLoading } = useUser();
   const [businessBids, setBusinessBids] = useState<BusinessBid[]>([]);
   const [packages, setPackages] = useState<ProviderPackage[]>([]);
   const [bidsLoading, setBidsLoading] = useState(false);
@@ -84,52 +84,22 @@ export default function ProviderDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    loadUserData();
-  }, []);
-
-  useEffect(() => {
-    if (user?.role === "provider") {
-      checkCompanyExists();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (hasCompany) {
+    if (user?.role === "provider" && hasCompany) {
       fetchBusinessBids();
       fetchProviderPackages();
     }
-  }, [hasCompany]);
-
-  const loadUserData = async () => {
-    try {
-      // Simulate loading user data - replace with actual API call
-      const userData = {
-        role: "provider",
-        work_email: "provider@example.com",
-        profile: {
-          firstName: "Provider",
-          lastLogin: new Date().toISOString(),
-        },
-      };
-      setUser(userData);
-    } catch (error) {
-      console.error("Error loading user data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLoading(false);
+  }, [user, hasCompany]);
 
   const checkCompanyExists = async () => {
     try {
       const response = await fetch("/api/getCompany");
       if (response.ok) {
         const data = await response.json();
-        setHasCompany(!!data.company);
         setCompany(data.company);
       }
     } catch (error) {
       console.error("Error checking company:", error);
-      setHasCompany(false);
     }
   };
 
@@ -210,13 +180,10 @@ export default function ProviderDashboard() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-bold text-white mb-2">
-              Welcome back, {user.profile?.firstName || "Provider"}
+              Welcome back, {user.name || "Provider"}
             </h2>
             <p className="text-gray-300">
-              {user.work_email} • Last login:{" "}
-              {user.profile?.lastLogin
-                ? new Date(user.profile.lastLogin).toLocaleDateString()
-                : "Recently"}
+              {user.work_email || user.email} • Last login: Recently
             </p>
           </div>
           <div className="text-center md:text-right">

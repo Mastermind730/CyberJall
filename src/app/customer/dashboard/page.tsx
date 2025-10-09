@@ -1,3 +1,6 @@
+"use client";
+
+import { useUser } from "../../hooks/useUser";
 import {
   Card,
   CardContent,
@@ -22,6 +25,28 @@ import {
 import { Progress } from "@radix-ui/react-progress";
 
 export default function CustomerDashboard() {
+  const { user, isLoading, isAuthenticated } = useUser();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Access Denied
+          </h2>
+          <p className="text-gray-600">Please log in to access this page.</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -29,10 +54,10 @@ export default function CustomerDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">
-              Welcome back, John Doe
+              Welcome back, {user.name || user.email}
             </h2>
             <p className="text-gray-300">
-              TechCorp Inc. • Last login: 2 hours ago
+              {user.company_name || "Customer"} • Role: {user.role}
             </p>
           </div>
           <div className="text-right">

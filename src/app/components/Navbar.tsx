@@ -3,191 +3,43 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
-interface User {
-  name?: string;
-  email?: string;
-  company_name?: string;
-  work_email?: string;
-  avatarUrl?: string;
-  role?: string;
-}
+import { useUser } from "../hooks/useUser";
 
 interface NavbarProps {
   className?: string;
 }
 
 export default function Navbar({ className = "" }: NavbarProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [hasCompany, setHasCompany] = useState(false);
-  const [companyLoading, setCompanyLoading] = useState(false);
+  const { user, isAuthenticated, hasCompany, companyLoading, logout } =
+    useUser();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Check if user exists in localStorage when component mounts
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const userData = JSON.parse(userStr);
-        // Verify the token is still valid by making a test API call
-        verifyAuthStatus(userData);
-      } catch {
-        // Invalid localStorage data, clear it
-        clearAuthState();
-      }
-    } else {
-      setIsLoggedIn(false);
-      setUser(null);
-      setHasCompany(false);
-    }
-  }, []);
-
-  // Function to verify authentication status
-  const verifyAuthStatus = async (userData: User) => {
-    try {
-      // Test if the server still recognizes our auth token
-      const response = await fetch("/api/getCompany", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        // Token is valid, set user data
-        setIsLoggedIn(true);
-        setUser(userData);
-        // Check if provider has company profile
-        if (userData.role === "provider") {
-          const data = await response.json();
-          setHasCompany(data.hasCompany || false);
-        }
-      } else if (response.status === 401) {
-        // Token is invalid, clear everything
-        clearAuthState();
-      }
-    } catch (error) {
-      console.error("Auth verification failed:", error);
-      // On network error, assume auth is invalid for security
-      clearAuthState();
-    }
-  };
-
-  // Function to check if provider has company profile
-  const checkCompanyProfile = async () => {
-    setCompanyLoading(true);
-    try {
-      const response = await fetch("/api/getCompany", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setHasCompany(data.hasCompany || false);
-      } else {
-        setHasCompany(false);
-      }
-    } catch (error) {
-      console.error("Error checking company profile:", error);
-      setHasCompany(false);
-    } finally {
-      setCompanyLoading(false);
-    }
-  };
-
-  // Function to completely clear all authentication state
-  const clearAuthState = () => {
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setShowProfileDropdown(false);
-    setHasCompany(false);
-    setUser(null);
-    setIsMobileMenuOpen(false);
-
-    // Try to clear any client-side accessible cookies
-    try {
-      // Clear any non-httpOnly cookies that might exist
-      document.cookie.split(";").forEach((c) => {
-        const eqPos = c.indexOf("=");
-        const name = eqPos > -1 ? c.substr(0, eqPos) : c;
-        document.cookie =
-          name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-        document.cookie =
-          name +
-          "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" +
-          window.location.hostname;
-        document.cookie =
-          name +
-          "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." +
-          window.location.hostname;
-      });
-    } catch (error) {
-      console.error("Error clearing cookies:", error);
-    }
-  };
-
-  // Close dropdown on outside click
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        showProfileDropdown &&
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
+        setActiveDropdown(null);
         setShowProfileDropdown(false);
       }
     }
-    if (showProfileDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showProfileDropdown]);
+  }, []);
 
+  // Handle logout using useUser hook
   const handleLogout = async () => {
-    console.log("Logout initiated");
-
-    try {
-      // Call the logout API to clear server-side auth cookies
-      const response = await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        console.log("Logout API successful");
-      } else {
-        console.error(
-          "Logout API failed:",
-          response.status,
-          response.statusText
-        );
-      }
-    } catch (error) {
-      console.error("Logout API error:", error);
-      // Continue with logout even if API call fails
-    } finally {
-      // Clear client-side state regardless of API success/failure
-      clearAuthState();
-
-      // Clear all possible localStorage and sessionStorage items
-      localStorage.clear();
-      sessionStorage.clear();
-
-      console.log("Client state cleared, redirecting to login");
-
-      // Force a complete page reload to ensure all cached state is cleared
-      window.location.href = "/login";
-    }
+    await logout();
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -400,7 +252,7 @@ export default function Navbar({ className = "" }: NavbarProps) {
           {/* Desktop Action Buttons */}
           <div className="hidden md:flex items-center space-x-3 ml-4">
             {/* User Profile or Login */}
-            {isLoggedIn && user ? (
+            {isAuthenticated && user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
@@ -582,7 +434,7 @@ export default function Navbar({ className = "" }: NavbarProps) {
             </div>
 
             {/* Mobile User Section */}
-            {isLoggedIn && user && (
+            {isAuthenticated && user && (
               <div className="px-4 py-3 border-t border-gray-800">
                 <div className="flex items-center space-x-3 mb-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -620,7 +472,7 @@ export default function Navbar({ className = "" }: NavbarProps) {
 
             {/* Mobile Action Buttons */}
             <div className="px-4 py-3 border-t border-gray-800 space-y-3">
-              {!isLoggedIn ? (
+              {!isAuthenticated ? (
                 <Link
                   href="/login"
                   onClick={() => setIsMobileMenuOpen(false)}

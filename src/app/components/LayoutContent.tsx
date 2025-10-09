@@ -13,7 +13,7 @@ export default function LayoutContent({
   const isCustomerRoute = pathname?.startsWith("/customer");
   const isProviderRoute = pathname?.startsWith("/provider");
   const isDashboardRoute = pathname?.startsWith("/dashboard");
-  
+
   // Hide navbar and footer for provider, customer, and dashboard routes
   const hideNavbar = isProviderRoute || isCustomerRoute || isDashboardRoute;
 
@@ -21,7 +21,9 @@ export default function LayoutContent({
     <>
       <div className="relative z-10 min-h-screen flex flex-col">
         {!hideNavbar && <NavbarNew />}
-        <main className={hideNavbar ? "min-h-screen" : "flex-1"}>{children}</main>
+        <main className={hideNavbar ? "min-h-screen" : "flex-1"}>
+          {children}
+        </main>
         {!isCustomerRoute && !hideNavbar && <Footer />}
       </div>
     </>
