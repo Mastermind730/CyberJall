@@ -1,590 +1,746 @@
-"use client"
-import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
+"use client";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface User {
-  name?: string
-  email?: string
-  company_name?: string
-  work_email?: string
-  avatarUrl?: string
-  role?: string
+  name?: string;
+  email?: string;
+  company_name?: string;
+  work_email?: string;
+  avatarUrl?: string;
+  role?: string;
 }
 
-export default function NavbarNew() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
-  const router = useRouter()
-  const dropdownRef = useRef<HTMLDivElement>(null)
+interface NavbarProps {
+  className?: string;
+}
+
+export default function Navbar({ className = "" }: NavbarProps) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [hasCompany, setHasCompany] = useState(false);
+  const [companyLoading, setCompanyLoading] = useState(false);
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Check if user exists in localStorage when component mounts
-    const userStr = localStorage.getItem('user')
+    const userStr = localStorage.getItem("user");
     if (userStr) {
-      setIsLoggedIn(true)
       try {
-        setUser(JSON.parse(userStr))
+        const userData = JSON.parse(userStr);
+        // Verify the token is still valid by making a test API call
+        verifyAuthStatus(userData);
       } catch {
-        setUser(null)
+        // Invalid localStorage data, clear it
+        clearAuthState();
       }
     } else {
-      setIsLoggedIn(false)
-      setUser(null)
+      setIsLoggedIn(false);
+      setUser(null);
+      setHasCompany(false);
     }
-  }, [])
+  }, []);
+
+  // Function to verify authentication status
+  const verifyAuthStatus = async (userData: User) => {
+    try {
+      // Test if the server still recognizes our auth token
+      const response = await fetch("/api/getCompany", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        // Token is valid, set user data
+        setIsLoggedIn(true);
+        setUser(userData);
+        // Check if provider has company profile
+        if (userData.role === "provider") {
+          const data = await response.json();
+          setHasCompany(data.hasCompany || false);
+        }
+      } else if (response.status === 401) {
+        // Token is invalid, clear everything
+        clearAuthState();
+      }
+    } catch (error) {
+      console.error("Auth verification failed:", error);
+      // On network error, assume auth is invalid for security
+      clearAuthState();
+    }
+  };
+
+  // Function to check if provider has company profile
+  const checkCompanyProfile = async () => {
+    setCompanyLoading(true);
+    try {
+      const response = await fetch("/api/getCompany", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHasCompany(data.hasCompany || false);
+      } else {
+        setHasCompany(false);
+      }
+    } catch (error) {
+      console.error("Error checking company profile:", error);
+      setHasCompany(false);
+    } finally {
+      setCompanyLoading(false);
+    }
+  };
+
+  // Function to completely clear all authentication state
+  const clearAuthState = () => {
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setShowProfileDropdown(false);
+    setHasCompany(false);
+    setUser(null);
+    setIsMobileMenuOpen(false);
+
+    // Try to clear any client-side accessible cookies
+    try {
+      // Clear any non-httpOnly cookies that might exist
+      document.cookie.split(";").forEach((c) => {
+        const eqPos = c.indexOf("=");
+        const name = eqPos > -1 ? c.substr(0, eqPos) : c;
+        document.cookie =
+          name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        document.cookie =
+          name +
+          "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" +
+          window.location.hostname;
+        document.cookie =
+          name +
+          "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." +
+          window.location.hostname;
+      });
+    } catch (error) {
+      console.error("Error clearing cookies:", error);
+    }
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (showProfileDropdown && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowProfileDropdown(false)
+      if (
+        showProfileDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowProfileDropdown(false);
       }
     }
     if (showProfileDropdown) {
-      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
+
+  const handleLogout = async () => {
+    console.log("Logout initiated");
+
+    try {
+      // Call the logout API to clear server-side auth cookies
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        console.log("Logout API successful");
+      } else {
+        console.error(
+          "Logout API failed:",
+          response.status,
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Logout API error:", error);
+      // Continue with logout even if API call fails
+    } finally {
+      // Clear client-side state regardless of API success/failure
+      clearAuthState();
+
+      // Clear all possible localStorage and sessionStorage items
+      localStorage.clear();
+      sessionStorage.clear();
+
+      console.log("Client state cleared, redirecting to login");
+
+      // Force a complete page reload to ensure all cached state is cleared
+      window.location.href = "/login";
     }
-  }, [showProfileDropdown])
+  };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    setIsLoggedIn(false)
-    setShowProfileDropdown(false)
-    router.push('/login')
-    if (isMobileMenuOpen) setIsMobileMenuOpen(false)
-  }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Implement search functionality
+      console.log("Searching for:", searchQuery);
+    }
+  };
 
-  const navItems = [
-    {
-      name: "Home",
-      link: "/",
-    },
-    {
-      name: "Company",
-      link: "/company",
-      hasDropdown: true,
-      dropdownItems: [
-        {
-          category: "Company",
-          items: [
-            {
-              name: "Why Choose CyberJall",
-              link: "/company#why-choose-us",
-              description: "Comprehensive web application security testing",
-            },
-            {
-              name: "Our Clients",
-              link: "/company#clients",
-              description: "Cloud infrastructure security assessment",
-            },
-            {
-              name: "Our Service Partners",
-              link: "/ourPartners",
-              description: "Network security vulnerability testing",
-            },
-            {
-              name: "Get Free Consultation",
-              link: "/contact_us",
-              description: "API security and vulnerability assessment",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: "MarketPlace",
-      link: "/ourPartners",
-    },
-    {
-      name: "CyberJall Insights",
-      link: "/cyberjall_insights",
-    },
-    {
-      name: "Services",
-      link: "/services",
-      hasDropdown: true,
-      dropdownItems: [
-        {
-          category: "VAPT Services",
-          items: [
-            {
-              name: "Web App Testing",
-              link: "/services#consultation",
-              description: "Comprehensive web application security testing",
-            },
-            {
-              name: "Cloud Pen Testing",
-              link: "/services/cloud",
-              description: "Cloud infrastructure security assessment",
-            },
-            {
-              name: "Network Pen Testing",
-              link: "/services/network",
-              description: "Network security vulnerability testing",
-            },
-            {
-              name: "API Pen Testing",
-              link: "/services/api_testing",
-              description: "API security and vulnerability assessment",
-            },
-            {
-              name: "Mobile App Testing",
-              link: "/services/mobile_pentesting",
-              description: "Mobile application security assessment",
-            },
-          ],
-        },
-        {
-          category: "Compliance Standards",
-          items: [
-            { name: "ISO 27001", link: "/services/compliance", description: "Information security management certification" },
-            { name: "HIPAA", link: "/services/compliance", description: "Healthcare data protection compliance" },
-            { name: "SOC 2", link: "/services/compliance", description: "Service organization control compliance" },
-            { name: "GDPR", link: "/services/compliance", description: "General data protection regulation" },
-          ],
-        },
-        {
-          category: "Advanced Threat Defense",
-          items: [
-            { name: "XDR ", link: "/service1", description: "Extended Detection & Response" },
-            { name: "AI Extended Detection & Response", link: "/service2", description: "AI Extended Detection & Response" },
-            { name: "ASM", link: "/service3", description: "Attack Surface Management " },
-            { name: " Zero Trust Implementation", link: "/service4", description: " Zero Trust Implementation" },
-          ],
-        },
-         {
-          category: "Cloud Security Services",
-          items: [
-            { name: "CSPM", link: "/cspm", description: "Extended Detection & Response" },
-            { name: " Cloud Data Protection & DLP", link: "/cloudPndDLP", description: "AI Extended Detection & Response" },
-            { name: "Cloud Compliance Mapping", link: "/cloudCompliance", description: "Attack Surface Management " },
-            { name: "DevSecOps Implementation", link: "/devSecOps", description: " Zero Trust Implementation" },
-          ],
-        },
-      ],
-    },
-    {
-      name: "Product",
-      link: "#product",
-      hasDropdown: true,
-      dropdownItems: [
-        {
-          category: "Products",
-          items: [
-            {
-              name: "Bug Bounty",
-              link: "/products/bug_bounty",
-              description: "Comprehensive web application security testing",
-            },
-          ]
-        }
-      ]
-    },
-  ]
+  // Build navigation items dynamically based on user role and company status
+  const getNavItems = () => {
+    const baseNavItems = [
+      {
+        name: "Home",
+        link: "/",
+      },
+      {
+        name: "Company",
+        link: "/company",
+        hasDropdown: true,
+        dropdownItems: [
+          {
+            category: "Company",
+            items: [
+              {
+                name: "Why Choose CyberJall",
+                link: "/company#why-choose-us",
+                description: "Comprehensive web application security testing",
+              },
+              {
+                name: "Our Clients",
+                link: "/company#clients",
+                description: "Cloud infrastructure security assessment",
+              },
+              {
+                name: "Our Service Partners",
+                link: "/ourPartners",
+                description: "Network security vulnerability testing",
+              },
+              {
+                name: "Get Free Consultation",
+                link: "/contact_us",
+                description: "API security and vulnerability assessment",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "MarketPlace",
+        link: "/ourPartners",
+      },
+      {
+        name: "CyberJall Insights",
+        link: "/cyberjall_insights",
+      },
+    ];
 
-  // Helper for avatar initials
-  const getInitials = (name?: string, email?: string) => {
-    if (name && name.trim().length > 0) {
+    // Add Bids option for providers with company profiles
+    if (user?.role === "provider" && hasCompany && !companyLoading) {
+      baseNavItems.push({
+        name: "Bids",
+        link: "/provider/bids",
+      });
+    }
+
+    return baseNavItems;
+  };
+
+  const navItems = getNavItems();
+
+  // Helper function to get user initials
+  function getInitials(name?: string, email?: string): string {
+    if (name && name.length > 0) {
       return name
         .split(" ")
-        .map((w) => w[0])
+        .map((n) => n[0])
         .join("")
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2);
     }
     if (email && email.length > 0) {
-      return email[0].toUpperCase()
+      return email[0].toUpperCase();
     }
-    return "U"
+    return "U";
   }
 
   return (
-    <div className="relative w-full bg-white shadow-sm border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-      {/* Desktop Navigation */}
-      <div className="hidden lg:flex items-center justify-between px-6 py-4">
-        <div className="flex items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            CyberJall
-          </Link>
-        </div>
-        
-        <div className="flex items-center space-x-8">
-          {navItems.map((item, index) => (
-            <div key={index} className="relative group">
-              <Link 
-                href={item.link} 
-                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors duration-200 font-medium text-sm"
-              >
-                {item.name}
-              </Link>
-              
-              {item.hasDropdown && item.dropdownItems && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-96 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                  <div className="grid grid-cols-3 gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700">
-                    {item.dropdownItems.map((category, catIndex) => (
-                      <div key={catIndex} className="space-y-3">
-                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
-                          {category.category}
-                        </h4>
-                        <div className="space-y-2">
-                          {category.items.map((dropdownItem, ddIndex) => (
-                            <Link
-                              key={ddIndex}
-                              href={dropdownItem.link}
-                              className="block p-3 text-xs text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 border border-transparent hover:border-blue-100 dark:hover:border-gray-600"
-                            >
-                              <div className="font-medium text-gray-900 dark:text-white">
-                                {dropdownItem.name}
-                              </div>
-                              <div className="text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                                {dropdownItem.description}
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {isLoggedIn && user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowProfileDropdown((v) => !v)}
-                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
-                aria-label="Profile menu"
-              >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ring-white dark:ring-gray-800">
-                  {user.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt="avatar"
-                      className="w-full h-full object-cover rounded-full"
+    <nav
+      className={`bg-black/95 backdrop-blur-md border-b border-gray-800/50 sticky top-0 z-50 ${className}`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center flex-shrink-0">
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src="/main_logo.svg"
+                alt="CyberJall"
+                width={100}
+                height={100}
+                className="h-8 w-auto"
+              />
+            </Link>
+          </div>
+
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
-                  ) : (
-                    getInitials(user.name || user.company_name, user.email || user.work_email)
-                  )}
+                  </svg>
                 </div>
-                <svg 
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showProfileDropdown ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {/* Profile Dropdown */}
-              {showProfileDropdown && (
-                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in-80 slide-in-from-top-2">
-                  {/* Header */}
-                  <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-lg backdrop-blur-sm ring-2 ring-white/30">
-                        {user.avatarUrl ? (
-                          <img
-                            src={user.avatarUrl}
-                            alt="avatar"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          getInitials(user.name || user.company_name, user.email || user.work_email)
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-lg font-bold text-white truncate">
-                          {user.name || user.company_name || "User"}
-                        </div>
-                        <div className="text-blue-100 text-sm truncate">
-                          {user.email || user.work_email}
-                        </div>
-                        {user.role && (
-                          <div className="text-blue-200 text-xs font-medium mt-0.5">
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full pl-10 pr-4 py-2 border border-gray-700 rounded-lg bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  placeholder="Search services, compliance, or security solutions..."
+                />
+              </div>
+            </form>
+          </div>
 
-                  {/* Menu Items */}
-                  <div className="p-2 bg-white dark:bg-gray-800">
-                    <div className="space-y-1">
-                      {/* <Link
-                        href="/profile"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 group"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <div className="font-medium">Profile Settings</div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">Manage your account</div>
-                        </div>
-                      </Link> */}
-                      
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 group"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:bg-green-200 dark:group-hover:bg-green-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                          </svg>
-                        </div>
-                        <div>
-                          <div className="font-medium">Dashboard</div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">View your dashboard</div>
-                        </div>
-                      </Link>
-
-                      {/* <Link
-                        href="/settings"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 group"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-900/50 transition-colors">
-                          <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <div className="font-medium">Settings</div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">Adjust your preferences</div>
-                        </div>
-                      </Link> */}
-                    </div>
-
-                    <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center space-x-3 w-full px-3 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150 group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
-                        <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium">Sign out</div>
-                        <div className="text-red-500 dark:text-red-400 text-xs">Log out of your account</div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button
-              onClick={() => router.push('/login')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 border border-gray-300 dark:border-gray-600"
-            >
-              Login
-            </button>
-          )}
-          <button
-            onClick={() => router.push('/contact_us')}
-            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md"
-          >
-            Contact Us
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      <div className="lg:hidden flex items-center justify-between p-4">
-        <Link href="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
-          CyberJall
-        </Link>
-        
-        <div className="flex items-center gap-2">
-          {isLoggedIn && user && (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ring-white dark:ring-gray-800"
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <div
+                key={item.name}
+                className="relative"
+                onMouseEnter={() =>
+                  item.hasDropdown && setActiveDropdown(item.name)
+                }
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt="avatar"
-                    className="w-full h-full object-cover rounded-full"
-                  />
+                {item.hasDropdown ? (
+                  <button className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200 flex items-center space-x-1">
+                    <span>{item.name}</span>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
                 ) : (
-                  getInitials(user.name || user.company_name, user.email || user.work_email)
+                  <Link
+                    href={item.link}
+                    className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                  >
+                    {item.name}
+                  </Link>
                 )}
-              </button>
 
-              {/* Mobile Dropdown */}
-              {showProfileDropdown && (
-                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in-80 slide-in-from-top-2">
-                  {/* Header */}
-                  <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-md backdrop-blur-sm ring-2 ring-white/30">
-                        {user.avatarUrl ? (
-                          <img
-                            src={user.avatarUrl}
-                            alt="avatar"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          getInitials(user.name || user.company_name, user.email || user.work_email)
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-md font-bold text-white truncate">
-                          {user.name || user.company_name || "User"}
+                {/* Dropdown Menu */}
+                {item.hasDropdown && activeDropdown === item.name && (
+                  <div className="absolute top-full left-0 mt-1 w-96 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg shadow-xl z-50">
+                    <div className="p-4">
+                      {item.dropdownItems?.map((category, categoryIndex) => (
+                        <div key={categoryIndex} className="mb-4">
+                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                            {category.category}
+                          </h3>
+                          <div className="space-y-1">
+                            {category.items.map((dropdownItem, itemIndex) => (
+                              <Link
+                                key={itemIndex}
+                                href={dropdownItem.link}
+                                className="block p-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-md transition-all duration-200"
+                                onClick={() => setActiveDropdown(null)}
+                              >
+                                <div className="font-medium">
+                                  {dropdownItem.name}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {dropdownItem.description}
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
                         </div>
-                        <div className="text-blue-100 text-sm truncate">
-                          {user.email || user.work_email}
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  </div>
-
-                  {/* Menu Items */}
-                  <div className="p-2 bg-white dark:bg-gray-800">
-                    <div className="space-y-1">
-                      <Link
-                        href="/profile"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>Profile Settings</span>
-                      </Link>
-                      
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center space-x-3 px-3 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
-                        onClick={() => setShowProfileDropdown(false)}
-                      >
-                        <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
-                        <span>Dashboard</span>
-                      </Link>
-
-                      <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                      
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center space-x-3 w-full px-3 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-150"
-                      >
-                        <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        <span>Sign out</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-inner">
-          <div className="px-4 py-4 space-y-4">
-            {navItems.map((item, index) => (
-              <div key={index}>
-                <Link 
-                  href={item.link} 
-                  className="block py-2 text-gray-700 dark:text-gray-300 font-medium text-sm"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-                
-                {item.hasDropdown && item.dropdownItems && (
-                  <div className="pl-4 mt-2 space-y-4 border-l border-gray-200 dark:border-gray-700">
-                    {item.dropdownItems.map((category, catIndex) => (
-                      <div key={catIndex} className="space-y-2">
-                        <h4 className="font-semibold text-gray-900 dark:text-white text-xs">
-                          {category.category}
-                        </h4>
-                        <div className="space-y-2">
-                          {category.items.map((dropdownItem, ddIndex) => (
-                            <Link
-                              key={ddIndex}
-                              href={dropdownItem.link}
-                              className="block p-2 text-xs text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <div className="font-medium">{dropdownItem.name}</div>
-                              <div className="text-gray-500 dark:text-gray-400 mt-1">
-                                {dropdownItem.description}
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 )}
               </div>
             ))}
-            
-            <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
-              {!isLoggedIn && (
+          </div>
+
+          {/* Desktop Action Buttons */}
+          <div className="hidden md:flex items-center space-x-3 ml-4">
+            {/* User Profile or Login */}
+            {isLoggedIn && user ? (
+              <div className="relative" ref={dropdownRef}>
                 <button
-                  onClick={() => {
-                    router.push('/login')
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
                 >
-                  Login
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {getInitials(user.name, user.work_email)}
+                  </div>
+                  <span>
+                    {user.name || user.work_email?.split("@")[0] || "User"}
+                  </span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
                 </button>
-              )}
-              <button
-                onClick={() => {
-                  router.push('/contact_us')
-                  setIsMobileMenuOpen(false)
-                }}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
+
+                {/* Profile Dropdown */}
+                {showProfileDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg shadow-xl z-50">
+                    <div className="p-4">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-lg font-medium">
+                          {getInitials(user.name, user.work_email)}
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">
+                            {user.name || "User"}
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            {user.work_email}
+                          </p>
+                          {user.company_name && (
+                            <p className="text-gray-500 text-xs">
+                              {user.company_name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="border-t border-gray-700 pt-4 space-y-2">
+                        {user.role === "provider" && (
+                          <Link
+                            href="/provider"
+                            onClick={() => setShowProfileDropdown(false)}
+                            className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-md transition-all duration-200"
+                          >
+                            Provider Dashboard
+                          </Link>
+                        )}
+                        {user.role === "customer" && (
+                          <Link
+                            href="/customer"
+                            onClick={() => setShowProfileDropdown(false)}
+                            className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-md transition-all duration-200"
+                          >
+                            Customer Dashboard
+                          </Link>
+                        )}
+                        <Link
+                          href="/company"
+                          onClick={() => setShowProfileDropdown(false)}
+                          className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-md transition-all duration-200"
+                        >
+                          Profile
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-gray-800/50 rounded-md transition-all duration-200"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white border border-gray-600 rounded-lg hover:border-gray-500 transition-all duration-200"
               >
-                Contact Us
-              </button>
-            </div>
+                Login
+              </Link>
+            )}
+
+            {/* Primary CTA Button */}
+            <Link
+              href="/contact_us"
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+            >
+              Contact Us
+            </Link>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/50 transition-all duration-200"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
-      )}
-    </div>
-  )
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-800">
+            {/* Mobile Search */}
+            <div className="px-4 py-3">
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="block w-full pl-10 pr-4 py-2 border border-gray-700 rounded-lg bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                    placeholder="Search..."
+                  />
+                </div>
+              </form>
+            </div>
+
+            {/* Mobile Navigation Links */}
+            <div className="px-4 py-2 space-y-1">
+              {navItems.map((item, idx) => (
+                <MobileNavItem
+                  key={`mobile-nav-${idx}`}
+                  item={item}
+                  onClose={() => setIsMobileMenuOpen(false)}
+                />
+              ))}
+            </div>
+
+            {/* Mobile User Section */}
+            {isLoggedIn && user && (
+              <div className="px-4 py-3 border-t border-gray-800">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {getInitials(user.name, user.work_email)}
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">
+                      {user.name || "User"}
+                    </p>
+                    <p className="text-gray-400 text-sm">{user.work_email}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {user.role === "provider" && (
+                    <Link
+                      href="/provider"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                    >
+                      Provider Dashboard
+                    </Link>
+                  )}
+                  {user.role === "customer" && (
+                    <Link
+                      href="/customer"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                    >
+                      Customer Dashboard
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Action Buttons */}
+            <div className="px-4 py-3 border-t border-gray-800 space-y-3">
+              {!isLoggedIn ? (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full px-4 py-2 text-center text-base font-medium text-gray-300 border border-gray-600 rounded-lg hover:border-gray-500 hover:text-white transition-all duration-200"
+                >
+                  Login
+                </Link>
+              ) : (
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2 text-left text-base font-medium text-red-400 hover:text-red-300 hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                >
+                  Logout
+                </button>
+              )}
+              <Link
+                href="/contact_us"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full px-4 py-2 text-center text-base font-medium text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 rounded-lg transition-all duration-200"
+              >
+                Contact Us
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
 }
+
+interface NavItem {
+  name: string;
+  link: string;
+  hasDropdown?: boolean;
+  dropdownItems?: {
+    category: string;
+    items: {
+      name: string;
+      link: string;
+      description: string;
+    }[];
+  }[];
+}
+
+interface MobileNavItemProps {
+  item: NavItem;
+  onClose: () => void;
+}
+
+const MobileNavItem = ({ item, onClose }: MobileNavItemProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleClick = () => {
+    if (item.hasDropdown) {
+      setIsExpanded(!isExpanded);
+    } else {
+      onClose();
+    }
+  };
+
+  if (item.hasDropdown && item.dropdownItems) {
+    return (
+      <div className="space-y-1">
+        <button
+          onClick={handleClick}
+          className="w-full flex items-center justify-between px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+        >
+          <span>{item.name}</span>
+          <svg
+            className={`w-4 h-4 transition-transform duration-200 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        {isExpanded && (
+          <div className="ml-4 space-y-1">
+            {item.dropdownItems.map((category, categoryIndex) => (
+              <div key={categoryIndex} className="space-y-1">
+                <h6 className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  {category.category}
+                </h6>
+                {category.items.map((dropdownItem, itemIndex) => (
+                  <Link
+                    key={itemIndex}
+                    href={dropdownItem.link}
+                    onClick={onClose}
+                    className="block px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+                  >
+                    <div className="font-medium">{dropdownItem.name}</div>
+                    <div className="text-xs text-gray-500">
+                      {dropdownItem.description}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  } else {
+    return (
+      <Link
+        href={item.link}
+        onClick={onClose}
+        className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+      >
+        {item.name}
+      </Link>
+    );
+  }
+};

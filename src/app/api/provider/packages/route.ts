@@ -15,13 +15,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { payload } = await jwtVerify(token, secret);
-    const companyId = String(payload.companyId); // Ensure string
+    const companyId = payload.companyId;
+    const userId = payload.userId as string;
     const userRole = payload.role as string;
-
-    // console.log("🔍 Debug Info:");
-    // console.log("JWT companyId:", companyId);
-    // console.log("Expected providerId:", "686baba356b033954e2440f1");
-    // console.log("Match:", companyId === "686baba356b033954e2440f1");
 
     if (userRole !== "provider") {
       return NextResponse.json(
@@ -30,18 +26,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Test with exact known ID first
-    // const testPackage = await prisma.package.findFirst({
-    //   where: {
-    //     providerId: "686baba356b033954e2440f1",
-    //   },
-    // });
-    // console.log("Test package with known ID:", testPackage);
+    // If the provider doesn't have a companyId yet, return empty packages
+    if (!companyId || companyId === "null" || companyId === null) {
+      return NextResponse.json({
+        packages: [],
+        message: "No company profile found. Please create your company profile first."
+      });
+    }
 
-    // Then try with the JWT companyId
+    // Ensure companyId is a string for the database query
+    const companyIdString = String(companyId);
+
     const packages = await prisma.package.findMany({
       where: {
-        providerId: companyId,
+        providerId: companyIdString,
       },
       orderBy: {
         createdAt: "desc",

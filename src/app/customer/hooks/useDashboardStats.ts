@@ -125,22 +125,13 @@ export function useDashboardStats(): DashboardStatsHook {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-      const [statsResponse, companyResponse] = await Promise.all([
-        fetch("/api/customer/dashboard/stats", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          signal: controller.signal,
-        }),
-        user?.role === "provider" 
-          ? fetch(`/api/company/${user.id}`, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-              signal: controller.signal,
-            })
-          : Promise.resolve(null),
-      ]);
+      // Always fetch dashboard stats
+      const statsResponse = await fetch("/api/customer/dashboard/stats", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+      });
 
       clearTimeout(timeoutId);
 
@@ -151,10 +142,26 @@ export function useDashboardStats(): DashboardStatsHook {
       const statsData = await statsResponse.json();
       setStats(statsData.stats);
 
-      if (companyResponse && companyResponse.ok) {
-        const companyData = await companyResponse.json();
-        setCompany(companyData);
+      // For providers, try to get company data via getCompany endpoint
+      if (user?.role === "provider") {
+        try {
+          const companyResponse = await fetch("/api/getCompany", {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            signal: controller.signal,
+          });
+
+          if (companyResponse.ok) {
+            const companyData = await companyResponse.json();
+            setCompany(companyData.company);
+          }
+        } catch (companyError) {
+          console.log("Company fetch failed (this is expected for new providers):", companyError);
+          setCompany(null);
+        }
       }
+
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
         console.error("Error fetching dashboard data:", err);

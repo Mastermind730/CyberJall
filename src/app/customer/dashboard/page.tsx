@@ -1,6 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card"
-import { Badge } from "@/app/components/ui/badge"
-import { Button } from "@/app/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import { Badge } from "@/app/components/ui/badge";
+import { Button } from "@/app/components/ui/button";
 // import { Progress } from "@/components/ui/progress"
 import {
   Package,
@@ -12,8 +18,8 @@ import {
   FileText,
   MessageSquare,
   Calendar,
-} from "lucide-react"
-import { Progress } from "@radix-ui/react-progress"
+} from "lucide-react";
+import { Progress } from "@radix-ui/react-progress";
 
 export default function CustomerDashboard() {
   return (
@@ -22,8 +28,12 @@ export default function CustomerDashboard() {
       <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome back, John Doe</h2>
-            <p className="text-gray-300">TechCorp Inc. • Last login: 2 hours ago</p>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Welcome back, John Doe
+            </h2>
+            <p className="text-gray-300">
+              TechCorp Inc. • Last login: 2 hours ago
+            </p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-orange-500">85</div>
@@ -34,9 +44,11 @@ export default function CustomerDashboard() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Active Packages</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Active Packages
+            </CardTitle>
             <Package className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
@@ -45,9 +57,11 @@ export default function CustomerDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Security Score</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Security Score
+            </CardTitle>
             <Shield className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -56,9 +70,11 @@ export default function CustomerDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Open Tickets</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Open Tickets
+            </CardTitle>
             <MessageSquare className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
@@ -67,9 +83,11 @@ export default function CustomerDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Pending Invoices</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-300">
+              Pending Invoices
+            </CardTitle>
             <FileText className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
@@ -81,24 +99,31 @@ export default function CustomerDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Packages */}
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Package className="mr-2 h-5 w-5 text-orange-500" />
               Recent Packages
             </CardTitle>
-            <CardDescription className="text-gray-400">Your latest security service engagements</CardDescription>
+            <CardDescription className="text-gray-400">
+              Your latest security service engagements
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <div>
-                  <p className="text-sm font-medium text-white">Penetration Testing</p>
+                  <p className="text-sm font-medium text-white">
+                    Penetration Testing
+                  </p>
                   <p className="text-xs text-gray-400">SecureGuard Solutions</p>
                 </div>
               </div>
-              <Badge variant="secondary" className="bg-green-500/20 text-green-400">
+              <Badge
+                variant="secondary"
+                className="bg-green-500/20 text-green-400"
+              >
                 Active
               </Badge>
             </div>
@@ -107,11 +132,16 @@ export default function CustomerDashboard() {
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <div>
-                  <p className="text-sm font-medium text-white">Security Audit</p>
+                  <p className="text-sm font-medium text-white">
+                    Security Audit
+                  </p>
                   <p className="text-xs text-gray-400">CyberShield Inc.</p>
                 </div>
               </div>
-              <Badge variant="secondary" className="bg-blue-500/20 text-blue-400">
+              <Badge
+                variant="secondary"
+                className="bg-blue-500/20 text-blue-400"
+              >
                 Upcoming
               </Badge>
             </div>
@@ -120,11 +150,16 @@ export default function CustomerDashboard() {
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                 <div>
-                  <p className="text-sm font-medium text-white">Vulnerability Assessment</p>
+                  <p className="text-sm font-medium text-white">
+                    Vulnerability Assessment
+                  </p>
                   <p className="text-xs text-gray-400">DefenseFirst</p>
                 </div>
               </div>
-              <Badge variant="secondary" className="bg-gray-500/20 text-gray-400">
+              <Badge
+                variant="secondary"
+                className="bg-gray-500/20 text-gray-400"
+              >
                 Completed
               </Badge>
             </div>
@@ -132,13 +167,15 @@ export default function CustomerDashboard() {
         </Card>
 
         {/* Security Insights */}
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <TrendingUp className="mr-2 h-5 w-5 text-orange-500" />
               Security Insights
             </CardTitle>
-            <CardDescription className="text-gray-400">Your cybersecurity health overview</CardDescription>
+            <CardDescription className="text-gray-400">
+              Your cybersecurity health overview
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -152,26 +189,34 @@ export default function CustomerDashboard() {
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-gray-300">Network Security: Strong</span>
+                <span className="text-sm text-gray-300">
+                  Network Security: Strong
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                <span className="text-sm text-gray-300">Email Security: Needs Attention</span>
+                <span className="text-sm text-gray-300">
+                  Email Security: Needs Attention
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-gray-300">Access Control: Excellent</span>
+                <span className="text-sm text-gray-300">
+                  Access Control: Excellent
+                </span>
               </div>
             </div>
 
-            <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">View Detailed Report</Button>
+            <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+              View Detailed Report
+            </Button>
           </CardContent>
         </Card>
       </div>
 
       {/* Recent Activity & Upcoming Events */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Clock className="mr-2 h-5 w-5 text-orange-500" />
@@ -203,7 +248,7 @@ export default function CustomerDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-900 border-gray-800">
+        <Card className="bg-black border-gray-800">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Calendar className="mr-2 h-5 w-5 text-orange-500" />
@@ -236,5 +281,5 @@ export default function CustomerDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

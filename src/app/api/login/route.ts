@@ -95,6 +95,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({
       success: true,
+      token, // Add the token to the response
       user: {
         id: user.id,
         email: user.work_email,

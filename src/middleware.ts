@@ -9,16 +9,15 @@ const secret = new TextEncoder().encode(
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  // console.log(secret,"secret");
 
   // Get token from cookies in the request
   const token = request.cookies.get("auth_token")?.value;
 
   // Public paths that don't require authentication
-  const publicPaths = ["/login", "/register", "/", "/api/login"];
+  const publicPaths = ["/login", "/register", "/", "/api/login", "/debug-auth"];
 
   // API routes that don't require auth
-  const publicApiPaths = ["/api/login", "/api/register"];
+  const publicApiPaths = ["/api/login", "/api/register", "/api/logout"];
 
   // Check if current path is public
   const isPublicPath = publicPaths.some(
@@ -32,11 +31,19 @@ export async function middleware(request: NextRequest) {
   if (isPublicPath) {
     if (token) {
       try {
-        await jwtVerify(token, secret);
+        const { payload } = await jwtVerify(token, secret);
         console.log("Valid token for public path");
-        // If user has valid token and tries to access login, redirect to dashboard
+        
+        // If user has valid token and tries to access login/register, redirect based on role
         if (pathname === "/login" || pathname === "/register") {
-          return NextResponse.redirect(new URL("/dashboard", request.url));
+          const userRole = payload.role as string;
+          if (userRole === "provider") {
+            return NextResponse.redirect(new URL("/provider", request.url));
+          } else if (userRole === "customer") {
+            return NextResponse.redirect(new URL("/customer", request.url));
+          } else {
+            return NextResponse.redirect(new URL("/dashboard", request.url));
+          }
         }
       } catch (e) {
         // Token invalid, allow access to public pages
@@ -53,6 +60,37 @@ export async function middleware(request: NextRequest) {
   try {
     const { payload } = await jwtVerify(token, secret);
     console.log("Valid token payload:", payload);
+    
+    const userRole = payload.role as string;
+    
+    // Role-based route protection
+    if (pathname.startsWith("/provider")) {
+      if (userRole !== "provider") {
+        // Non-providers trying to access provider routes - redirect to appropriate dashboard
+        if (userRole === "customer") {
+          return NextResponse.redirect(new URL("/customer", request.url));
+        } else {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+      }
+    } else if (pathname.startsWith("/customer")) {
+      if (userRole !== "customer") {
+        // Non-customers trying to access customer routes - redirect to appropriate dashboard
+        if (userRole === "provider") {
+          return NextResponse.redirect(new URL("/provider", request.url));
+        } else {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        }
+      }
+    } else if (pathname === "/dashboard") {
+      // Redirect dashboard access to role-specific dashboards
+      if (userRole === "provider") {
+        return NextResponse.redirect(new URL("/provider", request.url));
+      } else if (userRole === "customer") {
+        return NextResponse.redirect(new URL("/customer", request.url));
+      }
+    }
+    
     return NextResponse.next();
   } catch (e) {
     console.error("Token verification failed:", e);

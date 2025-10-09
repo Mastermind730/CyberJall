@@ -2,9 +2,9 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "../components/ui/button";
 import {
@@ -16,6 +16,8 @@ import {
   Menu,
   X,
   Shield,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
 
 const navigation = [
@@ -57,7 +59,75 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+  const router = useRouter();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Load user data
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch {
+        // Invalid user data, clear it
+        localStorage.removeItem("user");
+      }
+    }
+  }, []);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        showUserMenu &&
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    }
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "/login";
+    }
+  };
+
+  // Helper function to get user initials
+  function getInitials(name?: string, email?: string): string {
+    if (name && name.length > 0) {
+      return name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (email && email.length > 0) {
+      return email[0].toUpperCase();
+    }
+    return "C";
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -152,17 +222,91 @@ export default function CustomerLayout({
 
       {/* Main content */}
       <div className="lg:pl-64">
-        {/* Mobile menu button */}
-        <div className="lg:hidden fixed top-4 left-4 z-30">
+        {/* Header with mobile menu and user menu */}
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-gray-900 border-b border-gray-800 px-4 lg:px-6">
+          {/* Mobile menu button */}
           <Button
             variant="ghost"
             size="sm"
-            className="bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800"
+            className="text-gray-400 hover:text-white lg:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-5 w-5" />
           </Button>
-        </div>
+
+          {/* User Menu */}
+          <div className="flex items-center gap-x-4 ml-auto">
+            {user && (
+              <div className="relative" ref={userMenuRef}>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-x-2 text-sm font-medium text-gray-300 hover:text-white"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {getInitials(user.name, user.work_email)}
+                  </div>
+                  <span className="hidden sm:block">
+                    {user.name || user.work_email?.split('@')[0] || 'Customer'}
+                  </span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+
+                {/* User Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
+                    <div className="p-4">
+                      <div className="flex items-center gap-x-3 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-lg font-medium">
+                          {getInitials(user.name, user.work_email)}
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">
+                            {user.name || 'Customer'}
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            {user.work_email}
+                          </p>
+                          {user.company_name && (
+                            <p className="text-gray-500 text-xs">
+                              {user.company_name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-gray-700 pt-4 space-y-2">
+                        <Link
+                          href="/customer/profile"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-x-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-all duration-200"
+                        >
+                          <User className="w-4 h-4" />
+                          Profile
+                        </Link>
+                        <Link
+                          href="/customer/settings"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-x-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-all duration-200"
+                        >
+                          <Settings className="w-4 h-4" />
+                          Settings
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-x-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-gray-700 rounded-md transition-all duration-200"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </header>
 
         {/* Page content */}
         <main className="p-4 lg:p-6">{children}</main>
