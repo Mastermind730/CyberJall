@@ -150,14 +150,14 @@ export default function ProviderDashboard() {
         <div className="text-center">
           <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
           <p className="text-gray-300 text-lg mb-4">
-            Please log in to access the dashboard
+            Please Wait till the page loads...
           </p>
-          <Button
+          {/* <Button
             onClick={() => router.push("/login")}
             className="bg-orange-500 hover:bg-orange-600"
           >
             Go to Login
-          </Button>
+          </Button> */}
         </div>
       </div>
     );
