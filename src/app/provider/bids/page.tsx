@@ -30,6 +30,7 @@ import {
   Building,
   MapPin,
   FileText,
+  Check,
 } from "lucide-react";
 
 interface BusinessBid {
@@ -64,6 +65,7 @@ export default function ProviderBids() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [urgencyFilter, setUrgencyFilter] = useState("all");
+  const [approvingBids, setApprovingBids] = useState<Set<string>>(new Set());
   const router = useRouter();
 
   useEffect(() => {
@@ -82,6 +84,48 @@ export default function ProviderBids() {
       console.error("Error fetching business bids:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const approveBid = async (bidId: string) => {
+    setApprovingBids(prev => new Set(prev).add(bidId));
+    
+    try {
+      const response = await fetch("/api/approveBid", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ bidId }),
+      });
+
+      if (response.ok) {
+        // Update the bid status in the local state
+        setBids(prevBids => 
+          prevBids.map(bid => 
+            bid.id === bidId 
+              ? { ...bid, status: "approved" as const, updatedAt: new Date().toISOString() }
+              : bid
+          )
+        );
+        
+        // Show success message (you can add a toast here)
+        console.log("Bid approved successfully");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to approve bid:", errorData.error);
+        // Show error message (you can add a toast here)
+      }
+    } catch (error) {
+      console.error("Error approving bid:", error);
+      // Show error message (you can add a toast here)
+    } finally {
+      setApprovingBids(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(bidId);
+        return newSet;
+      });
     }
   };
 
@@ -295,6 +339,26 @@ export default function ProviderBids() {
                     >
                       View Details
                     </Button>
+                    {bid.status === "pending_review" && (
+                      <Button
+                        size="sm"
+                        className="bg-green-500 hover:bg-green-600"
+                        onClick={() => approveBid(bid.id)}
+                        disabled={approvingBids.has(bid.id)}
+                      >
+                        {approvingBids.has(bid.id) ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Approving...
+                          </>
+                        ) : (
+                          <>
+                            <Check className="h-4 w-4 mr-2" />
+                            Approve
+                          </>
+                        )}
+                      </Button>
+                    )}
                     {bid.status === "approved" && (
                       <Button
                         size="sm"
