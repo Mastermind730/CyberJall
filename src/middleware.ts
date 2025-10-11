@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
     if (token) {
       try {
         const { payload } = await jwtVerify(token, secret);
-        console.log("Valid token for public path");
+        // console.log("Valid token for public path");
         
         // If user has valid token and tries to access login/register, redirect based on role
         if (pathname === "/login" || pathname === "/register") {
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    console.log("Valid token payload:", payload);
+    // console.log("Valid token payload:", payload);
     
     const userRole = payload.role as string;
     
@@ -93,7 +93,7 @@ export async function middleware(request: NextRequest) {
     
     return NextResponse.next();
   } catch (e) {
-    console.error("Token verification failed:", e);
+    // console.error("Token verification failed:", e);
     // Redirect to login and clear invalid cookie
     const response = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.delete("auth_token");

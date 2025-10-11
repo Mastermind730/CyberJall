@@ -57,6 +57,7 @@ export function useUser(): UseUserReturn {
   // Clear all authentication state
   const clearAuthState = useCallback(() => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
     setHasCompany(false);
     setIsLoading(false);
@@ -105,31 +106,43 @@ export function useUser(): UseUserReturn {
 
   // Verify authentication status with server
   const verifyAuthStatus = useCallback(async (userData: User) => {
-    console.log("useUser: Verifying auth status for:", userData);
+    console.log("useUser: Verifying auth status with server...", userData.email);
     try {
-      const response = await fetch("/api/getCompany", {
+      const response = await fetch("/api/me", {
         method: "GET",
         credentials: "include",
       });
 
-      console.log("useUser: Auth verification response status:", response.status);
-
       if (response.ok) {
-        // Token is valid, set user data
-        console.log("useUser: Auth verification successful, setting user");
-        setUser(userData);
+        const data = await response.json();
+        console.log("useUser: Server verification successful:", data.user.email);
+        // Use server data as it's more up-to-date
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        
         // Check if provider has company profile
-        if (userData.role === "provider") {
-          const data = await response.json();
-          setHasCompany(data.hasCompany || false);
+        if (data.user.role === "provider") {
+          try {
+            const companyResponse = await fetch("/api/getCompany", {
+              method: "GET",
+              credentials: "include",
+            });
+            if (companyResponse.ok) {
+              const companyData = await companyResponse.json();
+              console.log("useUser: Company profile check result:", companyData.hasCompany);
+              setHasCompany(companyData.hasCompany || false);
+            }
+          } catch (companyError) {
+            console.error("Error fetching company data:", companyError);
+          }
         }
       } else if (response.status === 401) {
+        console.log("useUser: Token is invalid, clearing auth state");
         // Token is invalid, clear everything
-        console.log("useUser: Auth verification failed - 401, clearing auth state");
         clearAuthState();
       }
     } catch (error) {
-      console.error("useUser: Auth verification failed:", error);
+      console.error("Auth verification failed:", error);
       // On network error, assume auth is invalid for security
       clearAuthState();
     } finally {
@@ -137,69 +150,76 @@ export function useUser(): UseUserReturn {
     }
   }, [clearAuthState]);
 
-  // Initialize user from localStorage
-  useEffect(() => {
-    const initializeUser = async () => {
-      console.log("useUser: Initializing user...");
-      try {
-        const userStr = localStorage.getItem("user");
-        console.log("useUser: localStorage user:", userStr);
-        if (userStr) {
-          const userData = JSON.parse(userStr);
-          console.log("useUser: Parsed user data:", userData);
-          await verifyAuthStatus(userData);
-        } else {
-          console.log("useUser: No user in localStorage, checking server auth");
-          // Even if no localStorage data, check if there's a valid JWT token
-          await checkServerAuth();
-        }
-      } catch (error) {
-        console.error("useUser: Error initializing user:", error);
-        clearAuthState();
-      }
-    };
-
-    initializeUser();
-  }, [verifyAuthStatus, clearAuthState]);
-
   // Check server authentication without localStorage data
-  const checkServerAuth = async () => {
+  const checkServerAuth = useCallback(async () => {
+    console.log("useUser: Checking server auth (no localStorage data)...");
     try {
       const response = await fetch("/api/me", {
         method: "GET",
         credentials: "include",
       });
 
-      console.log("useUser: Server auth check response status:", response.status);
-
       if (response.ok) {
         const data = await response.json();
-        console.log("useUser: Got user data from server:", data.user);
+        console.log("useUser: Server auth check successful:", data.user.email);
         setUser(data.user);
         
-        // Also store in localStorage for next time
+        // Store in localStorage for next time
         localStorage.setItem("user", JSON.stringify(data.user));
         
         // Check company profile for providers
         if (data.user.role === "provider") {
-          const companyResponse = await fetch("/api/getCompany", {
-            method: "GET",
-            credentials: "include",
-          });
-          if (companyResponse.ok) {
-            const companyData = await companyResponse.json();
-            setHasCompany(companyData.hasCompany || false);
+          try {
+            const companyResponse = await fetch("/api/getCompany", {
+              method: "GET",
+              credentials: "include",
+            });
+            if (companyResponse.ok) {
+              const companyData = await companyResponse.json();
+              console.log("useUser: Company profile check result:", companyData.hasCompany);
+              setHasCompany(companyData.hasCompany || false);
+            }
+          } catch (companyError) {
+            console.error("Error fetching company data:", companyError);
           }
         }
       } else {
-        console.log("useUser: No valid server authentication");
+        console.log("useUser: No valid authentication found on server");
+        // No valid authentication found
+        clearAuthState();
       }
     } catch (error) {
-      console.error("useUser: Server auth check failed:", error);
+      console.error("Server auth check failed:", error);
+      clearAuthState();
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [clearAuthState]);
+
+  // Initialize user from localStorage or server
+  useEffect(() => {
+    const initializeUser = async () => {
+      console.log("useUser: Initializing user...");
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          console.log("useUser: Found user in localStorage, verifying with server...");
+          const userData = JSON.parse(userStr);
+          // Verify the localStorage data with server
+          await verifyAuthStatus(userData);
+        } else {
+          console.log("useUser: No localStorage data, checking server auth...");
+          // No localStorage data, check if there's a valid JWT token
+          await checkServerAuth();
+        }
+      } catch (error) {
+        console.error("Error initializing user:", error);
+        clearAuthState();
+      }
+    };
+
+    initializeUser();
+  }, [verifyAuthStatus, checkServerAuth, clearAuthState]);
 
   // Login function
   const login = useCallback((userData: User) => {
@@ -269,6 +289,17 @@ export function useUser(): UseUserReturn {
 
   // Computed values
   const isAuthenticated = !!user;
+
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log("useUser: State changed:", {
+      user: user?.email || null,
+      isLoading,
+      isAuthenticated,
+      hasCompany,
+      companyLoading
+    });
+  }, [user, isLoading, isAuthenticated, hasCompany, companyLoading]);
 
   return {
     user,

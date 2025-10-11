@@ -27,6 +27,8 @@ import {
   FiTarget,
   FiDollarSign,
   FiMessageCircle,
+  FiCpu,
+  FiUserCheck,
 } from "react-icons/fi";
 import { FaBrain } from "react-icons/fa6";
 
@@ -172,6 +174,28 @@ export default function Partners() {
   const features = [
     {
       id: 1,
+      title: "AI Based Service",
+      description:
+        "Leverage advanced AI algorithms to analyze and optimize your cybersecurity infrastructure",
+      icon: FiCpu,
+      color: "text-cyan-400",
+      bgColor: "bg-cyan-900/20",
+      hoverBgColor: "hover:bg-cyan-900/30",
+      action: () => console.log("AI Based Service clicked"),
+    },
+    {
+      id: 2,
+      title: "AI Based Provider Match",
+      description:
+        "Smart AI matching system to find the perfect cybersecurity provider for your specific needs",
+      icon: FiUserCheck,
+      color: "text-indigo-400",
+      bgColor: "bg-indigo-900/20",
+      hoverBgColor: "hover:bg-indigo-900/30",
+      action: () => console.log("AI Based Provider Match clicked"),
+    },
+    {
+      id: 3,
       title: "AI-Powered Service Recommendation",
       description:
         "Get personalized cybersecurity recommendations based on your business needs",
@@ -182,7 +206,7 @@ export default function Partners() {
       action: () => console.log("AI Recommendation clicked"),
     },
     {
-      id: 2,
+      id: 4,
       title: "Cyber Health Score",
       description:
         "Assess your organization's cybersecurity posture with our comprehensive scoring system",
@@ -193,7 +217,7 @@ export default function Partners() {
       action: () => console.log("Cyber Health Score clicked"),
     },
     {
-      id: 3,
+      id: 5,
       title: "Smart Compare",
       description:
         "Compare cybersecurity providers side-by-side to make informed decisions",
@@ -204,7 +228,7 @@ export default function Partners() {
       action: () => setShowComparison(true),
     },
     {
-      id: 4,
+      id: 6,
       title: "CyberBid",
       description:
         "Create competitive bids and get quotes from multiple security providers",
@@ -215,7 +239,7 @@ export default function Partners() {
       action: () => router.push("/bid/create"),
     },
     {
-      id: 5,
+      id: 7,
       title: "Free Consultation",
       description:
         "Connect with cybersecurity experts for personalized advice and guidance",
@@ -481,7 +505,9 @@ export default function Partners() {
                   />
                 </div>
                 <div className="flex items-center space-x-3">
-                  <span className="text-sm text-gray-400 whitespace-nowrap">Sort by:</span>
+                  <span className="text-sm text-gray-400 whitespace-nowrap">
+                    Sort by:
+                  </span>
                   <select
                     className="block w-full pl-3 pr-10 py-3 text-base border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-xl bg-gray-700/50 backdrop-blur-sm text-white transition-colors"
                     defaultValue="Featured"
@@ -498,7 +524,9 @@ export default function Partners() {
               {activeFilterCount > 0 && (
                 <div className="pt-4 border-t border-gray-700/50">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm text-gray-400">Active filters:</span>
+                    <span className="text-sm text-gray-400">
+                      Active filters:
+                    </span>
                     {filters.industry.map((industry) => (
                       <span
                         key={`active-industry-${industry}`}
@@ -590,7 +618,8 @@ export default function Partners() {
               <h2 className="text-lg font-semibold text-white">
                 Available Providers
                 <span className="text-gray-400 font-normal ml-2">
-                  ({partners.length} {partners.length === 1 ? "company" : "companies"})
+                  ({partners.length}{" "}
+                  {partners.length === 1 ? "company" : "companies"})
                 </span>
               </h2>
             </div>
@@ -628,7 +657,8 @@ export default function Partners() {
                   No partners found
                 </h3>
                 <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                  Try adjusting your filters or search query to find what you're looking for.
+                  Try adjusting your filters or search query to find what you're
+                  looking for.
                 </p>
                 <button
                   onClick={clearFilters}
@@ -700,13 +730,15 @@ export default function Partners() {
                                 ))}
                               </div>
                               <span className="text-sm text-gray-400 ml-2">
-                                {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? "review" : "reviews"})
+                                {averageRating.toFixed(1)} ({reviewCount}{" "}
+                                {reviewCount === 1 ? "review" : "reviews"})
                               </span>
                             </div>
                             <div className="mt-2 flex items-center text-sm text-gray-400">
                               <FiMapPin className="flex-shrink-0 mr-2 h-4 w-4" />
                               <span className="truncate">
-                                {partner.headquarters_city}, {partner.headquarters_country}
+                                {partner.headquarters_city},{" "}
+                                {partner.headquarters_country}
                               </span>
                             </div>
                           </div>
@@ -726,11 +758,17 @@ export default function Partners() {
                           </div>
                           <div className="flex items-center text-sm text-gray-300">
                             <FiLayers className="flex-shrink-0 mr-3 h-4 w-4 text-purple-400" />
-                            <span>{partner.services_offered?.length || 0} services</span>
+                            <span>
+                              {partner.services_offered?.length || 0} services
+                            </span>
                           </div>
                           <div className="flex items-center text-sm text-gray-300">
                             <FiAward className="flex-shrink-0 mr-3 h-4 w-4 text-yellow-400" />
-                            <span>{partner.expertise_and_certifications?.length || 0} certs</span>
+                            <span>
+                              {partner.expertise_and_certifications?.length ||
+                                0}{" "}
+                              certs
+                            </span>
                           </div>
                         </div>
 
@@ -966,7 +1004,10 @@ export default function Partners() {
                                             />
                                           ))}
                                           <span className="ml-2 text-xs text-gray-400">
-                                            {avgRating.toFixed(1)} ({company.client_reviews?.length || 0})
+                                            {avgRating.toFixed(1)} (
+                                            {company.client_reviews?.length ||
+                                              0}
+                                            )
                                           </span>
                                         </div>
                                       </td>

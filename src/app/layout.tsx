@@ -6,8 +6,6 @@ import "./globals.css";
 import LayoutContent from "./components/LayoutContent";
 // import DynamicBackground from "./components/Background";
 
-
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="!scroll-smooth">
-      <body className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} bg-black text-white antialiased`}
+      >
         <LayoutContent>{children}</LayoutContent>
       </body>
     </html>

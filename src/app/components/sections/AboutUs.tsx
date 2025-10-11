@@ -1,156 +1,206 @@
-'use client';
-import type { FC } from 'react';
-import Image from 'next/image';
+"use client";
+import type { FC } from "react";
+import Image from "next/image";
+import { ModernSection } from "../ui/modern-section";
+import { ModernCard } from "../ui/modern-card";
+import { ModernButton } from "../ui/modern-button";
 
 export const AboutUs: FC = () => {
   return (
-    <section className="py-24 bg-gray-900 relative overflow-hidden">
-      {/* Subtle Grid Background */}
-      <div className="absolute inset-0 opacity-5">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-              <path d="M 80 0 L 0 0 0 80" fill="none" stroke="currentColor" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
+    <ModernSection background="grid" spacing="lg">
+      {/* Header Section */}
+      <div className="text-center mb-16">
+        <span className="inline-block text-xs font-bold tracking-widest text-red-500 uppercase mb-3 px-3 py-1.5 rounded-full border border-red-500/30 bg-red-500/5">
+          About CyberJall
+        </span>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+          Cybersecurity,{" "}
+          <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+            Simplified
+          </span>
+        </h1>
+        <div className="w-20 h-0.5 bg-gradient-to-r from-red-500 to-orange-500 mx-auto mb-6 rounded-full"></div>
+        <p className="text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          We bridge the gap between complex cybersecurity needs and accessible
+          solutions, making enterprise-grade protection available to businesses
+          of all sizes.
+        </p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative">
-        {/* Header Section */}
-        <div className="text-center mb-20">
-          <h2 className="text-sm font-medium tracking-wider text-red-500 uppercase mb-4">
-            About CyberJall
-          </h2>
-          <h1 className="text-4xl font-bold text-white sm:text-5xl tracking-tight">
-            Cybersecurity, Simplified
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-transparent my-6 mx-auto"></div>
-        </div>
+      {/* Two Column Layout */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+        {/* Left Column - Cards */}
+        <div className="space-y-6">
+          {/* Welcome Card */}
+          <ModernCard variant="feature" className="group">
+            <div className="flex items-start">
+              <div className="bg-gradient-to-br from-red-500/10 to-orange-500/10 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
+                <svg
+                  className="w-5 h-5 text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-2">
+                  Welcome to CyberJall
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Your trusted cybersecurity marketplace where businesses find
+                  verified providers, compare services, and build custom
+                  security solutions.
+                </p>
+              </div>
+            </div>
+          </ModernCard>
 
-        {/* Two Column Layout */}
-        <div className="lg:grid lg:grid-cols-2 lg:gap-16">
-          {/* Left Column - Cards */}
-          <div className="space-y-6">
-            {/* Welcome Card */}
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 border border-gray-700 shadow-lg transition-all hover:shadow-xl hover:border-gray-600">
-              <div className="flex items-center mb-4">
-                <div className="bg-red-500/10 p-2 rounded-lg mr-4">
-                  <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+          {/* Mission Card */}
+          <ModernCard variant="feature" className="group">
+            <div className="flex items-start">
+              <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
+                <svg
+                  className="w-5 h-5 text-orange-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-2">
+                  Our Mission
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  To democratize cybersecurity by making premium protection
+                  accessible, transparent, and simple for every organization.
+                </p>
+              </div>
+            </div>
+          </ModernCard>
+
+          {/* Value Proposition Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              {
+                icon: "🎯",
+                title: "Clarity",
+                desc: "Transparent pricing and verified providers.",
+              },
+              {
+                icon: "⚡",
+                title: "Control",
+                desc: "Customize services to match your needs.",
+              },
+              {
+                icon: "🛡️",
+                title: "Confidence",
+                desc: "Verified providers with performance metrics.",
+              },
+              {
+                icon: "🤝",
+                title: "Community",
+                desc: "Shared knowledge from security experts.",
+              },
+            ].map((item, index) => (
+              <ModernCard
+                key={index}
+                variant="feature"
+                className="text-center group p-3"
+              >
+                <div className="text-xl mb-2 group-hover:scale-125 transition-transform duration-300">
+                  {item.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-white">Welcome to CyberJall</h3>
-              </div>
-              <p className="text-gray-300 leading-relaxed">
-                We&apos;re redefining how businesses access cybersecurity services through our centralized, transparent marketplace that connects you with top-tier providers.
-              </p>
-            </div>
-
-            {/* Decision Card */}
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 border border-gray-700 shadow-lg transition-all hover:shadow-xl hover:border-gray-600">
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Cybersecurity Isn&apos;t Just a Service — <span className="text-red-400">It&apos;s a Decision You Can&apos;t Get Wrong</span>
-              </h3>
-              <p className="text-gray-300 mb-6 leading-relaxed">
-                Finding the right cybersecurity partner is overwhelming — too many providers, unclear pricing, and no way to compare.
-              </p>
-              <div className="bg-gray-800/50 p-4 rounded-lg border-l-4 border-red-500">
-                <p className="text-white font-medium">
-                  CyberJall simplifies it all.
-                </p>
-                <p className="text-gray-300 text-sm mt-1">
-                  Explore trusted service providers, use Smart Match Filters, compare profiles side-by-side, and get free consultation if you&apos;re unsure.
-                </p>
-              </div>
-            </div>
-
-            {/* Small Cards Grid */}
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700 hover:border-red-500/30 transition-colors">
-                <h4 className="text-white font-medium mb-2 flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                  Clarity
+                <h4 className="text-sm font-bold text-white mb-1">
+                  {item.title}
                 </h4>
-                <p className="text-gray-400 text-sm">
-                  Transparent pricing and service details from vetted providers.
-                </p>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700 hover:border-red-500/30 transition-colors">
-                <h4 className="text-white font-medium mb-2 flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                  Control
-                </h4>
-                <p className="text-gray-400 text-sm">
-                  Customize and bundle services to match your exact needs.
-                </p>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700 hover:border-red-500/30 transition-colors">
-                <h4 className="text-white font-medium mb-2 flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                  Confidence
-                </h4>
-                <p className="text-gray-400 text-sm">
-                  Verified providers with performance metrics and reviews.
-                </p>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-5 border border-gray-700 hover:border-red-500/30 transition-colors">
-                <h4 className="text-white font-medium mb-2 flex items-center">
-                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                  Community
-                </h4>
-                <p className="text-gray-400 text-sm">
-                  Shared knowledge from security professionals worldwide.
-                </p>
-              </div>
-            </div>
-
-            {/* Final Statement */}
-            <div className="mt-8 bg-gray-800/30 rounded-xl p-6 border border-gray-700 backdrop-blur-sm">
-              <p className="text-white text-center font-light">
-                Whether you&apos;re a startup or an enterprise — CyberJall gives you <span className="text-red-400 font-medium">clarity, control, and confidence</span> in every cybersecurity decision.
-              </p>
-            </div>
+                <p className="text-gray-400 text-xs">{item.desc}</p>
+              </ModernCard>
+            ))}
           </div>
 
-          {/* Right Column - Single Image Container */}
-          <div className="relative mt-10 lg:mt-0">
-            <div className="sticky top-24">
-              <div className="relative h-[700px] min-h-[920px] w-full rounded-xl overflow-hidden">
-                <Image
-                  src="/aboutus.png"
-                  alt="CyberJall Security Platform"
-                  fill
-                  className="object-cover rounded-xl"
-                  priority
-                  quality={100}
+          {/* CTA */}
+          <div className="text-center pt-4">
+            <ModernButton size="md" className="shadow-lg">
+              Explore Our Platform
+              <svg
+                className="w-4 h-4 ml-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-8 w-full">
-                  <div className="max-w-xs">
-                    <div className="bg-red-500/10 backdrop-blur-sm px-3 py-1 rounded-full inline-flex items-center mb-4">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></span>
-                      <span className="text-white text-xs font-medium">Trusted Network</span>
-                    </div>
-                    <h3 className="text-white text-2xl font-bold mb-2">The Smart Way to Secure Your Business</h3>
-                    <p className="text-gray-300">Compare, customize, and connect with confidence through our curated marketplace</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </svg>
+            </ModernButton>
           </div>
         </div>
 
-        {/* Decorative Elements */}
-        <div className="absolute left-0 top-1/3 -translate-x-1/2 opacity-10">
-          <svg className="w-64 h-64 text-red-500" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path fill="none" stroke="currentColor" strokeWidth="1" 
-              d="M100,20 L180,100 L100,180 L20,100 Z" 
-              className="animate-[spin_30s_linear_infinite]"/>
-          </svg>
+        {/* Right Column - Image */}
+        <div className="relative mt-10 lg:mt-0">
+          <ModernCard variant="pro" className="overflow-hidden">
+            <div className="relative h-72 lg:h-96 w-full">
+              <Image
+                src="/Aboutus.gif"
+                alt="CyberJall Platform Dashboard"
+                fill
+                className="object-cover"
+                priority
+                quality={90}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h4 className="text-white text-base font-bold mb-1">
+                  Modern Security Dashboard
+                </h4>
+                <p className="text-gray-300 text-xs">
+                  Intuitive interface designed for security professionals.
+                </p>
+              </div>
+            </div>
+          </ModernCard>
+
+          {/* Floating Stats */}
+          <div className="absolute -top-3 -right-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-3 shadow-lg">
+            <div className="text-white text-center">
+              <div className="text-xl font-bold">500+</div>
+              <div className="text-xs opacity-90">Trusted Providers</div>
+            </div>
+          </div>
+
+          <div className="absolute -bottom-3 -left-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-3 shadow-lg">
+            <div className="text-white text-center">
+              <div className="text-xl font-bold">24/7</div>
+              <div className="text-xs opacity-90">Expert Support</div>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+
+      {/* Background Decorations */}
+      <div className="absolute left-0 top-1/3 -translate-x-1/2 opacity-5 pointer-events-none">
+        <div className="w-48 h-48 bg-gradient-to-r from-red-500 to-orange-500 rounded-full blur-3xl"></div>
+      </div>
+      <div className="absolute right-0 bottom-1/3 translate-x-1/2 opacity-5 pointer-events-none">
+        <div className="w-48 h-48 bg-gradient-to-r from-red-500 to-orange-500 rounded-full blur-3xl"></div>
+      </div>
+    </ModernSection>
   );
 };

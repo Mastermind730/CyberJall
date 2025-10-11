@@ -88,8 +88,8 @@ export default function ProviderBids() {
   };
 
   const approveBid = async (bidId: string) => {
-    setApprovingBids(prev => new Set(prev).add(bidId));
-    
+    setApprovingBids((prev) => new Set(prev).add(bidId));
+
     try {
       const response = await fetch("/api/approveBid", {
         method: "POST",
@@ -102,14 +102,18 @@ export default function ProviderBids() {
 
       if (response.ok) {
         // Update the bid status in the local state
-        setBids(prevBids => 
-          prevBids.map(bid => 
-            bid.id === bidId 
-              ? { ...bid, status: "approved" as const, updatedAt: new Date().toISOString() }
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid.id === bidId
+              ? {
+                  ...bid,
+                  status: "approved" as const,
+                  updatedAt: new Date().toISOString(),
+                }
               : bid
           )
         );
-        
+
         // Show success message (you can add a toast here)
         console.log("Bid approved successfully");
       } else {
@@ -121,7 +125,7 @@ export default function ProviderBids() {
       console.error("Error approving bid:", error);
       // Show error message (you can add a toast here)
     } finally {
-      setApprovingBids(prev => {
+      setApprovingBids((prev) => {
         const newSet = new Set(prev);
         newSet.delete(bidId);
         return newSet;

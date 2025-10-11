@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import MarketplaceRegistrationForm from "../components/MarketplaceRegistrationForm";
 import {
+  FiCpu,
+  FiUserCheck,
   FiSearch,
   FiChevronDown,
   FiX,
@@ -272,7 +274,7 @@ export default function Partners() {
   const [showComparison, setShowComparison] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-   // --- Invite Modal State ---
+  // --- Invite Modal State ---
   const [inviteModal, setInviteModal] = useState<{
     open: boolean;
     partner: Partner | null;
@@ -285,7 +287,6 @@ export default function Partners() {
   const handleInviteSuccess = () => {
     setInviteModal({ open: false, partner: null });
   };
-
 
   useEffect(() => {
     setIsClient(true);
@@ -533,6 +534,14 @@ export default function Partners() {
                   Quick Actions
                 </h3>
                 <div className="space-y-2">
+                  <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-cyan-900/50 to-blue-900/50 text-cyan-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-cyan-800/50 hover:to-blue-800/50 transition-all duration-200">
+                    <span>AI Based Service</span>
+                    <FiCpu className="text-cyan-400" />
+                  </button>
+                  <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-indigo-900/50 to-violet-900/50 text-indigo-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-indigo-800/50 hover:to-violet-800/50 transition-all duration-200">
+                    <span>AI Based Provider Match</span>
+                    <FiUserCheck className="text-indigo-400" />
+                  </button>
                   <button className="w-full text-left px-3 py-2 bg-gradient-to-r from-emerald-900/50 to-green-900/50 text-emerald-200 rounded-md text-sm font-medium flex items-center justify-between hover:from-emerald-800/50 hover:to-green-800/50 transition-all duration-200">
                     <span>Cyber Health Score</span>
                     <FiActivity className="text-emerald-400" />
@@ -1039,7 +1048,9 @@ export default function Partners() {
                             className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-gray-600 text-xs font-medium rounded-md text-white bg-gray-800/50 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 backdrop-blur-sm"
                           >
                             <IconAddressBook className="h-3.5 w-3.5" />
-                            <span className="hidden sm:inline ml-1">Invite</span>
+                            <span className="hidden sm:inline ml-1">
+                              Invite
+                            </span>
                           </button>
 
                           {partner.website && (
@@ -1050,7 +1061,9 @@ export default function Partners() {
                               className="flex-1 inline-flex items-center justify-center px-2 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                             >
                               <FiExternalLink className="h-3.5 w-3.5" />
-                              <span className="hidden sm:inline ml-1">Site</span>
+                              <span className="hidden sm:inline ml-1">
+                                Site
+                              </span>
                             </Link>
                           )}
                         </div>

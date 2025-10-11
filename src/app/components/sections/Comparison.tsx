@@ -1,16 +1,26 @@
-'use client';
-import Image from 'next/image';
-import Link from 'next/link';
+"use client";
+import Image from "next/image";
+import Link from "next/link";
 
 export const ComparisonSection: React.FC = () => {
   return (
-    <section className="py-24 bg-gray-900 relative overflow-hidden">
+    <section className="py-24 bg-black relative overflow-hidden">
       {/* Subtle Grid Background */}
       <div className="absolute inset-0 opacity-5">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-              <path d="M 80 0 L 0 0 0 80" fill="none" stroke="currentColor" strokeWidth="0.5"/>
+            <pattern
+              id="grid"
+              width="80"
+              height="80"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 80 0 L 0 0 0 80"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="0.5"
+              />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
@@ -24,7 +34,8 @@ export const ComparisonSection: React.FC = () => {
             Transformation
           </h2>
           <h1 className="text-4xl font-bold text-white sm:text-5xl">
-            From <span className="text-gray-400">Confusion</span> to <span className="text-red-400">Clarity</span>
+            From <span className="text-gray-400">Confusion</span> to{" "}
+            <span className="text-red-400">Clarity</span>
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-transparent my-6 mx-auto"></div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -45,68 +56,156 @@ export const ComparisonSection: React.FC = () => {
                   X-Operator
                 </div>
               </div>
-              
+
               <ul className="space-y-6">
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
-                  <span className="text-gray-300">Dozens of unknown vendors</span>
+                  <span className="text-gray-300">
+                    Dozens of unknown vendors
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
                   <span className="text-gray-300">No idea who to trust</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
                   <span className="text-gray-300">Generic pitches</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
-                  <span className="text-gray-300">Can&apos;t compare services easily</span>
+                  <span className="text-gray-300">
+                    Can&apos;t compare services easily
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
                   <span className="text-gray-300">Confusing onboarding</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
-                  <span className="text-gray-300">One-size-fits-all options</span>
+                  <span className="text-gray-300">
+                    One-size-fits-all options
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
-                  <span className="text-gray-300">No extra support after sale</span>
+                  <span className="text-gray-300">
+                    No extra support after sale
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-red-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </div>
                   <span className="text-gray-300">Unclear outcomes or ROI</span>
@@ -124,100 +223,169 @@ export const ComparisonSection: React.FC = () => {
                   Offset Operator
                 </div>
               </div>
-              
+
               <ul className="space-y-6">
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">Curated, verified providers only</span>
+                  <span className="text-white">
+                    Curated, verified providers only
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">AI-guided Smart Match feature</span>
+                  <span className="text-white">
+                    AI-guided Smart Match feature
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">Profiles with ratings, certifications & reviews</span>
+                  <span className="text-white">
+                    Profiles with ratings, certifications & reviews
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">Side-by-side profile comparison tool</span>
+                  <span className="text-white">
+                    Side-by-side profile comparison tool
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">Guided onboarding with CyberJall team</span>
+                  <span className="text-white">
+                    Guided onboarding with CyberJall team
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">Choose multiple providers in one engagement</span>
+                  <span className="text-white">
+                    Choose multiple providers in one engagement
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">1-month extended support & premium Insights</span>
+                  <span className="text-white">
+                    1-month extended support & premium Insights
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-green-500/10 p-1 rounded-full mr-4 mt-1">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <span className="text-white">Measurable improvement via Cyber Health Score</span>
+                  <span className="text-white">
+                    Measurable improvement via Cyber Health Score
+                  </span>
                 </li>
               </ul>
-            </div>
-          </div>
-
-          {/* Image Section */}
-          <div className="relative h-80 w-full">
-            <Image
-              src="/comparison.png"
-              alt="Transformation with CyberJall"
-              fill
-              className="object-cover"
-              priority
-              quality={100}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-8 w-full">
-              <div className="max-w-2xl mx-auto text-center">
-                <h3 className="text-xl font-bold text-white mb-3">Ready for the CyberJall Difference?</h3>
-                <p className="text-gray-300 mb-4">
-                  Join hundreds of businesses who transformed their cybersecurity approach
-                </p>
-                <Link href={"/contact_us"} className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm">
-                  Get Started Today
-                  <svg className="ml-3 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
             </div>
           </div>
         </div>
