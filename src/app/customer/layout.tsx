@@ -111,11 +111,11 @@ export default function CustomerLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black pt-16">
       {/* Mobile sidebar */}
       <div
         className={cn(
-          "fixed inset-0 z-40 lg:hidden",
+          "fixed inset-0 z-[60] lg:hidden",
           sidebarOpen ? "block" : "hidden"
         )}
       >
@@ -165,7 +165,7 @@ export default function CustomerLayout({
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:block">
+  <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:left-0 lg:w-64 lg:block">
         <div className="flex flex-col h-full bg-gray-900 border-r border-gray-800">
           <div className="flex items-center space-x-2 p-6 border-b border-gray-800">
             <Shield className="h-6 w-6 text-orange-500" />
@@ -204,7 +204,7 @@ export default function CustomerLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Header with mobile menu and user menu */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-gray-900 border-b border-gray-800 px-4 lg:px-6">
+        <header className="sticky top-16 z-30 flex h-16 items-center justify-between bg-gray-900 border-b border-gray-800 px-4 lg:px-6">
           {/* Mobile menu button */}
           <Button
             variant="ghost"

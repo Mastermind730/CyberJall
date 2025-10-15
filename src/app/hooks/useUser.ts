@@ -219,6 +219,47 @@ export function useUser(): UseUserReturn {
     };
 
     initializeUser();
+
+    // Keep auth in sync across tabs
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "user") {
+        // If user was cleared in another tab, logout here too
+        if (!e.newValue) {
+          clearAuthState();
+        } else {
+          // If user updated, re-verify with server
+          try {
+            const parsed = JSON.parse(e.newValue);
+            verifyAuthStatus(parsed);
+          } catch (err) {
+            console.error("Failed to parse user from storage event", err);
+          }
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+
+    // Refresh auth on tab focus
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        const current = localStorage.getItem("user");
+        if (current) {
+          try {
+            verifyAuthStatus(JSON.parse(current));
+          } catch (err) {
+            console.error("Failed to refresh auth on focus", err);
+          }
+        } else {
+          checkServerAuth();
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [verifyAuthStatus, checkServerAuth, clearAuthState]);
 
   // Login function

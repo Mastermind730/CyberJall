@@ -14,8 +14,14 @@ export default function Navbar({ className = "" }: NavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const { user, isAuthenticated, hasCompany, companyLoading, logout } =
-    useUser();
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    hasCompany,
+    companyLoading,
+    logout,
+  } = useUser();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -259,10 +265,12 @@ export default function Navbar({ className = "" }: NavbarProps) {
                   className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                    {getInitials(user.name, user.work_email)}
+                    {getInitials(user.name, user.work_email || user.email)}
                   </div>
                   <span>
-                    {user.name || user.work_email?.split("@")[0] || "User"}
+                    {user.name ||
+                      (user.work_email || user.email)?.split("@")[0] ||
+                      "User"}
                   </span>
                   <svg
                     className="w-4 h-4"
@@ -285,14 +293,17 @@ export default function Navbar({ className = "" }: NavbarProps) {
                     <div className="p-4">
                       <div className="flex items-center space-x-3 mb-4">
                         <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white text-lg font-medium">
-                          {getInitials(user.name, user.work_email)}
+                          {getInitials(
+                            user.name,
+                            user.work_email || user.email
+                          )}
                         </div>
                         <div>
                           <p className="text-white font-medium">
                             {user.name || "User"}
                           </p>
                           <p className="text-gray-400 text-sm">
-                            {user.work_email}
+                            {user.work_email || user.email}
                           </p>
                           {user.company_name && (
                             <p className="text-gray-500 text-xs">
@@ -339,13 +350,17 @@ export default function Navbar({ className = "" }: NavbarProps) {
                   </div>
                 )}
               </div>
-            ) : (
+            ) : !isLoading ? (
               <Link
                 href="/login"
                 className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white border border-gray-600 rounded-lg hover:border-gray-500 transition-all duration-200"
               >
                 Login
               </Link>
+            ) : (
+              <div className="px-4 py-2 text-sm text-gray-400">
+                Checking auth...
+              </div>
             )}
 
             {/* Primary CTA Button */}

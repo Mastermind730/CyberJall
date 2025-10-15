@@ -103,13 +103,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Protect only authenticated areas to avoid conflicts on public pages
+    "/customer/:path*",
+    "/provider/:path*",
+    "/dashboard",
+    // Still run on auth pages for redirecting logged-in users
+    "/login",
+    "/register",
+    // APIs that require auth can be protected explicitly if needed
+    // "/api/(?!login|register|logout).*"  // uncomment to enforce API auth broadly
   ],
 };

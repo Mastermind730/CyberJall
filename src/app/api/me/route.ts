@@ -7,19 +7,8 @@ const secret = new TextEncoder().encode(
 
 export async function GET(req: NextRequest) {
   try {
-    // Get token from cookies - same way as getCompany endpoint
-    const cookieHeader = req.headers.get('cookie');
-    if (!cookieHeader) {
-      return NextResponse.json(
-        { error: "No authentication token" },
-        { status: 401 }
-      );
-    }
-
-    const authToken = cookieHeader
-      .split(';')
-      .find(c => c.trim().startsWith('auth_token='))
-      ?.split('=')[1];
+    // Get token from cookies using NextRequest API
+    const authToken = req.cookies.get("auth_token")?.value;
 
     if (!authToken) {
       return NextResponse.json(
@@ -38,6 +27,8 @@ export async function GET(req: NextRequest) {
     const userData = {
       id: payload.userId,
       email: payload.email,
+      // Provide both fields for client-side compatibility
+      work_email: payload.email,
       role: payload.role,
       company_name: payload.companyName,
       validatedCompanyId: payload.companyId,
