@@ -165,7 +165,7 @@ export default function CustomerLayout({
       </div>
 
       {/* Desktop sidebar */}
-  <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:left-0 lg:w-64 lg:block">
+      <div className="hidden lg:fixed lg:top-16 lg:bottom-0 lg:left-0 lg:w-64 lg:block">
         <div className="flex flex-col h-full bg-gray-900 border-r border-gray-800">
           <div className="flex items-center space-x-2 p-6 border-b border-gray-800">
             <Shield className="h-6 w-6 text-orange-500" />

@@ -1,48 +1,91 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar"
-import { Loader2, UserIcon, Building2, Mail, Phone } from "lucide-react"
+import { useEffect, useMemo, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/app/components/ui/avatar";
+import { Loader2, Building2, Mail, Phone } from "lucide-react";
+import { useCustomerProfile } from "@/app/customer/hooks/useCustomerProfile";
 
 export default function ProfilePage() {
-  // Dummy state for profile data
-  const [isEditing, setIsEditing] = useState(false)
-  const [firstName, setFirstName] = useState("John")
-  const [lastName, setLastName] = useState("Doe")
-  const [jobTitle, setJobTitle] = useState("Software Engineer")
-  const [phone, setPhone] = useState("+1 (555) 123-4567")
-  const [companyName, setCompanyName] = useState("Acme Inc.")
-  const [isUpdating, setIsUpdating] = useState(false)
+  const { data, loading, error, save } = useCustomerProfile(4000);
 
-  // Dummy user data
-  const user = {
-    company_name: "Acme Inc.",
-    work_email: "john.doe@acme.com",
-    contact: "+1 (555) 123-4567"
+  const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [phone, setPhone] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const user = useMemo(
+    () => data?.user ?? { company_name: "", work_email: "", contact: "" },
+    [data]
+  );
+  const profile = useMemo(
+    () =>
+      data?.profile ?? {
+        firstName: "",
+        lastName: "",
+        jobTitle: "",
+        phone: "",
+        avatar: "/placeholder-user.jpg",
+      },
+    [data]
+  );
+
+  useEffect(() => {
+    if (data?.profile) {
+      setFirstName(data.profile.firstName ?? "");
+      setLastName(data.profile.lastName ?? "");
+      setJobTitle(data.profile.jobTitle ?? "");
+      setPhone(data.profile.phone ?? "");
+    }
+    if (data?.user) {
+      setCompanyName(data.user.company_name ?? "");
+    }
+  }, [data]);
+
+  const handleSave = async () => {
+    try {
+      setIsUpdating(true);
+      await save({
+        firstName,
+        lastName,
+        jobTitle,
+        phone,
+        company_name: companyName,
+      });
+      setIsEditing(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20 text-gray-300">
+        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading profile...
+      </div>
+    );
   }
 
-  const profile = {
-    firstName: "John",
-    lastName: "Doe",
-    jobTitle: "Software Engineer",
-    phone: "+1 (555) 123-4567",
-    avatar: "/placeholder-user.jpg"
-  }
-
-  const handleSave = () => {
-    setIsUpdating(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsUpdating(false)
-      setIsEditing(false)
-      // In a real app, you would show a toast notification here
-      console.log("Profile updated successfully!")
-    }, 1000)
+  if (error) {
+    return <div className="text-red-400">Failed to load profile: {error}</div>;
   }
 
   return (
@@ -63,12 +106,12 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4">
             <Avatar className="h-24 w-24 border-2 border-orange-500">
               <AvatarImage
-                src={profile.avatar}
+                src={profile.avatar || "/placeholder-user.jpg"}
                 alt="User Avatar"
               />
               <AvatarFallback className="bg-orange-500 text-white text-4xl">
-                {firstName.charAt(0)}
-                {lastName.charAt(0)}
+                {(firstName || "U").charAt(0)}
+                {(lastName || "S").charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="grid gap-1">
@@ -136,7 +179,7 @@ export default function ProfilePage() {
               <Input
                 id="email"
                 type="email"
-                value={user.work_email}
+                value={user.work_email || ""}
                 disabled
                 className="bg-gray-800 border-gray-700 text-white focus:ring-orange-500"
               />
@@ -181,20 +224,20 @@ export default function ProfilePage() {
           <div className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-orange-500" />
             <span className="text-gray-300">Company:</span>
-            <span className="font-medium">{user.company_name}</span>
+            <span className="font-medium">{user.company_name || ""}</span>
           </div>
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-orange-500" />
             <span className="text-gray-300">Email:</span>
-            <span className="font-medium">{user.work_email}</span>
+            <span className="font-medium">{user.work_email || ""}</span>
           </div>
           <div className="flex items-center gap-2">
             <Phone className="h-5 w-5 text-orange-500" />
             <span className="text-gray-300">Contact:</span>
-            <span className="font-medium">{user.contact}</span>
+            <span className="font-medium">{user.contact || phone}</span>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
