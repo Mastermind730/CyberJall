@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 export interface ModernButtonProps
   extends Omit<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
-    | 'onDrag'
-    | 'onDragStart'
-    | 'onDragEnd'
-    | 'onAnimationStart'
-    | 'onAnimationEnd'
+    | "onDrag"
+    | "onDragStart"
+    | "onDragEnd"
+    | "onAnimationStart"
+    | "onAnimationEnd"
   > {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "glow" | "shimmer";
   size?: "sm" | "md" | "lg";

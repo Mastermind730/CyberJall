@@ -68,12 +68,7 @@ export const AboutUs: FC = () => {
         variants={containerVariants}
         className="text-center mb-12 relative z-10"
       >
-        <motion.div variants={itemVariants}>
-          <span className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-red-400 uppercase mb-3 px-4 py-1.5 rounded-full border border-red-500/30 bg-red-500/5 backdrop-blur-sm shadow-lg shadow-red-500/10">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            About CyberJall
-          </span>
-        </motion.div>
+        <motion.div variants={itemVariants}></motion.div>
 
         <motion.h1
           variants={itemVariants}

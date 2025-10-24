@@ -99,12 +99,12 @@ const Home: NextPage = () => {
           </div>
 
           {/* Hero Section - Load immediately with priority */}
-          <div className="bg-black relative">
+          <div className="bg-black relative h-fit">
             <Hero />
           </div>
 
           {/* Lazy loaded sections with minimal spacing */}
-          <Suspense fallback={<div className="h-64 bg-black" />}>
+          <Suspense fallback={<div className="h-52 bg-black" />}>
             <section className="py-4 md:py-6 bg-black relative">
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/5 to-transparent"></div>
               <div className="relative z-10">

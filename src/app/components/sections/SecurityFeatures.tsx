@@ -78,7 +78,8 @@ export const SecurityFeatures: React.FC = () => {
             variants={itemVariants}
             className="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed"
           >
-            Today&apos;s relentless cyber threats demand a security strategy that is just as relentless and proactive.
+            Today&apos;s relentless cyber threats demand a security strategy
+            that is just as relentless and proactive.
           </motion.p>
         </motion.div>
 
@@ -132,7 +133,8 @@ export const SecurityFeatures: React.FC = () => {
                   Recognize Everything
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  Understand the far reaches of your attack surface better than your attackers.
+                  Understand the far reaches of your attack surface better than
+                  your attackers.
                 </p>
               </div>
             </motion.div>
@@ -174,7 +176,8 @@ export const SecurityFeatures: React.FC = () => {
                   Discover More
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  Rely on a global community of trusted researchers to continuously find issues.
+                  Rely on a global community of trusted researchers to
+                  continuously find issues.
                 </p>
               </div>
             </motion.div>
@@ -216,7 +219,8 @@ export const SecurityFeatures: React.FC = () => {
                   Justify & Prioritize
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  Always know which bugs to fix. Receive only valid vulnerabilities.
+                  Always know which bugs to fix. Receive only valid
+                  vulnerabilities.
                 </p>
               </div>
             </motion.div>
@@ -258,7 +262,8 @@ export const SecurityFeatures: React.FC = () => {
                   Fix Faster
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  Streamline your security processes with intelligent automation and workflows.
+                  Streamline your security processes with intelligent automation
+                  and workflows.
                 </p>
               </div>
             </motion.div>
