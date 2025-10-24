@@ -139,16 +139,17 @@ export default function Navbar({ className = "" }: NavbarProps) {
       className={`bg-black/95 backdrop-blur-md border-b border-gray-800/50 sticky top-0 z-50 ${className}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center space-x-2">
               <Image
                 src="/main_logo.svg"
                 alt="CyberJall"
-                width={100}
-                height={100}
-                className="h-8 w-auto"
+                width={360}
+                height={360}
+                className="w-auto"
+                style={{ height: "100px" }}
               />
             </Link>
           </div>
@@ -366,9 +367,32 @@ export default function Navbar({ className = "" }: NavbarProps) {
             {/* Primary CTA Button */}
             <Link
               href="/contact_us"
-              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+              className="group relative px-6 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 hover:scale-105"
+              style={{
+                background: "transparent",
+                border: "2px solid transparent",
+                backgroundImage:
+                  "linear-gradient(black, black), linear-gradient(to right, #ef4444, #f97316, #ef4444)",
+                backgroundOrigin: "border-box",
+                backgroundClip: "padding-box, border-box",
+              }}
             >
-              Contact Us
+              {/* Outer border line with spacing */}
+              <span
+                className="absolute rounded-xl pointer-events-none"
+                style={{
+                  inset: "0px",
+                  padding: "0px",
+                  background:
+                    "linear-gradient(to right, #ef4444, #f97316, #ef4444)",
+                  WebkitMask:
+                    "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                  WebkitMaskComposite: "xor",
+                  maskComposite: "exclude",
+                }}
+              />
+              {/* Content */}
+              <span className="relative z-10 text-white">Contact Us</span>
             </Link>
           </div>
 
@@ -506,9 +530,32 @@ export default function Navbar({ className = "" }: NavbarProps) {
               <Link
                 href="/contact_us"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full px-4 py-2 text-center text-base font-medium text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 rounded-lg transition-all duration-200"
+                className="group relative block w-full px-6 py-2.5 text-center text-base font-bold rounded-xl transition-all duration-300 hover:scale-105"
+                style={{
+                  background: "transparent",
+                  border: "2px solid transparent",
+                  backgroundImage:
+                    "linear-gradient(black, black), linear-gradient(to right, #ef4444, #f97316, #ef4444)",
+                  backgroundOrigin: "border-box",
+                  backgroundClip: "padding-box, border-box",
+                }}
               >
-                Contact Us
+                {/* Outer border line with spacing */}
+                <span
+                  className="absolute rounded-2xl pointer-events-none"
+                  style={{
+                    inset: "-6px",
+                    padding: "2px",
+                    background:
+                      "linear-gradient(to right, #ef4444, #f97316, #ef4444)",
+                    WebkitMask:
+                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "xor",
+                    maskComposite: "exclude",
+                  }}
+                />
+                {/* Content */}
+                <span className="relative z-10 text-white">Contact Us</span>
               </Link>
             </div>
           </div>
