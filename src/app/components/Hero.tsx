@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import type { FC } from "react";
-// import { ModernButton } from "./ui/modern-button";
-import MarketplaceButton from "./ui/MarketplaceButton";
+import GradientBorderButton from "./ui/GradientBorderButton";
 import Link from "next/link";
 
 interface Slide {
@@ -240,52 +239,22 @@ export const Hero: FC = () => {
                 className="animate-slide-up flex flex-col sm:flex-row justify-center gap-4 mb-12"
                 style={{ animationDelay: "0.3s" }}
               >
-                <Link href="/cyberrequirements">
-                  <button
-                    className="group relative px-6 py-2.5 text-sm sm:text-base font-bold rounded-xl transition-all duration-300 hover:scale-105"
-                    style={{
-                      background: "transparent",
-                      border: "2px solid transparent",
-                      backgroundImage:
-                        "linear-gradient(black, black), linear-gradient(to right, #ef4444, #f97316, #ef4444)",
-                      backgroundOrigin: "border-box",
-                      backgroundClip: "padding-box, border-box",
-                    }}
+                <GradientBorderButton href="/cyberrequirements">
+                  Get Started Today
+                  <svg
+                    className="ml-3 w-5 h-5 transition-transform group-hover:translate-x-2 duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    {/* Outer border line with spacing */}
-                    <span
-                      className="absolute rounded-2xl pointer-events-none"
-                      style={{
-                        inset: "-7px",
-                        padding: "2px",
-                        background:
-                          "linear-gradient(to right, #ef4444, #f97316, #ef4444)",
-                        WebkitMask:
-                          "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                        WebkitMaskComposite: "xor",
-                        maskComposite: "exclude",
-                      }}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.5"
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
                     />
-
-                    {/* Content */}
-                    <span className="relative z-10 flex items-center text-white">
-                      Get Started Today
-                      <svg
-                        className="ml-3 w-5 h-5 transition-transform group-hover:translate-x-2 duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2.5"
-                          d="M13 7l5 5m0 0l-5 5m5-5H6"
-                        />
-                      </svg>
-                    </span>
-                  </button>
-                </Link>
+                  </svg>
+                </GradientBorderButton>
               </div>
 
               {/* Premium Navigation Dots */}

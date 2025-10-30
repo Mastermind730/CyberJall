@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useUser } from "../hooks/useUser";
+import GradientBorderButton from "./ui/GradientBorderButton";
 
 interface NavbarProps {
   className?: string;
@@ -527,36 +528,11 @@ export default function Navbar({ className = "" }: NavbarProps) {
                   Logout
                 </button>
               )}
-              <Link
-                href="/contact_us"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="group relative block w-full px-6 py-2.5 text-center text-base font-bold rounded-xl transition-all duration-300 hover:scale-105"
-                style={{
-                  background: "transparent",
-                  border: "2px solid transparent",
-                  backgroundImage:
-                    "linear-gradient(black, black), linear-gradient(to right, #ef4444, #f97316, #ef4444)",
-                  backgroundOrigin: "border-box",
-                  backgroundClip: "padding-box, border-box",
-                }}
-              >
-                {/* Outer border line with spacing */}
-                <span
-                  className="absolute rounded-2xl pointer-events-none"
-                  style={{
-                    inset: "-6px",
-                    padding: "2px",
-                    background:
-                      "linear-gradient(to right, #ef4444, #f97316, #ef4444)",
-                    WebkitMask:
-                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                    WebkitMaskComposite: "xor",
-                    maskComposite: "exclude",
-                  }}
-                />
-                {/* Content */}
-                <span className="relative z-10 text-white">Contact Us</span>
-              </Link>
+              <div onClick={() => setIsMobileMenuOpen(false)}>
+                <GradientBorderButton href="/contact_us" fullWidth>
+                  Contact Us
+                </GradientBorderButton>
+              </div>
             </div>
           </div>
         )}

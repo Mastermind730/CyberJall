@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ModernSection } from "../ui/modern-section";
 import { ModernCard } from "../ui/modern-card";
 import { ModernButton } from "../ui/modern-button";
+import GradientBorderButton from "../ui/GradientBorderButton";
 
 export const AboutUs: FC = () => {
   const containerVariants = {
@@ -338,7 +339,6 @@ export const AboutUs: FC = () => {
               ></motion.div>
             </div>
           </ModernCard>
-
           {/* Floating Stats */}
           <motion.div
             initial={{ opacity: 0, x: 20, y: -20 }}
@@ -346,21 +346,40 @@ export const AboutUs: FC = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
             whileHover={{ scale: 1.05 }}
-            className="absolute -top-16 -right-4 bg-gradient-to-br from-red-500 via-orange-500 to-red-600 rounded-2xl p-4 shadow-2xl shadow-red-500/30 border border-red-400/20"
+            className="absolute -top-16 -right-4 rounded-2xl p-4 backdrop-blur-sm bg-black/40"
+            style={{
+              border: "2px solid transparent",
+              backgroundImage:
+                "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), linear-gradient(to right, #ef4444, #f97316, #ef4444)",
+              backgroundOrigin: "border-box",
+              backgroundClip: "padding-box, border-box",
+            }}
           >
-            <div className="text-white text-center">
+            {/* Outer border line with spacing */}
+            <span
+              className="absolute rounded-2xl pointer-events-none"
+              style={{
+                inset: "-7px",
+                padding: "1.5px",
+                background:
+                  "linear-gradient(to right, #ef4444, #f97316, #ef4444)",
+                WebkitMask:
+                  "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "xor",
+                maskComposite: "exclude",
+              }}
+            />
+            <div className="relative z-10 text-white text-center">
               <div className="text-3xl font-bold mb-1">24/7</div>
               <div className="text-xs font-medium opacity-90">
                 Expert Support
               </div>
             </div>
           </motion.div>
-
           {/* Decorative elements */}
           <div className="absolute -z-10 -top-8 -right-8 w-32 h-32 bg-red-500/20 rounded-full blur-2xl"></div>
           <div className="absolute -z-10 -bottom-8 -left-8 w-32 h-32 bg-orange-500/20 rounded-full blur-2xl"></div>
-
-          {/* CTA Button */}
+          x{/* CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -368,11 +387,7 @@ export const AboutUs: FC = () => {
             transition={{ delay: 0.6 }}
             className="text-center"
           >
-            <ModernButton
-              variant="glow"
-              size="lg"
-              className="group w-full sm:w-auto"
-            >
+            <GradientBorderButton className="group w-full sm:w-auto">
               <span>Explore Our Platform</span>
               <svg
                 className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
@@ -387,7 +402,7 @@ export const AboutUs: FC = () => {
                   d="M13 7l5 5m0 0l-5 5m5-5H6"
                 />
               </svg>
-            </ModernButton>
+            </GradientBorderButton>
           </motion.div>
         </motion.div>
       </motion.div>
